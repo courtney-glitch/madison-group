@@ -1,14 +1,3 @@
-# Day 49 — Full Luxury Hero Redesign
-
-Open:
-
-```txt
-app/page.tsx
-```
-
-Delete everything and paste this full code:
-
-```tsx
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { PropertyCard } from "@/components/PropertyCard";
