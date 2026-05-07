@@ -59,7 +59,7 @@ export default async function HomePage() {
             <div className="absolute -left-6 -top-6 h-full w-full border border-[#B19A55]/40" />
 
             <img
-              src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2000&auto=format&fit=crop"
+              src="https://images.unsplash.com/photo-1600573472550-8090b5e0745e?q=80&w=2000&auto=format&fit=crop"
               alt="Luxury Real Estate"
               className="relative h-[620px] w-full object-cover shadow-2xl"
             />
