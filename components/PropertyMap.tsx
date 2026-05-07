@@ -2,17 +2,21 @@ type PropertyMapProps = {
   latitude: number | null;
   longitude: number | null;
   city: string;
+  address?: string | null;
+  zipCode?: string | null;
 };
 
 export function PropertyMap({
   latitude,
   longitude,
   city,
+  address,
+  zipCode,
 }: PropertyMapProps) {
   const query =
     latitude && longitude
       ? `${latitude},${longitude}`
-      : `${city}, New Jersey`;
+      : [address, city, "NJ", zipCode].filter(Boolean).join(", ");
 
   return (
     <section className="mt-16 border border-[#1A1A1A]/10 bg-white p-8 shadow-xl">
@@ -20,9 +24,7 @@ export function PropertyMap({
         LOCATION
       </p>
 
-      <h2 className="mt-3 font-serif text-4xl font-bold">
-        Explore the Area
-      </h2>
+      <h2 className="mt-3 font-serif text-4xl font-bold">Explore the Area</h2>
 
       <iframe
         title="Property Map"
