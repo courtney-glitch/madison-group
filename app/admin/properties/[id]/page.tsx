@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
+import { ImageUploader } from "@/components/ImageUploader";
 
 export default function EditPropertyPage() {
   const params = useParams();
@@ -10,6 +11,8 @@ export default function EditPropertyPage() {
 
   const [title, setTitle] = useState("");
   const [city, setCity] = useState("");
+  const [address, setAddress] = useState("");
+  const [zipCode, setZipCode] = useState("");
   const [price, setPrice] = useState("");
   const [beds, setBeds] = useState("");
   const [baths, setBaths] = useState("");
@@ -34,13 +37,15 @@ export default function EditPropertyPage() {
     }
 
     if (data) {
-      setTitle(data.title);
-      setCity(data.city);
-      setPrice(data.price);
-      setBeds(String(data.beds));
-      setBaths(String(data.baths));
-      setImage(data.image);
-      setDescription(data.description);
+      setTitle(data.title || "");
+      setCity(data.city || "");
+      setAddress(data.address || "");
+      setZipCode(data.zip_code || "");
+      setPrice(data.price || "");
+      setBeds(String(data.beds || ""));
+      setBaths(String(data.baths || ""));
+      setImage(data.image || "");
+      setDescription(data.description || "");
     }
   }
 
@@ -52,6 +57,8 @@ export default function EditPropertyPage() {
       .update({
         title,
         city,
+        address,
+        zip_code: zipCode,
         price,
         beds: Number(beds),
         baths: Number(baths),
@@ -88,12 +95,30 @@ export default function EditPropertyPage() {
 
           <input
             type="text"
-            placeholder="City"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            required
+            placeholder="Street Address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
             className="border border-[#1A1A1A]/20 px-4 py-3"
           />
+
+          <div className="grid gap-5 md:grid-cols-2">
+            <input
+              type="text"
+              placeholder="City"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              required
+              className="border border-[#1A1A1A]/20 px-4 py-3"
+            />
+
+            <input
+              type="text"
+              placeholder="ZIP Code"
+              value={zipCode}
+              onChange={(e) => setZipCode(e.target.value)}
+              className="border border-[#1A1A1A]/20 px-4 py-3"
+            />
+          </div>
 
           <input
             type="text"
@@ -104,32 +129,39 @@ export default function EditPropertyPage() {
             className="border border-[#1A1A1A]/20 px-4 py-3"
           />
 
-          <input
-            type="number"
-            placeholder="Beds"
-            value={beds}
-            onChange={(e) => setBeds(e.target.value)}
-            required
-            className="border border-[#1A1A1A]/20 px-4 py-3"
-          />
+          <div className="grid gap-5 md:grid-cols-2">
+            <input
+              type="number"
+              placeholder="Beds"
+              value={beds}
+              onChange={(e) => setBeds(e.target.value)}
+              required
+              className="border border-[#1A1A1A]/20 px-4 py-3"
+            />
 
-          <input
-            type="number"
-            placeholder="Baths"
-            value={baths}
-            onChange={(e) => setBaths(e.target.value)}
-            required
-            className="border border-[#1A1A1A]/20 px-4 py-3"
-          />
+            <input
+              type="number"
+              placeholder="Baths"
+              value={baths}
+              onChange={(e) => setBaths(e.target.value)}
+              required
+              className="border border-[#1A1A1A]/20 px-4 py-3"
+            />
+          </div>
 
-          <input
-            type="text"
-            placeholder="Image URL"
-            value={image}
-            onChange={(e) => setImage(e.target.value)}
-            required
-            className="border border-[#1A1A1A]/20 px-4 py-3"
-          />
+          <div className="grid gap-3">
+            <p className="font-serif text-sm font-bold">Property Image</p>
+
+            <ImageUploader onUpload={setImage} />
+
+            {image && (
+              <img
+                src={image}
+                alt="Preview"
+                className="h-48 w-full object-cover"
+              />
+            )}
+          </div>
 
           <textarea
             placeholder="Description"

@@ -7,6 +7,8 @@ import { ImageUploader } from "@/components/ImageUploader";
 export default function NewPropertyPage() {
   const [title, setTitle] = useState("");
   const [city, setCity] = useState("");
+  const [address, setAddress] = useState("");
+  const [zipCode, setZipCode] = useState("");
   const [price, setPrice] = useState("");
   const [beds, setBeds] = useState("");
   const [baths, setBaths] = useState("");
@@ -25,6 +27,8 @@ export default function NewPropertyPage() {
     const { error } = await supabase.from("properties").insert({
       title,
       city,
+      address,
+      zip_code: zipCode,
       price,
       beds: Number(beds),
       baths: Number(baths),
@@ -38,6 +42,8 @@ export default function NewPropertyPage() {
       setMessage("Property added successfully.");
       setTitle("");
       setCity("");
+      setAddress("");
+      setZipCode("");
       setPrice("");
       setBeds("");
       setBaths("");
@@ -67,12 +73,30 @@ export default function NewPropertyPage() {
 
           <input
             type="text"
-            placeholder="City"
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            required
+            placeholder="Street Address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
             className="border border-[#1A1A1A]/20 px-4 py-3"
           />
+
+          <div className="grid gap-5 md:grid-cols-2">
+            <input
+              type="text"
+              placeholder="City"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              required
+              className="border border-[#1A1A1A]/20 px-4 py-3"
+            />
+
+            <input
+              type="text"
+              placeholder="ZIP Code"
+              value={zipCode}
+              onChange={(e) => setZipCode(e.target.value)}
+              className="border border-[#1A1A1A]/20 px-4 py-3"
+            />
+          </div>
 
           <input
             type="text"
@@ -83,23 +107,25 @@ export default function NewPropertyPage() {
             className="border border-[#1A1A1A]/20 px-4 py-3"
           />
 
-          <input
-            type="number"
-            placeholder="Beds"
-            value={beds}
-            onChange={(e) => setBeds(e.target.value)}
-            required
-            className="border border-[#1A1A1A]/20 px-4 py-3"
-          />
+          <div className="grid gap-5 md:grid-cols-2">
+            <input
+              type="number"
+              placeholder="Beds"
+              value={beds}
+              onChange={(e) => setBeds(e.target.value)}
+              required
+              className="border border-[#1A1A1A]/20 px-4 py-3"
+            />
 
-          <input
-            type="number"
-            placeholder="Baths"
-            value={baths}
-            onChange={(e) => setBaths(e.target.value)}
-            required
-            className="border border-[#1A1A1A]/20 px-4 py-3"
-          />
+            <input
+              type="number"
+              placeholder="Baths"
+              value={baths}
+              onChange={(e) => setBaths(e.target.value)}
+              required
+              className="border border-[#1A1A1A]/20 px-4 py-3"
+            />
+          </div>
 
           <div className="grid gap-3">
             <p className="font-serif text-sm font-bold">Property Image</p>
