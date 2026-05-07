@@ -20,49 +20,49 @@ export default async function HomePage() {
 
   return (
     <main className="bg-[#F8F5EF] text-[#1A1A1A]">
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-0 bg-black/30 z-10" />
+      <section className="relative overflow-hidden bg-[#F8F5EF]">
+        <div className="mx-auto grid min-h-[90vh] max-w-7xl items-center gap-12 px-6 py-20 md:grid-cols-2">
+          <div className="relative z-20">
+            <p className="mb-5 font-serif text-sm tracking-[0.45em] text-[#B19A55]">
+              BERGEN COUNTY LUXURY REAL ESTATE
+            </p>
 
-        <img
-          src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=2000&auto=format&fit=crop"
-          alt="Luxury Real Estate"
-          className="h-[90vh] w-full object-cover"
-        />
+            <h1 className="font-serif text-6xl font-bold leading-tight md:text-8xl">
+              Building
+              <br />
+              Beautiful Lives
+            </h1>
 
-        <div className="absolute inset-0 z-20 flex items-center">
-          <div className="mx-auto max-w-7xl px-6 w-full">
-            <div className="max-w-3xl text-white">
-              <p className="mb-5 font-serif text-sm tracking-[0.45em] text-[#D4B06A]">
-                BERGEN COUNTY LUXURY REAL ESTATE
-              </p>
+            <p className="mt-8 max-w-2xl text-xl leading-9 text-[#1A1A1A]/75">
+              Curated homes, elevated service, and trusted guidance across
+              Bergen County&apos;s most desirable communities.
+            </p>
 
-              <h1 className="font-serif text-6xl font-bold leading-tight md:text-8xl">
-                Building
-                <br />
-                Beautiful Lives
-              </h1>
+            <div className="mt-12 flex flex-col gap-4 sm:flex-row">
+              <Link
+                href="/properties"
+                className="bg-[#B19A55] px-8 py-4 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-white transition hover:bg-[#9D884B]"
+              >
+                Explore Homes
+              </Link>
 
-              <p className="mt-8 max-w-2xl text-xl leading-9 text-white/90">
-                Curated homes, elevated service, and trusted guidance across
-                Bergen County&apos;s most desirable communities.
-              </p>
-
-              <div className="mt-12 flex flex-col gap-4 sm:flex-row">
-                <Link
-                  href="/properties"
-                  className="bg-[#B19A55] px-8 py-4 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-white transition hover:bg-[#9D884B]"
-                >
-                  Explore Homes
-                </Link>
-
-                <Link
-                  href="/contact"
-                  className="border border-white/40 bg-white/10 px-8 py-4 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-white backdrop-blur transition hover:bg-white hover:text-[#1A1A1A]"
-                >
-                  Contact Us
-                </Link>
-              </div>
+              <Link
+                href="/contact"
+                className="border border-[#1A1A1A]/20 bg-white/80 px-8 py-4 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-[#1A1A1A] transition hover:bg-[#B19A55] hover:text-white"
+              >
+                Contact Us
+              </Link>
             </div>
+          </div>
+
+          <div className="relative">
+            <div className="absolute -left-6 -top-6 h-full w-full border border-[#B19A55]/40" />
+
+            <img
+              src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2000&auto=format&fit=crop"
+              alt="Luxury Real Estate"
+              className="relative h-[620px] w-full object-cover shadow-2xl"
+            />
           </div>
         </div>
       </section>
@@ -70,18 +70,14 @@ export default async function HomePage() {
       <section className="border-b border-[#1A1A1A]/10 bg-white px-6 py-10">
         <div className="mx-auto grid max-w-7xl gap-8 text-center md:grid-cols-4">
           <div>
-            <p className="font-serif text-5xl font-bold text-[#B19A55]">
-              20+
-            </p>
+            <p className="font-serif text-5xl font-bold text-[#B19A55]">20+</p>
             <p className="mt-3 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">
               Years Experience
             </p>
           </div>
 
           <div>
-            <p className="font-serif text-5xl font-bold text-[#B19A55]">
-              500+
-            </p>
+            <p className="font-serif text-5xl font-bold text-[#B19A55]">500+</p>
             <p className="mt-3 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">
               Homes Sold
             </p>
