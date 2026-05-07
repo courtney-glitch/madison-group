@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShowingForm } from "@/components/ShowingForm";
 import { MortgageCalculator } from "@/components/MortgageCalculator";
+import { PropertyMap } from "@/components/PropertyMap";
 
 export default async function PropertyDetailPage({
   params,
@@ -21,7 +22,10 @@ export default async function PropertyDetailPage({
     return (
       <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
         <section className="mx-auto max-w-6xl">
-          <Link href="/properties" className="font-serif text-sm text-[#B19A55]">
+          <Link
+            href="/properties"
+            className="font-serif text-sm text-[#B19A55]"
+          >
             ← Back to homes
           </Link>
 
@@ -36,7 +40,10 @@ export default async function PropertyDetailPage({
   return (
     <main className="min-h-screen bg-[#F8F5EF] text-[#1A1A1A]">
       <section className="mx-auto max-w-7xl px-6 py-10">
-        <Link href="/properties" className="font-serif text-sm text-[#B19A55]">
+        <Link
+          href="/properties"
+          className="font-serif text-sm text-[#B19A55]"
+        >
           ← Back to homes
         </Link>
 
@@ -73,6 +80,7 @@ export default async function PropertyDetailPage({
                 <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/50">
                   Beds
                 </p>
+
                 <p className="mt-2 font-serif text-2xl font-bold">
                   {property.beds}
                 </p>
@@ -82,6 +90,7 @@ export default async function PropertyDetailPage({
                 <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/50">
                   Baths
                 </p>
+
                 <p className="mt-2 font-serif text-2xl font-bold">
                   {property.baths}
                 </p>
@@ -108,9 +117,18 @@ export default async function PropertyDetailPage({
 
       <section className="mx-auto max-w-7xl px-6 py-12">
         <MortgageCalculator price={property.price} />
+
+        <PropertyMap
+          latitude={property.latitude}
+          longitude={property.longitude}
+          city={property.city}
+        />
       </section>
 
-      <section id="showing" className="mx-auto max-w-4xl px-6 py-16">
+      <section
+        id="showing"
+        className="mx-auto max-w-4xl px-6 py-16"
+      >
         <div className="bg-white p-8 shadow-xl">
           <ShowingForm propertyId={property.id} />
         </div>
