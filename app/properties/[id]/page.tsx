@@ -18,6 +18,12 @@ export default async function PropertyDetailPage({
     .eq("id", id)
     .single();
 
+  const { data: galleryImages } = await supabase
+    .from("property_images")
+    .select("*")
+    .eq("property_id", id)
+    .order("created_at", { ascending: true });
+
   if (error || !property) {
     return (
       <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
@@ -34,6 +40,11 @@ export default async function PropertyDetailPage({
     );
   }
 
+  const allImages = [
+    ...(property.image ? [{ id: "main", image_url: property.image }] : []),
+    ...(galleryImages || []),
+  ];
+
   return (
     <main className="min-h-screen bg-[#F8F5EF] text-[#1A1A1A]">
       <section className="mx-auto max-w-7xl px-6 py-10">
@@ -43,12 +54,27 @@ export default async function PropertyDetailPage({
 
         <div className="mt-8 grid gap-10 lg:grid-cols-[1.3fr_0.7fr]">
           <div>
-            {property.image ? (
-              <img
-                src={property.image}
-                alt={property.title}
-                className="h-[620px] w-full object-cover shadow-2xl"
-              />
+            {allImages.length > 0 ? (
+              <div className="grid gap-4">
+                <img
+                  src={allImages[0].image_url}
+                  alt={property.title}
+                  className="h-[560px] w-full object-cover shadow-2xl"
+                />
+
+                {allImages.length > 1 && (
+                  <div className="grid gap-4 md:grid-cols-3">
+                    {allImages.slice(1, 4).map((image) => (
+                      <img
+                        key={image.id}
+                        src={image.image_url}
+                        alt={property.title}
+                        className="h-40 w-full object-cover"
+                      />
+                    ))}
+                  </div>
+                )}
+              </div>
             ) : (
               <div className="flex h-[620px] w-full items-center justify-center bg-[#1A1A1A] text-white">
                 No Image Available
@@ -96,7 +122,12 @@ export default async function PropertyDetailPage({
                 </p>
 
                 <p className="mt-2 leading-7">
-                  {property.address && <>{property.address}<br /></>}
+                  {property.address && (
+                    <>
+                      {property.address}
+                      <br />
+                    </>
+                  )}
                   {property.city}, NJ {property.zip_code}
                 </p>
               </div>
@@ -119,6 +150,25 @@ export default async function PropertyDetailPage({
           </aside>
         </div>
       </section>
+
+      {allImages.length > 4 && (
+        <section className="mx-auto max-w-7xl px-6 py-12">
+          <p className="mb-6 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
+            PROPERTY GALLERY
+          </p>
+
+          <div className="grid gap-4 md:grid-cols-4">
+            {allImages.slice(4).map((image) => (
+              <img
+                key={image.id}
+                src={image.image_url}
+                alt={property.title}
+                className="h-48 w-full object-cover"
+              />
+            ))}
+          </div>
+        </section>
+      )}
 
       <section className="mx-auto max-w-7xl px-6 py-12">
         <MortgageCalculator price={property.price} />

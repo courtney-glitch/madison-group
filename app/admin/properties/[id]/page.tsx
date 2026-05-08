@@ -1,191 +1,189 @@
-import Link from "next/link";
+"use client";
+
+import { useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
-import { FavoriteButton } from "@/components/FavoriteButton";
-import { ShowingForm } from "@/components/ShowingForm";
-import { MortgageCalculator } from "@/components/MortgageCalculator";
-import { PropertyMap } from "@/components/PropertyMap";
+import { ImageUploader } from "@/components/ImageUploader";
+import { PropertyGalleryUploader } from "@/components/PropertyGalleryUploader";
 
-export default async function PropertyDetailPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const { id } = await params;
+export default function EditPropertyPage() {
+  const params = useParams();
+  const id = params.id as string;
 
-  const { data: property, error } = await supabase
-    .from("properties")
-    .select("*")
-    .eq("id", id)
-    .single();
+  const [title, setTitle] = useState("");
+  const [city, setCity] = useState("");
+  const [address, setAddress] = useState("");
+  const [zipCode, setZipCode] = useState("");
+  const [price, setPrice] = useState("");
+  const [beds, setBeds] = useState("");
+  const [baths, setBaths] = useState("");
+  const [image, setImage] = useState("");
+  const [description, setDescription] = useState("");
+  const [message, setMessage] = useState("");
 
-  const { data: galleryImages } = await supabase
-    .from("property_images")
-    .select("*")
-    .eq("property_id", id)
-    .order("created_at", { ascending: true });
+  useEffect(() => {
+    loadProperty();
+  }, []);
 
-  if (error || !property) {
-    return (
-      <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
-        <section className="mx-auto max-w-6xl">
-          <Link href="/properties" className="font-serif text-sm text-[#B19A55]">
-            ← Back to homes
-          </Link>
+  async function loadProperty() {
+    const { data, error } = await supabase
+      .from("properties")
+      .select("*")
+      .eq("id", id)
+      .single();
 
-          <h1 className="mt-8 font-serif text-4xl font-bold">
-            Home not found
-          </h1>
-        </section>
-      </main>
-    );
+    if (error) {
+      setMessage(error.message);
+      return;
+    }
+
+    if (data) {
+      setTitle(data.title || "");
+      setCity(data.city || "");
+      setAddress(data.address || "");
+      setZipCode(data.zip_code || "");
+      setPrice(data.price || "");
+      setBeds(String(data.beds || ""));
+      setBaths(String(data.baths || ""));
+      setImage(data.image || "");
+      setDescription(data.description || "");
+    }
   }
 
-  const allImages = [
-    ...(property.image ? [{ id: "main", image_url: property.image }] : []),
-    ...(galleryImages || []),
-  ];
+  async function handleUpdate(e: React.FormEvent) {
+    e.preventDefault();
+
+    const { error } = await supabase
+      .from("properties")
+      .update({
+        title,
+        city,
+        address,
+        zip_code: zipCode,
+        price,
+        beds: Number(beds),
+        baths: Number(baths),
+        image,
+        description,
+      })
+      .eq("id", id);
+
+    if (error) {
+      setMessage(error.message);
+    } else {
+      setMessage("Property updated successfully.");
+    }
+  }
 
   return (
-    <main className="min-h-screen bg-[#F8F5EF] text-[#1A1A1A]">
-      <section className="mx-auto max-w-7xl px-6 py-10">
-        <Link href="/properties" className="font-serif text-sm text-[#B19A55]">
-          ← Back to homes
-        </Link>
+    <main className="min-h-screen bg-white px-6 py-12 text-[#1A1A1A]">
+      <section className="mx-auto max-w-3xl">
+        <p className="mb-3 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
+          ADMIN
+        </p>
 
-        <div className="mt-8 grid gap-10 lg:grid-cols-[1.3fr_0.7fr]">
-          <div>
-            {allImages.length > 0 ? (
-              <div className="grid gap-4">
-                <img
-                  src={allImages[0].image_url}
-                  alt={property.title}
-                  className="h-[560px] w-full object-cover shadow-2xl"
-                />
+        <h1 className="font-serif text-4xl font-bold">Edit Property</h1>
 
-                {allImages.length > 1 && (
-                  <div className="grid gap-4 md:grid-cols-3">
-                    {allImages.slice(1, 4).map((image) => (
-                      <img
-                        key={image.id}
-                        src={image.image_url}
-                        alt={property.title}
-                        className="h-40 w-full object-cover"
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex h-[620px] w-full items-center justify-center bg-[#1A1A1A] text-white">
-                No Image Available
-              </div>
-            )}
+        <form onSubmit={handleUpdate} className="mt-10 grid gap-5">
+          <input
+            type="text"
+            placeholder="Property title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+            className="border border-[#1A1A1A]/20 px-4 py-3"
+          />
+
+          <input
+            type="text"
+            placeholder="Street Address"
+            value={address}
+            onChange={(e) => setAddress(e.target.value)}
+            className="border border-[#1A1A1A]/20 px-4 py-3"
+          />
+
+          <div className="grid gap-5 md:grid-cols-2">
+            <input
+              type="text"
+              placeholder="City"
+              value={city}
+              onChange={(e) => setCity(e.target.value)}
+              required
+              className="border border-[#1A1A1A]/20 px-4 py-3"
+            />
+
+            <input
+              type="text"
+              placeholder="ZIP Code"
+              value={zipCode}
+              onChange={(e) => setZipCode(e.target.value)}
+              className="border border-[#1A1A1A]/20 px-4 py-3"
+            />
           </div>
 
-          <aside className="bg-white p-8 shadow-xl">
-            <p className="font-serif text-sm tracking-[0.35em] text-[#B19A55]">
-              {property.city}, NJ
-            </p>
+          <input
+            type="text"
+            placeholder="Price"
+            value={price}
+            onChange={(e) => setPrice(e.target.value)}
+            required
+            className="border border-[#1A1A1A]/20 px-4 py-3"
+          />
 
-            <h1 className="mt-4 font-serif text-4xl font-bold leading-tight">
-              {property.title}
-            </h1>
+          <div className="grid gap-5 md:grid-cols-2">
+            <input
+              type="number"
+              placeholder="Beds"
+              value={beds}
+              onChange={(e) => setBeds(e.target.value)}
+              required
+              className="border border-[#1A1A1A]/20 px-4 py-3"
+            />
 
-            <p className="mt-6 font-serif text-4xl font-bold text-[#B19A55]">
-              {property.price}
-            </p>
+            <input
+              type="number"
+              placeholder="Baths"
+              value={baths}
+              onChange={(e) => setBaths(e.target.value)}
+              required
+              className="border border-[#1A1A1A]/20 px-4 py-3"
+            />
+          </div>
 
-            <div className="mt-8 grid grid-cols-2 gap-4 border-y border-[#1A1A1A]/10 py-6">
-              <div>
-                <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/50">
-                  Beds
-                </p>
-                <p className="mt-2 font-serif text-2xl font-bold">
-                  {property.beds}
-                </p>
-              </div>
+          <div className="grid gap-3">
+            <p className="font-serif text-sm font-bold">Main Property Image</p>
 
-              <div>
-                <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/50">
-                  Baths
-                </p>
-                <p className="mt-2 font-serif text-2xl font-bold">
-                  {property.baths}
-                </p>
-              </div>
-            </div>
+            <ImageUploader onUpload={setImage} />
 
-            {(property.address || property.zip_code) && (
-              <div className="mt-8 border-b border-[#1A1A1A]/10 pb-6">
-                <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/50">
-                  Address
-                </p>
-
-                <p className="mt-2 leading-7">
-                  {property.address && (
-                    <>
-                      {property.address}
-                      <br />
-                    </>
-                  )}
-                  {property.city}, NJ {property.zip_code}
-                </p>
-              </div>
-            )}
-
-            <p className="mt-8 leading-8 text-[#1A1A1A]/75">
-              {property.description}
-            </p>
-
-            <div className="mt-8 grid gap-4">
-              <Link
-                href="#showing"
-                className="bg-[#B19A55] px-8 py-4 text-center font-serif text-sm font-bold uppercase tracking-[0.2em] text-white"
-              >
-                Request Showing
-              </Link>
-
-              <FavoriteButton propertyId={property.id} />
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      {allImages.length > 4 && (
-        <section className="mx-auto max-w-7xl px-6 py-12">
-          <p className="mb-6 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
-            PROPERTY GALLERY
-          </p>
-
-          <div className="grid gap-4 md:grid-cols-4">
-            {allImages.slice(4).map((image) => (
+            {image && (
               <img
-                key={image.id}
-                src={image.image_url}
-                alt={property.title}
+                src={image}
+                alt="Preview"
                 className="h-48 w-full object-cover"
               />
-            ))}
+            )}
           </div>
-        </section>
-      )}
 
-      <section className="mx-auto max-w-7xl px-6 py-12">
-        <MortgageCalculator price={property.price} />
+          <textarea
+            placeholder="Description"
+            rows={6}
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            required
+            className="border border-[#1A1A1A]/20 px-4 py-3"
+          />
 
-        <PropertyMap
-          latitude={property.latitude}
-          longitude={property.longitude}
-          city={property.city}
-          address={property.address}
-          zipCode={property.zip_code}
-        />
-      </section>
+          <button
+            type="submit"
+            className="bg-[#B19A55] px-8 py-4 font-serif text-sm font-bold uppercase tracking-[0.2em] text-white"
+          >
+            Update Property
+          </button>
 
-      <section id="showing" className="mx-auto max-w-4xl px-6 py-16">
-        <div className="bg-white p-8 shadow-xl">
-          <ShowingForm propertyId={property.id} />
-        </div>
+          {message && <p className="text-sm text-[#B19A55]">{message}</p>}
+        </form>
+
+        <PropertyGalleryUploader propertyId={id} />
       </section>
     </main>
   );
