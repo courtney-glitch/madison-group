@@ -4,6 +4,7 @@ import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShowingForm } from "@/components/ShowingForm";
 import { MortgageCalculator } from "@/components/MortgageCalculator";
 import { PropertyMap } from "@/components/PropertyMap";
+import { PropertyGallery } from "@/components/PropertyGallery";
 
 export default async function PropertyDetailPage({
   params,
@@ -53,34 +54,7 @@ export default async function PropertyDetailPage({
         </Link>
 
         <div className="mt-8 grid gap-10 lg:grid-cols-[1.3fr_0.7fr]">
-          <div>
-            {allImages.length > 0 ? (
-              <div className="grid gap-4">
-                <img
-                  src={allImages[0].image_url}
-                  alt={property.title}
-                  className="h-[560px] w-full object-cover shadow-2xl"
-                />
-
-                {allImages.length > 1 && (
-                  <div className="grid gap-4 md:grid-cols-3">
-                    {allImages.slice(1, 4).map((image) => (
-                      <img
-                        key={image.id}
-                        src={image.image_url}
-                        alt={property.title}
-                        className="h-40 w-full object-cover"
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="flex h-[620px] w-full items-center justify-center bg-[#1A1A1A] text-white">
-                No Image Available
-              </div>
-            )}
-          </div>
+          <PropertyGallery images={allImages} title={property.title} />
 
           <aside className="bg-white p-8 shadow-xl">
             <p className="font-serif text-sm tracking-[0.35em] text-[#B19A55]">
@@ -158,11 +132,11 @@ export default async function PropertyDetailPage({
           </p>
 
           <div className="grid gap-4 md:grid-cols-4">
-            {allImages.slice(4).map((image) => (
+            {allImages.slice(4).map((image, index) => (
               <img
                 key={image.id}
                 src={image.image_url}
-                alt={property.title}
+                alt={`${property.title} gallery image ${index + 1}`}
                 className="h-48 w-full object-cover"
               />
             ))}
