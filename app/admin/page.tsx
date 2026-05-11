@@ -56,7 +56,7 @@ export default function AdminPage() {
     {
       title: "Manage Properties",
       href: "/admin/properties",
-      description: "Add, edit, and delete property listings.",
+      description: "Add, edit, delete, and manage property listings.",
     },
     {
       title: "Add Property",
@@ -66,7 +66,17 @@ export default function AdminPage() {
     {
       title: "Showing Requests",
       href: "/admin/leads",
-      description: "Review leads and update their status.",
+      description: "Review showing requests and update lead status.",
+    },
+    {
+      title: "Buyer Inquiries",
+      href: "/admin/inquiries",
+      description: "View buyer inquiry details, contact info, and messages.",
+    },
+    {
+      title: "Manage Agents",
+      href: "/admin/agents",
+      description: "Add and manage team members and agent profiles.",
     },
     {
       title: "Company Settings",
@@ -91,7 +101,7 @@ export default function AdminPage() {
             <Link
               key={link.href}
               href={link.href}
-              className="border border-[#1A1A1A]/10 p-6 hover:border-[#B19A55]"
+              className="border border-[#1A1A1A]/10 p-6 transition hover:border-[#B19A55] hover:shadow-xl"
             >
               <h2 className="font-serif text-2xl font-bold">{link.title}</h2>
 
