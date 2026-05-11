@@ -37,6 +37,7 @@ export function Navbar() {
 
   const publicLinks = [
     { href: "/properties", label: "Properties" },
+    { href: "/team", label: "Team" },
     { href: "/about", label: "About" },
     { href: "/contact", label: "Contact" },
   ];
