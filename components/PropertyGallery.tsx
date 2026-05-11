@@ -23,19 +23,18 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
     );
   }
 
-  const activeImage =
-    activeIndex !== null ? images[activeIndex] : null;
+  const activeImage = activeIndex !== null ? images[activeIndex] : null;
 
   function nextImage() {
     if (activeIndex === null) return;
+
     setActiveIndex((activeIndex + 1) % images.length);
   }
 
   function previousImage() {
     if (activeIndex === null) return;
-    setActiveIndex(
-      activeIndex === 0 ? images.length - 1 : activeIndex - 1
-    );
+
+    setActiveIndex(activeIndex === 0 ? images.length - 1 : activeIndex - 1);
   }
 
   return (
@@ -73,7 +72,7 @@ export function PropertyGallery({ images, title }: PropertyGalleryProps) {
         )}
       </div>
 
-      {activeImage && (
+      {activeImage && activeIndex !== null && (
         <div className="fixed inset-0 z-[999] bg-black/95 px-6 py-6 text-white">
           <div className="mx-auto flex h-full max-w-7xl flex-col">
             <div className="flex items-center justify-between">
