@@ -4,8 +4,35 @@ import "./globals.css";
 import { Navbar } from "@/components/Navbar";
 
 export const metadata: Metadata = {
-  title: "Madison Group",
-  description: "Building Beautiful Lives",
+  title: "Madison Group | Bergen County Real Estate",
+  description:
+    "Madison Group is an education-first Bergen County real estate platform helping buyers and sellers move with clarity, confidence, and trusted guidance.",
+  openGraph: {
+    title: "Madison Group | Building Beautiful Lives",
+    description:
+      "Luxury Bergen County real estate guidance for Wyckoff, Mahwah, Saddle River, Upper Saddle River, Allendale, Franklin Lakes, and beyond.",
+    url: "https://madison-group.vercel.app",
+    siteName: "Madison Group",
+    images: [
+      {
+        url: "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?q=80&w=1200&auto=format&fit=crop",
+        width: 1200,
+        height: 630,
+        alt: "Madison Group luxury real estate",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Madison Group | Bergen County Real Estate",
+    description:
+      "Building Beautiful Lives through calm, strategic, education-first real estate guidance.",
+    images: [
+      "https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?q=80&w=1200&auto=format&fit=crop",
+    ],
+  },
 };
 
 export default function RootLayout({
@@ -28,9 +55,8 @@ export default function RootLayout({
               </h2>
 
               <p className="mt-4 leading-7 text-[#1A1A1A]/70">
-                Serving Bergen County&apos;s most desirable
-                communities with a calm, education-first
-                approach to real estate.
+                Serving Bergen County&apos;s most desirable communities with a
+                calm, education-first approach to real estate.
               </p>
             </div>
 
@@ -58,8 +84,8 @@ export default function RootLayout({
               </div>
 
               <p className="mt-8 text-sm text-[#1A1A1A]/50">
-                © {new Date().getFullYear()} Madison Group.
-                All rights reserved.
+                © {new Date().getFullYear()} Madison Group. All rights
+                reserved.
               </p>
             </div>
           </div>
