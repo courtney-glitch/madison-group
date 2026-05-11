@@ -1,5 +1,6 @@
 import { PropertyCard } from "@/components/PropertyCard";
 import { PropertySearch } from "@/components/PropertySearch";
+import { PropertyFilters } from "@/components/PropertyFilters";
 import { supabase } from "@/lib/supabase";
 
 export default async function PropertiesPage({
@@ -8,6 +9,10 @@ export default async function PropertiesPage({
   searchParams: Promise<{
     city?: string;
     search?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    beds?: string;
+    baths?: string;
   }>;
 }) {
   const params = await searchParams;
@@ -25,6 +30,22 @@ export default async function PropertiesPage({
     query = query.or(
       `city.ilike.%${params.search}%,title.ilike.%${params.search}%`
     );
+  }
+
+  if (params.minPrice) {
+    query = query.gte("price_number", Number(params.minPrice));
+  }
+
+  if (params.maxPrice) {
+    query = query.lte("price_number", Number(params.maxPrice));
+  }
+
+  if (params.beds) {
+    query = query.gte("beds", Number(params.beds));
+  }
+
+  if (params.baths) {
+    query = query.gte("baths", Number(params.baths));
   }
 
   const { data: properties, error } = await query;
@@ -60,6 +81,8 @@ export default async function PropertiesPage({
         </p>
 
         <PropertySearch />
+
+        <PropertyFilters />
 
         <p className="mt-8 text-sm text-[#1A1A1A]/70">
           Showing {properties?.length || 0} homes
