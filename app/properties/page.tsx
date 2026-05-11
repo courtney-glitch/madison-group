@@ -1,165 +1,90 @@
-import Link from "next/link";
+import { PropertyCard } from "@/components/PropertyCard";
+import { PropertySearch } from "@/components/PropertySearch";
 import { supabase } from "@/lib/supabase";
-import { FavoriteButton } from "@/components/FavoriteButton";
-import { ShowingForm } from "@/components/ShowingForm";
-import { MortgageCalculator } from "@/components/MortgageCalculator";
-import { PropertyMap } from "@/components/PropertyMap";
-import { PropertyGallery } from "@/components/PropertyGallery";
 
-export default async function PropertyDetailPage({
-  params,
+export default async function PropertiesPage({
+  searchParams,
 }: {
-  params: Promise<{ id: string }>;
+  searchParams: Promise<{
+    city?: string;
+    search?: string;
+  }>;
 }) {
-  const { id } = await params;
+  const params = await searchParams;
 
-  const { data: property, error } = await supabase
+  let query = supabase
     .from("properties")
     .select("*")
-    .eq("id", id)
-    .single();
+    .order("created_at", { ascending: false });
 
-  const { data: galleryImages } = await supabase
-    .from("property_images")
-    .select("*")
-    .eq("property_id", id)
-    .order("created_at", { ascending: true });
+  if (params.city) {
+    query = query.ilike("city", `%${params.city}%`);
+  }
 
-  if (error || !property) {
+  if (params.search) {
+    query = query.or(
+      `city.ilike.%${params.search}%,title.ilike.%${params.search}%`
+    );
+  }
+
+  const { data: properties, error } = await query;
+
+  if (error) {
     return (
       <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
-        <section className="mx-auto max-w-6xl">
-          <Link href="/properties" className="font-serif text-sm text-[#B19A55]">
-            ← Back to homes
-          </Link>
-
-          <h1 className="mt-8 font-serif text-4xl font-bold">
-            Home not found
-          </h1>
-        </section>
+        <p className="font-serif text-2xl font-bold">
+          Something went wrong loading homes.
+        </p>
       </main>
     );
   }
 
-  const allImages = [
-    ...(property.image ? [{ id: "main", image_url: property.image }] : []),
-    ...(galleryImages || []),
-  ];
-
   return (
-    <main className="min-h-screen bg-[#F8F5EF] text-[#1A1A1A]">
-      <section className="mx-auto max-w-7xl px-6 py-10">
-        <Link href="/properties" className="font-serif text-sm text-[#B19A55]">
-          ← Back to homes
-        </Link>
+    <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
+      <section className="mx-auto max-w-7xl">
+        <p className="mb-3 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
+          MADISON GROUP
+        </p>
 
-        <div className="mt-8 grid gap-10 lg:grid-cols-[1.3fr_0.7fr]">
-          <PropertyGallery images={allImages} title={property.title} />
+        <h1 className="font-serif text-5xl font-bold md:text-6xl">
+          {params.city
+            ? `Homes in ${params.city}`
+            : params.search
+            ? "Search Results"
+            : "Explore Homes"}
+        </h1>
 
-          <aside className="bg-white p-8 shadow-xl">
-            <p className="font-serif text-sm tracking-[0.35em] text-[#B19A55]">
-              {property.city}, NJ
-            </p>
+        <p className="mt-4 max-w-2xl text-lg leading-8 text-[#1A1A1A]/70">
+          Search thoughtfully selected properties with clarity, calm, and
+          advocacy from the Madison Group team.
+        </p>
 
-            <h1 className="mt-4 font-serif text-4xl font-bold leading-tight">
-              {property.title}
-            </h1>
+        <PropertySearch />
 
-            <p className="mt-6 font-serif text-4xl font-bold text-[#B19A55]">
-              {property.price}
-            </p>
+        <p className="mt-8 text-sm text-[#1A1A1A]/70">
+          Showing {properties?.length || 0} homes
+        </p>
 
-            <div className="mt-8 grid grid-cols-2 gap-4 border-y border-[#1A1A1A]/10 py-6">
-              <div>
-                <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/50">
-                  Beds
-                </p>
-                <p className="mt-2 font-serif text-2xl font-bold">
-                  {property.beds}
-                </p>
-              </div>
-
-              <div>
-                <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/50">
-                  Baths
-                </p>
-                <p className="mt-2 font-serif text-2xl font-bold">
-                  {property.baths}
-                </p>
-              </div>
-            </div>
-
-            {(property.address || property.zip_code) && (
-              <div className="mt-8 border-b border-[#1A1A1A]/10 pb-6">
-                <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/50">
-                  Address
-                </p>
-
-                <p className="mt-2 leading-7">
-                  {property.address && (
-                    <>
-                      {property.address}
-                      <br />
-                    </>
-                  )}
-                  {property.city}, NJ {property.zip_code}
-                </p>
-              </div>
-            )}
-
-            <p className="mt-8 leading-8 text-[#1A1A1A]/75">
-              {property.description}
-            </p>
-
-            <div className="mt-8 grid gap-4">
-              <Link
-                href="#showing"
-                className="bg-[#B19A55] px-8 py-4 text-center font-serif text-sm font-bold uppercase tracking-[0.2em] text-white"
-              >
-                Request Showing
-              </Link>
-
-              <FavoriteButton propertyId={property.id} />
-            </div>
-          </aside>
-        </div>
-      </section>
-
-      {allImages.length > 4 && (
-        <section className="mx-auto max-w-7xl px-6 py-12">
-          <p className="mb-6 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
-            PROPERTY GALLERY
-          </p>
-
-          <div className="grid gap-4 md:grid-cols-4">
-            {allImages.slice(4).map((image, index) => (
-              <img
-                key={image.id}
-                src={image.image_url}
-                alt={`${property.title} gallery image ${index + 1}`}
-                className="h-48 w-full object-cover"
+        {properties?.length === 0 ? (
+          <div className="mt-10 border border-[#1A1A1A]/10 bg-white p-10 text-center">
+            <p className="font-serif text-2xl font-bold">No homes found</p>
+          </div>
+        ) : (
+          <div className="mt-8 grid gap-8 md:grid-cols-3">
+            {properties?.map((property) => (
+              <PropertyCard
+                key={property.id}
+                id={property.id}
+                title={property.title}
+                city={property.city}
+                price={property.price}
+                beds={property.beds}
+                baths={property.baths}
+                image={property.image}
               />
             ))}
           </div>
-        </section>
-      )}
-
-      <section className="mx-auto max-w-7xl px-6 py-12">
-        <MortgageCalculator price={property.price} />
-
-        <PropertyMap
-          latitude={property.latitude}
-          longitude={property.longitude}
-          city={property.city}
-          address={property.address}
-          zipCode={property.zip_code}
-        />
-      </section>
-
-      <section id="showing" className="mx-auto max-w-4xl px-6 py-16">
-        <div className="bg-white p-8 shadow-xl">
-          <ShowingForm propertyId={property.id} />
-        </div>
+        )}
       </section>
     </main>
   );

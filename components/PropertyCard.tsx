@@ -20,15 +20,15 @@ export function PropertyCard({
   image,
 }: PropertyCardProps) {
   return (
-    <article className="border border-[#1A1A1A]/20 bg-white p-6">
+    <article className="border border-[#1A1A1A]/10 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
       {image ? (
         <img
           src={image}
           alt={title}
-          className="mb-5 h-48 w-full object-cover"
+          className="mb-5 h-56 w-full object-cover"
         />
       ) : (
-        <div className="mb-5 flex h-48 w-full items-center justify-center bg-[#1A1A1A] text-white">
+        <div className="mb-5 flex h-56 w-full items-center justify-center bg-[#1A1A1A] text-white">
           No Image
         </div>
       )}
