@@ -53,6 +53,8 @@ export default function EditPropertyPage() {
   async function handleUpdate(e: React.FormEvent) {
     e.preventDefault();
 
+    const numericPrice = Number(price.replace(/[^0-9]/g, ""));
+
     const { error } = await supabase
       .from("properties")
       .update({
@@ -61,6 +63,7 @@ export default function EditPropertyPage() {
         address,
         zip_code: zipCode,
         price,
+        price_number: numericPrice,
         beds: Number(beds),
         baths: Number(baths),
         image,
@@ -123,7 +126,7 @@ export default function EditPropertyPage() {
 
           <input
             type="text"
-            placeholder="Price"
+            placeholder="$2,500,000"
             value={price}
             onChange={(e) => setPrice(e.target.value)}
             required
