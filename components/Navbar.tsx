@@ -2,9 +2,12 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 export function Navbar() {
+  const router = useRouter();
+
   const [loggedIn, setLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -32,7 +35,11 @@ export function Navbar() {
 
   async function handleLogout() {
     await supabase.auth.signOut();
+
     setMenuOpen(false);
+
+    router.push("/login");
+    router.refresh();
   }
 
   const publicLinks = [
@@ -75,7 +82,12 @@ export function Navbar() {
               <>
                 <Link href="/account">Account</Link>
                 <Link href="/admin">Admin</Link>
-                <button onClick={handleLogout} className="text-[#B19A55]">
+
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  className="text-[#B19A55]"
+                >
                   Logout
                 </button>
               </>
