@@ -80,6 +80,7 @@ export function Navbar() {
 
             {loggedIn ? (
               <>
+                <Link href="/saved-searches">Saved Searches</Link>
                 <Link href="/account">Account</Link>
                 <Link href="/admin">Admin</Link>
 
@@ -118,6 +119,10 @@ export function Navbar() {
 
             {loggedIn ? (
               <>
+                <Link href="/saved-searches" onClick={() => setMenuOpen(false)}>
+                  Saved Searches
+                </Link>
+
                 <Link href="/account" onClick={() => setMenuOpen(false)}>
                   Account
                 </Link>

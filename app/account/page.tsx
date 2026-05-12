@@ -26,7 +26,7 @@ export default function AccountPage() {
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-white px-6 py-12 text-[#1A1A1A]">
+      <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
         <p>Loading account...</p>
       </main>
     );
@@ -34,7 +34,7 @@ export default function AccountPage() {
 
   if (!email) {
     return (
-      <main className="min-h-screen bg-white px-6 py-12 text-[#1A1A1A]">
+      <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
         <section className="mx-auto max-w-3xl">
           <h1 className="font-serif text-4xl font-bold">Please login</h1>
 
@@ -50,15 +50,15 @@ export default function AccountPage() {
   }
 
   return (
-    <main className="min-h-screen bg-white px-6 py-12 text-[#1A1A1A]">
-      <section className="mx-auto max-w-3xl">
+    <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
+      <section className="mx-auto max-w-4xl">
         <p className="mb-3 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
           MY ACCOUNT
         </p>
 
-        <h1 className="font-serif text-4xl font-bold">Welcome back</h1>
+        <h1 className="font-serif text-5xl font-bold">Welcome back</h1>
 
-        <div className="mt-10 border border-[#1A1A1A]/10 p-6">
+        <div className="mt-10 border border-[#1A1A1A]/10 bg-white p-6 shadow-xl">
           <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">
             Email
           </p>
@@ -66,17 +66,24 @@ export default function AccountPage() {
           <p className="mt-2 font-serif text-2xl font-bold">{email}</p>
         </div>
 
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        <div className="mt-8 grid gap-4 sm:grid-cols-3">
           <Link
             href="/favorites"
-            className="border border-[#1A1A1A]/10 p-6 font-serif text-xl font-bold hover:border-[#B19A55]"
+            className="border border-[#1A1A1A]/10 bg-white p-6 font-serif text-xl font-bold shadow-sm hover:border-[#B19A55]"
           >
             Saved Homes
           </Link>
 
           <Link
+            href="/saved-searches"
+            className="border border-[#1A1A1A]/10 bg-white p-6 font-serif text-xl font-bold shadow-sm hover:border-[#B19A55]"
+          >
+            Saved Searches
+          </Link>
+
+          <Link
             href="/properties"
-            className="border border-[#1A1A1A]/10 p-6 font-serif text-xl font-bold hover:border-[#B19A55]"
+            className="border border-[#1A1A1A]/10 bg-white p-6 font-serif text-xl font-bold shadow-sm hover:border-[#B19A55]"
           >
             Explore Homes
           </Link>
