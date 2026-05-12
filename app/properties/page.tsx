@@ -1,6 +1,7 @@
 import { PropertyCard } from "@/components/PropertyCard";
 import { PropertySearch } from "@/components/PropertySearch";
 import { PropertyFilters } from "@/components/PropertyFilters";
+import { SaveSearchButton } from "@/components/SaveSearchButton";
 import { supabase } from "@/lib/supabase";
 
 export default async function PropertiesPage({
@@ -83,6 +84,8 @@ export default async function PropertiesPage({
         <PropertySearch />
 
         <PropertyFilters />
+
+        <SaveSearchButton />
 
         <p className="mt-8 text-sm text-[#1A1A1A]/70">
           Showing {properties?.length || 0} homes
