@@ -5,6 +5,7 @@ import { ShowingForm } from "@/components/ShowingForm";
 import { MortgageCalculator } from "@/components/MortgageCalculator";
 import { PropertyMap } from "@/components/PropertyMap";
 import { PropertyGallery } from "@/components/PropertyGallery";
+import { TrackPropertyView } from "@/components/TrackPropertyView";
 
 export default async function PropertyDetailPage({
   params,
@@ -20,16 +21,18 @@ export default async function PropertyDetailPage({
     .single();
 
   const { data: galleryImages } = await supabase
-    .from("property_images")
+    .from("property_gallery")
     .select("*")
-    .eq("property_id", id)
-    .order("created_at", { ascending: true });
+    .eq("property_id", id);
 
   if (error || !property) {
     return (
       <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
         <section className="mx-auto max-w-6xl">
-          <Link href="/properties" className="font-serif text-sm text-[#B19A55]">
+          <Link
+            href="/properties"
+            className="font-serif text-sm text-[#B19A55]"
+          >
             ← Back to homes
           </Link>
 
@@ -42,19 +45,36 @@ export default async function PropertyDetailPage({
   }
 
   const allImages = [
-    ...(property.image ? [{ id: "main", image_url: property.image }] : []),
+    ...(property.image
+      ? [
+          {
+            id: "main-image",
+            image_url: property.image,
+          },
+        ]
+      : []),
     ...(galleryImages || []),
   ];
 
   return (
     <main className="min-h-screen bg-[#F8F5EF] text-[#1A1A1A]">
+      <TrackPropertyView propertyId={property.id} />
+
       <section className="mx-auto max-w-7xl px-6 py-10">
-        <Link href="/properties" className="font-serif text-sm text-[#B19A55]">
+        <Link
+          href="/properties"
+          className="font-serif text-sm text-[#B19A55]"
+        >
           ← Back to homes
         </Link>
 
         <div className="mt-8 grid gap-10 lg:grid-cols-[1.3fr_0.7fr]">
-          <PropertyGallery images={allImages} title={property.title} />
+          <div>
+            <PropertyGallery
+              images={allImages}
+              title={property.title}
+            />
+          </div>
 
           <aside className="bg-white p-8 shadow-xl">
             <p className="font-serif text-sm tracking-[0.35em] text-[#B19A55]">
@@ -74,6 +94,7 @@ export default async function PropertyDetailPage({
                 <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/50">
                   Beds
                 </p>
+
                 <p className="mt-2 font-serif text-2xl font-bold">
                   {property.beds}
                 </p>
@@ -83,6 +104,7 @@ export default async function PropertyDetailPage({
                 <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/50">
                   Baths
                 </p>
+
                 <p className="mt-2 font-serif text-2xl font-bold">
                   {property.baths}
                 </p>
@@ -102,6 +124,7 @@ export default async function PropertyDetailPage({
                       <br />
                     </>
                   )}
+
                   {property.city}, NJ {property.zip_code}
                 </p>
               </div>
@@ -124,25 +147,6 @@ export default async function PropertyDetailPage({
           </aside>
         </div>
       </section>
-
-      {allImages.length > 4 && (
-        <section className="mx-auto max-w-7xl px-6 py-12">
-          <p className="mb-6 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
-            PROPERTY GALLERY
-          </p>
-
-          <div className="grid gap-4 md:grid-cols-4">
-            {allImages.slice(4).map((image, index) => (
-              <img
-                key={image.id}
-                src={image.image_url}
-                alt={`${property.title} gallery image ${index + 1}`}
-                className="h-48 w-full object-cover"
-              />
-            ))}
-          </div>
-        </section>
-      )}
 
       <section className="mx-auto max-w-7xl px-6 py-12">
         <MortgageCalculator price={property.price} />
