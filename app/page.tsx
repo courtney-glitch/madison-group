@@ -22,7 +22,17 @@ export default async function HomePage() {
   return (
     <main className="bg-[#F8F5EF] text-[#1A1A1A]">
       <section className="relative overflow-hidden bg-white">
-        <div className="mx-auto grid min-h-[78vh] max-w-7xl items-center gap-12 px-6 py-20 md:grid-cols-[0.9fr_1.1fr]">
+        <div className="absolute inset-y-0 right-0 hidden w-[62%] md:block">
+          <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#F8F5EF] via-[#F8F5EF]/85 to-transparent" />
+
+          <img
+            src="https://images.unsplash.com/photo-1613977257363-707ba9348227?q=80&w=2000&auto=format&fit=crop"
+            alt="Bergen County Luxury Estate"
+            className="absolute inset-0 -z-10 h-full w-full object-cover"
+          />
+        </div>
+
+        <div className="mx-auto grid min-h-[85vh] max-w-7xl items-center gap-12 px-6 py-20 md:grid-cols-[0.9fr_1.1fr]">
           <FadeIn>
             <div className="relative z-20 max-w-2xl">
               <p className="mb-6 font-serif text-sm tracking-[0.45em] text-[#B19A55]">
@@ -59,28 +69,12 @@ export default async function HomePage() {
           </FadeIn>
 
           <FadeIn delay={0.15}>
-            <div className="relative min-h-[520px] overflow-hidden shadow-2xl">
-              <div className="absolute inset-0 bg-gradient-to-br from-[#F8F5EF] via-[#E7DCC6] to-[#B19A55]/50" />
-
-              <div className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-white/50 blur-3xl" />
-              <div className="absolute -bottom-24 left-10 h-96 w-96 rounded-full bg-[#B19A55]/30 blur-3xl" />
-
-              <div className="relative flex h-[520px] items-center justify-center p-8">
-                <div className="w-full max-w-md border border-[#B19A55]/50 bg-white/70 p-10 text-center backdrop-blur">
-                  <p className="font-serif text-sm tracking-[0.35em] text-[#B19A55]">
-                    MADISON GROUP
-                  </p>
-
-                  <p className="mt-5 font-serif text-4xl font-bold leading-tight">
-                    Bergen County Luxury Living
-                  </p>
-
-                  <p className="mt-5 leading-7 text-[#1A1A1A]/65">
-                    A refined real estate experience built for buyers, sellers,
-                    and families moving through life&apos;s biggest decisions.
-                  </p>
-                </div>
-              </div>
+            <div className="mt-12 overflow-hidden shadow-2xl md:hidden">
+              <img
+                src="https://images.unsplash.com/photo-1613977257363-707ba9348227?q=80&w=1600&auto=format&fit=crop"
+                alt="Bergen County Luxury Estate"
+                className="h-[420px] w-full object-cover"
+              />
             </div>
           </FadeIn>
         </div>
@@ -93,6 +87,7 @@ export default async function HomePage() {
               <p className="font-serif text-5xl font-bold text-[#B19A55]">
                 20+
               </p>
+
               <p className="mt-3 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">
                 Years Experience
               </p>
@@ -102,6 +97,7 @@ export default async function HomePage() {
               <p className="font-serif text-5xl font-bold text-[#B19A55]">
                 500+
               </p>
+
               <p className="mt-3 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">
                 Homes Sold
               </p>
@@ -111,6 +107,7 @@ export default async function HomePage() {
               <p className="font-serif text-5xl font-bold text-[#B19A55]">
                 $250M+
               </p>
+
               <p className="mt-3 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">
                 Sales Volume
               </p>
@@ -120,6 +117,7 @@ export default async function HomePage() {
               <p className="font-serif text-5xl font-bold text-[#B19A55]">
                 Bergen
               </p>
+
               <p className="mt-3 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">
                 County Experts
               </p>
@@ -182,26 +180,31 @@ export default async function HomePage() {
       <FadeIn delay={0.2}>
         <section className="bg-white px-6 py-24">
           <div className="mx-auto max-w-7xl">
-            <p className="mb-3 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
-              BERGEN COUNTY COMMUNITIES
-            </p>
+            <div className="grid gap-12 lg:grid-cols-[1fr_0.7fr]">
+              <div>
+                <p className="mb-3 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
+                  BERGEN COUNTY COMMUNITIES
+                </p>
 
-            <h2 className="max-w-4xl font-serif text-5xl font-bold leading-tight">
-              Local expertise in New Jersey&apos;s most desirable communities.
-            </h2>
+                <h2 className="max-w-4xl font-serif text-5xl font-bold leading-tight">
+                  Local expertise in New Jersey&apos;s most desirable
+                  communities.
+                </h2>
+              </div>
 
-            <div className="mt-14 grid gap-5 md:grid-cols-3 lg:grid-cols-6">
-              {targetCities.map((city) => (
-                <Link
-                  key={city}
-                  href={`/properties?city=${encodeURIComponent(city)}`}
-                  className="group border border-[#1A1A1A]/10 bg-[#F8F5EF] p-6 transition hover:border-[#B19A55] hover:bg-[#EFE7D6]"
-                >
-                  <p className="font-serif text-xl font-bold transition group-hover:text-[#B19A55]">
-                    {city}
-                  </p>
-                </Link>
-              ))}
+              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
+                {targetCities.map((city) => (
+                  <Link
+                    key={city}
+                    href={`/properties?city=${encodeURIComponent(city)}`}
+                    className="group border border-[#1A1A1A]/10 bg-[#F8F5EF] p-6 transition hover:border-[#B19A55] hover:bg-[#EFE7D6]"
+                  >
+                    <p className="font-serif text-xl font-bold transition group-hover:text-[#B19A55]">
+                      {city}
+                    </p>
+                  </Link>
+                ))}
+              </div>
             </div>
           </div>
         </section>
