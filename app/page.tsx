@@ -62,11 +62,17 @@ export default async function HomePage() {
             <div className="relative">
               <div className="absolute -left-6 -top-6 h-full w-full border border-[#B19A55]/40" />
 
-              <img
-                src="/hero-home.jpg"
-                alt="Luxury Real Estate"
-                className="relative h-[620px] w-full object-cover shadow-2xl"
-              />
+              <div className="relative flex h-[620px] w-full items-center justify-center bg-gradient-to-br from-[#F8F5EF] via-[#E8DDC8] to-[#B19A55]/40 shadow-2xl">
+                <div className="border border-[#B19A55]/50 bg-white/70 px-10 py-8 text-center backdrop-blur">
+                  <p className="font-serif text-sm tracking-[0.35em] text-[#B19A55]">
+                    MADISON GROUP
+                  </p>
+
+                  <p className="mt-4 font-serif text-4xl font-bold">
+                    Bergen County Luxury Living
+                  </p>
+                </div>
+              </div>
             </div>
           </FadeIn>
         </div>
