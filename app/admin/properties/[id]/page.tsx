@@ -1,304 +1,231 @@
-"use client";
-
-import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { FavoriteButton } from "@/components/FavoriteButton";
+import { ShowingForm } from "@/components/ShowingForm";
+import { MortgageCalculator } from "@/components/MortgageCalculator";
+import { PropertyMap } from "@/components/PropertyMap";
+import { PropertyGallery } from "@/components/PropertyGallery";
+import { TrackPropertyView } from "@/components/TrackPropertyView";
 
-export default function EditPropertyPage() {
-  const params = useParams();
-  const router = useRouter();
+export default async function PropertyDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
 
-  const propertyId = params.id as string;
+  const { data: property, error } = await supabase
+    .from("properties")
+    .select("*")
+    .eq("id", id)
+    .single();
 
-  const [loading, setLoading] = useState(true);
+  const { data: galleryImages } = await supabase
+    .from("property_images")
+    .select("*")
+    .eq("property_id", id)
+    .order("created_at", { ascending: true });
 
-  const [title, setTitle] = useState("");
-  const [city, setCity] = useState("");
-  const [address, setAddress] = useState("");
-  const [zipCode, setZipCode] = useState("");
-  const [price, setPrice] = useState("");
-  const [priceNumber, setPriceNumber] = useState("");
-  const [beds, setBeds] = useState("");
-  const [baths, setBaths] = useState("");
-  const [description, setDescription] = useState("");
-  const [image, setImage] = useState("");
-  const [status, setStatus] = useState("For Sale");
-
-  const [sqft, setSqft] = useState("");
-  const [propertyType, setPropertyType] = useState("");
-  const [yearBuilt, setYearBuilt] = useState("");
-  const [garage, setGarage] = useState("");
-  const [lotSize, setLotSize] = useState("");
-  const [taxes, setTaxes] = useState("");
-  const [schoolDistrict, setSchoolDistrict] = useState("");
-
-  useEffect(() => {
-    loadProperty();
-  }, []);
-
-  async function loadProperty() {
-    const { data } = await supabase
-      .from("properties")
-      .select("*")
-      .eq("id", propertyId)
-      .single();
-
-    if (!data) return;
-
-    setTitle(data.title || "");
-    setCity(data.city || "");
-    setAddress(data.address || "");
-    setZipCode(data.zip_code || "");
-    setPrice(data.price || "");
-    setPriceNumber(data.price_number?.toString() || "");
-    setBeds(data.beds?.toString() || "");
-    setBaths(data.baths?.toString() || "");
-    setDescription(data.description || "");
-    setImage(data.image || "");
-    setStatus(data.status || "For Sale");
-
-    setSqft(data.sqft?.toString() || "");
-    setPropertyType(data.property_type || "");
-    setYearBuilt(data.year_built?.toString() || "");
-    setGarage(data.garage || "");
-    setLotSize(data.lot_size || "");
-    setTaxes(data.taxes || "");
-    setSchoolDistrict(data.school_district || "");
-
-    setLoading(false);
-  }
-
-  async function handleImageUpload(
-    e: React.ChangeEvent<HTMLInputElement>
-  ) {
-    const file = e.target.files?.[0];
-
-    if (!file) return;
-
-    const fileName = `${Date.now()}-${file.name}`;
-
-    const { error } = await supabase.storage
-      .from("property-images")
-      .upload(fileName, file);
-
-    if (error) {
-      alert("Upload failed");
-      return;
-    }
-
-    const {
-      data: { publicUrl },
-    } = supabase.storage
-      .from("property-images")
-      .getPublicUrl(fileName);
-
-    setImage(publicUrl);
-  }
-
-  async function handleUpdateProperty() {
-    await supabase
-      .from("properties")
-      .update({
-        title,
-        city,
-        address,
-        zip_code: zipCode,
-        price,
-        price_number: Number(priceNumber),
-        beds: Number(beds),
-        baths: Number(baths),
-        description,
-        image,
-        status,
-
-        sqft: sqft ? Number(sqft) : null,
-        property_type: propertyType,
-        year_built: yearBuilt ? Number(yearBuilt) : null,
-        garage,
-        lot_size: lotSize,
-        taxes,
-        school_district: schoolDistrict,
-      })
-      .eq("id", propertyId);
-
-    router.push("/admin/properties");
-    router.refresh();
-  }
-
-  if (loading) {
+  if (error || !property) {
     return (
-      <main className="min-h-screen bg-[#F8F5EF] px-6 py-12">
-        <p>Loading property...</p>
+      <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
+        <section className="mx-auto max-w-6xl">
+          <Link href="/properties" className="font-serif text-sm text-[#B19A55]">
+            ← Back to homes
+          </Link>
+
+          <h1 className="mt-8 font-serif text-4xl font-bold">
+            Home not found
+          </h1>
+        </section>
       </main>
     );
   }
 
+  const allImages = [
+    ...(property.image ? [{ id: "main", image_url: property.image }] : []),
+    ...(galleryImages || []),
+  ];
+
+  const details = [
+    { label: "Beds", value: property.beds },
+    { label: "Baths", value: property.baths },
+    { label: "Square Feet", value: property.sqft ? property.sqft.toLocaleString() : null },
+    { label: "Property Type", value: property.property_type },
+    { label: "Year Built", value: property.year_built },
+    { label: "Garage", value: property.garage },
+    { label: "Lot Size", value: property.lot_size },
+    { label: "Taxes", value: property.taxes },
+    { label: "School District", value: property.school_district },
+  ].filter((item) => item.value);
+
   return (
-    <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
-      <section className="mx-auto max-w-4xl">
-        <p className="font-serif text-sm tracking-[0.35em] text-[#B19A55]">
-          ADMIN
-        </p>
+    <main className="min-h-screen bg-[#F8F5EF] text-[#1A1A1A]">
+      <TrackPropertyView propertyId={property.id} />
 
-        <h1 className="mt-4 font-serif text-5xl font-bold">
-          Edit Property
-        </h1>
+      <section className="mx-auto max-w-7xl px-6 py-10">
+        <Link href="/properties" className="font-serif text-sm text-[#B19A55]">
+          ← Back to homes
+        </Link>
 
-        <div className="mt-10 grid gap-6 bg-white p-8 shadow-xl">
-          <input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Property Title"
-            className="border border-[#1A1A1A]/10 p-4"
-          />
+        <div className="mt-8">
+          <PropertyGallery images={allImages} title={property.title} />
+        </div>
 
-          <input
-            value={city}
-            onChange={(e) => setCity(e.target.value)}
-            placeholder="City"
-            className="border border-[#1A1A1A]/10 p-4"
-          />
+        <div className="mt-12 grid gap-10 lg:grid-cols-[1fr_0.42fr]">
+          <section>
+            <div className="flex flex-col gap-6 border-b border-[#1A1A1A]/10 pb-10 md:flex-row md:items-end md:justify-between">
+              <div>
+                <p className="font-serif text-sm tracking-[0.35em] text-[#B19A55]">
+                  {property.city}, NJ
+                </p>
 
-          <input
-            value={address}
-            onChange={(e) => setAddress(e.target.value)}
-            placeholder="Address"
-            className="border border-[#1A1A1A]/10 p-4"
-          />
+                <h1 className="mt-4 font-serif text-5xl font-bold leading-tight md:text-6xl">
+                  {property.title}
+                </h1>
 
-          <input
-            value={zipCode}
-            onChange={(e) => setZipCode(e.target.value)}
-            placeholder="Zip Code"
-            className="border border-[#1A1A1A]/10 p-4"
-          />
+                {(property.address || property.zip_code) && (
+                  <p className="mt-5 text-lg text-[#1A1A1A]/70">
+                    {property.address && `${property.address}, `}
+                    {property.city}, NJ {property.zip_code}
+                  </p>
+                )}
+              </div>
 
-          <input
-            value={price}
-            onChange={(e) => setPrice(e.target.value)}
-            placeholder="Display Price"
-            className="border border-[#1A1A1A]/10 p-4"
-          />
+              <div className="md:text-right">
+                {property.status && (
+                  <p className="mb-3 inline-block bg-[#B19A55] px-4 py-2 font-serif text-xs font-bold uppercase tracking-[0.2em] text-white">
+                    {property.status}
+                  </p>
+                )}
 
-          <input
-            value={priceNumber}
-            onChange={(e) => setPriceNumber(e.target.value)}
-            placeholder="Numeric Price"
-            className="border border-[#1A1A1A]/10 p-4"
-          />
+                <p className="font-serif text-4xl font-bold text-[#B19A55]">
+                  {property.price}
+                </p>
+              </div>
+            </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <input
-              value={beds}
-              onChange={(e) => setBeds(e.target.value)}
-              placeholder="Beds"
-              className="border border-[#1A1A1A]/10 p-4"
-            />
+            <div className="grid border-b border-[#1A1A1A]/10 py-8 sm:grid-cols-2 lg:grid-cols-4">
+              <div className="border-[#1A1A1A]/10 py-4 sm:border-r">
+                <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/50">
+                  Beds
+                </p>
+                <p className="mt-2 font-serif text-3xl font-bold">
+                  {property.beds}
+                </p>
+              </div>
 
-            <input
-              value={baths}
-              onChange={(e) => setBaths(e.target.value)}
-              placeholder="Baths"
-              className="border border-[#1A1A1A]/10 p-4"
-            />
-          </div>
+              <div className="border-[#1A1A1A]/10 py-4 sm:border-r sm:pl-8">
+                <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/50">
+                  Baths
+                </p>
+                <p className="mt-2 font-serif text-3xl font-bold">
+                  {property.baths}
+                </p>
+              </div>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <input
-              value={sqft}
-              onChange={(e) => setSqft(e.target.value)}
-              placeholder="Square Feet"
-              className="border border-[#1A1A1A]/10 p-4"
-            />
+              <div className="border-[#1A1A1A]/10 py-4 lg:border-r lg:pl-8">
+                <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/50">
+                  Sq Ft
+                </p>
+                <p className="mt-2 font-serif text-3xl font-bold">
+                  {property.sqft ? property.sqft.toLocaleString() : "—"}
+                </p>
+              </div>
 
-            <input
-              value={yearBuilt}
-              onChange={(e) => setYearBuilt(e.target.value)}
-              placeholder="Year Built"
-              className="border border-[#1A1A1A]/10 p-4"
-            />
-          </div>
+              <div className="py-4 lg:pl-8">
+                <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/50">
+                  Type
+                </p>
+                <p className="mt-2 font-serif text-3xl font-bold">
+                  {property.property_type || "Home"}
+                </p>
+              </div>
+            </div>
 
-          <input
-            value={propertyType}
-            onChange={(e) => setPropertyType(e.target.value)}
-            placeholder="Property Type"
-            className="border border-[#1A1A1A]/10 p-4"
-          />
+            <section className="py-12">
+              <p className="mb-3 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
+                PROPERTY OVERVIEW
+              </p>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <input
-              value={garage}
-              onChange={(e) => setGarage(e.target.value)}
-              placeholder="Garage"
-              className="border border-[#1A1A1A]/10 p-4"
-            />
+              <h2 className="font-serif text-4xl font-bold">
+                Elevated living in {property.city}.
+              </h2>
 
-            <input
-              value={lotSize}
-              onChange={(e) => setLotSize(e.target.value)}
-              placeholder="Lot Size"
-              className="border border-[#1A1A1A]/10 p-4"
-            />
-          </div>
+              <p className="mt-6 max-w-4xl text-lg leading-9 text-[#1A1A1A]/75">
+                {property.description}
+              </p>
+            </section>
 
-          <div className="grid gap-6 md:grid-cols-2">
-            <input
-              value={taxes}
-              onChange={(e) => setTaxes(e.target.value)}
-              placeholder="Taxes"
-              className="border border-[#1A1A1A]/10 p-4"
-            />
+            {details.length > 0 && (
+              <section className="border-t border-[#1A1A1A]/10 py-12">
+                <p className="mb-3 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
+                  PROPERTY DETAILS
+                </p>
 
-            <input
-              value={schoolDistrict}
-              onChange={(e) => setSchoolDistrict(e.target.value)}
-              placeholder="School District"
-              className="border border-[#1A1A1A]/10 p-4"
-            />
-          </div>
+                <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {details.map((detail) => (
+                    <div
+                      key={detail.label}
+                      className="border border-[#1A1A1A]/10 bg-white p-6 shadow-sm"
+                    >
+                      <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/50">
+                        {detail.label}
+                      </p>
 
-          <select
-            value={status}
-            onChange={(e) => setStatus(e.target.value)}
-            className="border border-[#1A1A1A]/10 p-4"
-          >
-            <option>For Sale</option>
-            <option>Pending</option>
-            <option>Sold</option>
-            <option>Featured</option>
-          </select>
+                      <p className="mt-3 font-serif text-2xl font-bold">
+                        {detail.value}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            )}
 
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Property Description"
-            rows={6}
-            className="border border-[#1A1A1A]/10 p-4"
-          />
+            <section className="py-12">
+              <MortgageCalculator price={property.price} />
 
-          <div>
-            <p className="mb-3 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">
-              Main Property Image
+              <PropertyMap
+                latitude={property.latitude}
+                longitude={property.longitude}
+                city={property.city}
+                address={property.address}
+                zipCode={property.zip_code}
+              />
+            </section>
+          </section>
+
+          <aside className="h-fit bg-white p-8 shadow-2xl lg:sticky lg:top-28">
+            <p className="font-serif text-sm tracking-[0.35em] text-[#B19A55]">
+              PRIVATE TOUR
             </p>
 
-            <input type="file" onChange={handleImageUpload} />
+            <h2 className="mt-3 font-serif text-3xl font-bold">
+              Schedule a Showing
+            </h2>
 
-            {image && (
-              <img
-                src={image}
-                alt="Property"
-                className="mt-4 h-56 w-full object-cover"
-              />
-            )}
-          </div>
+            <p className="mt-4 leading-7 text-[#1A1A1A]/70">
+              Request a private tour and a Madison Group advisor will follow up
+              with next steps.
+            </p>
 
-          <button
-            onClick={handleUpdateProperty}
-            className="bg-[#B19A55] px-8 py-4 font-serif text-sm font-bold uppercase tracking-[0.2em] text-white"
-          >
-            Update Property
-          </button>
+            <div className="mt-8 grid gap-4">
+              <Link
+                href="#showing"
+                className="bg-[#B19A55] px-8 py-4 text-center font-serif text-sm font-bold uppercase tracking-[0.2em] text-white"
+              >
+                Request Showing
+              </Link>
+
+              <FavoriteButton propertyId={property.id} />
+            </div>
+          </aside>
+        </div>
+      </section>
+
+      <section id="showing" className="mx-auto max-w-4xl px-6 py-16">
+        <div className="bg-white p-8 shadow-xl">
+          <ShowingForm propertyId={property.id} />
         </div>
       </section>
     </main>
