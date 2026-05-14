@@ -13,7 +13,7 @@ const targetCities = [
 ];
 
 const heroImage =
-  "https://images.unsplash.com/photo-1613977257363-707ba9348227?q=80&w=2000&auto=format&fit=crop";
+  "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2200&auto=format&fit=crop";
 
 export default async function HomePage() {
   const { data: featuredProperties } = await supabase
@@ -28,7 +28,7 @@ export default async function HomePage() {
         className="relative min-h-[86vh] overflow-hidden bg-cover bg-center"
         style={{ backgroundImage: `url(${heroImage})` }}
       >
-        <div className="absolute inset-0 bg-gradient-to-r from-white via-white/90 to-white/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#F8F5EF] via-[#F8F5EF]/82 to-black/10" />
 
         <div className="relative z-10 mx-auto flex min-h-[86vh] max-w-7xl items-center px-6 py-20">
           <FadeIn>
