@@ -8,6 +8,7 @@ type PropertyCardProps = {
   beds: number;
   baths: number;
   image: string;
+  status?: string;
 };
 
 export function PropertyCard({
@@ -18,39 +19,63 @@ export function PropertyCard({
   beds,
   baths,
   image,
+  status,
 }: PropertyCardProps) {
+  const badgeStyles = {
+    "For Sale": "bg-[#B19A55] text-white",
+    Pending: "bg-orange-500 text-white",
+    Sold: "bg-[#1A1A1A] text-white",
+    Featured: "bg-emerald-600 text-white",
+  };
+
   return (
-    <article className="border border-[#1A1A1A]/10 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-xl">
-      {image ? (
-        <img
-          src={image}
-          alt={title}
-          className="mb-5 h-56 w-full object-cover"
-        />
-      ) : (
-        <div className="mb-5 flex h-56 w-full items-center justify-center bg-[#1A1A1A] text-white">
-          No Image
+    <Link
+      href={`/properties/${id}`}
+      className="group overflow-hidden bg-white shadow-xl transition duration-300 hover:-translate-y-1"
+    >
+      <div className="relative overflow-hidden">
+        {image ? (
+          <img
+            src={image}
+            alt={title}
+            className="h-80 w-full object-cover transition duration-500 group-hover:scale-105"
+          />
+        ) : (
+          <div className="flex h-80 items-center justify-center bg-[#1A1A1A] text-white">
+            No Image
+          </div>
+        )}
+
+        {status && (
+          <div
+            className={`absolute left-4 top-4 px-4 py-2 font-serif text-xs font-bold uppercase tracking-[0.2em] ${
+              badgeStyles[status as keyof typeof badgeStyles] ||
+              "bg-white text-[#1A1A1A]"
+            }`}
+          >
+            {status}
+          </div>
+        )}
+      </div>
+
+      <div className="p-6">
+        <p className="font-serif text-sm tracking-[0.3em] text-[#B19A55]">
+          {city}, NJ
+        </p>
+
+        <h2 className="mt-3 font-serif text-3xl font-bold leading-tight">
+          {title}
+        </h2>
+
+        <p className="mt-5 font-serif text-3xl font-bold text-[#B19A55]">
+          {price}
+        </p>
+
+        <div className="mt-6 flex gap-6 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">
+          <span>{beds} Beds</span>
+          <span>{baths} Baths</span>
         </div>
-      )}
-
-      <p className="font-serif text-sm tracking-[0.25em] text-[#B19A55]">
-        {city}, NJ
-      </p>
-
-      <h2 className="mt-3 font-serif text-2xl font-bold">{title}</h2>
-
-      <p className="mt-4 text-xl font-bold">{price}</p>
-
-      <p className="mt-2 text-sm">
-        {beds} beds · {baths} baths
-      </p>
-
-      <Link
-        href={`/properties/${id}`}
-        className="mt-6 block bg-[#B19A55] px-4 py-3 text-center font-serif text-sm font-bold uppercase tracking-[0.2em] text-white"
-      >
-        View Details
-      </Link>
-    </article>
+      </div>
+    </Link>
   );
 }
