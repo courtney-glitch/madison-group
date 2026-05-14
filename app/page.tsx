@@ -22,16 +22,7 @@ export default async function HomePage() {
   return (
     <main className="bg-[#F8F5EF] text-[#1A1A1A]">
       <section className="relative overflow-hidden bg-white">
-        <div className="absolute inset-y-0 right-0 hidden w-[62%] md:block">
-          <div className="h-full w-full bg-gradient-to-r from-white via-white/70 to-transparent" />
-          <img
-            src="https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?q=80&w=2000&auto=format&fit=crop"
-            alt="Luxury Bergen County home"
-            className="absolute inset-0 -z-10 h-full w-full object-cover"
-          />
-        </div>
-
-        <div className="mx-auto grid min-h-[78vh] max-w-7xl items-center px-6 py-20 md:grid-cols-[0.9fr_1.1fr]">
+        <div className="mx-auto grid min-h-[78vh] max-w-7xl items-center gap-12 px-6 py-20 md:grid-cols-[0.9fr_1.1fr]">
           <FadeIn>
             <div className="relative z-20 max-w-2xl">
               <p className="mb-6 font-serif text-sm tracking-[0.45em] text-[#B19A55]">
@@ -68,12 +59,28 @@ export default async function HomePage() {
           </FadeIn>
 
           <FadeIn delay={0.15}>
-            <div className="mt-12 md:hidden">
-              <img
-                src="https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?q=80&w=1600&auto=format&fit=crop"
-                alt="Luxury Bergen County home"
-                className="h-[420px] w-full object-cover shadow-2xl"
-              />
+            <div className="relative min-h-[520px] overflow-hidden shadow-2xl">
+              <div className="absolute inset-0 bg-gradient-to-br from-[#F8F5EF] via-[#E7DCC6] to-[#B19A55]/50" />
+
+              <div className="absolute -right-20 -top-20 h-80 w-80 rounded-full bg-white/50 blur-3xl" />
+              <div className="absolute -bottom-24 left-10 h-96 w-96 rounded-full bg-[#B19A55]/30 blur-3xl" />
+
+              <div className="relative flex h-[520px] items-center justify-center p-8">
+                <div className="w-full max-w-md border border-[#B19A55]/50 bg-white/70 p-10 text-center backdrop-blur">
+                  <p className="font-serif text-sm tracking-[0.35em] text-[#B19A55]">
+                    MADISON GROUP
+                  </p>
+
+                  <p className="mt-5 font-serif text-4xl font-bold leading-tight">
+                    Bergen County Luxury Living
+                  </p>
+
+                  <p className="mt-5 leading-7 text-[#1A1A1A]/65">
+                    A refined real estate experience built for buyers, sellers,
+                    and families moving through life&apos;s biggest decisions.
+                  </p>
+                </div>
+              </div>
             </div>
           </FadeIn>
         </div>
