@@ -107,6 +107,7 @@ export default async function PropertiesPage({
                 beds={property.beds}
                 baths={property.baths}
                 image={property.image}
+                status={property.status}
               />
             ))}
           </div>

@@ -150,6 +150,7 @@ export default async function HomePage() {
                     beds={property.beds}
                     baths={property.baths}
                     image={property.image}
+                    status={property.status}
                   />
                 ))}
               </div>

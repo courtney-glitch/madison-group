@@ -84,6 +84,7 @@ export default function FavoritesPage() {
                 beds={property.beds}
                 baths={property.baths}
                 image={property.image}
+                status={property.status}
               />
             ))}
           </div>
