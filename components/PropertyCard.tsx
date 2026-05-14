@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 
 type PropertyCardProps = {
   id: string;
@@ -21,6 +24,8 @@ export function PropertyCard({
   image,
   status,
 }: PropertyCardProps) {
+  const [imageError, setImageError] = useState(false);
+
   const badgeStyles = {
     "For Sale": "bg-[#B19A55] text-white",
     Pending: "bg-orange-500 text-white",
@@ -28,21 +33,24 @@ export function PropertyCard({
     Featured: "bg-emerald-600 text-white",
   };
 
+  const showImage = image && !imageError;
+
   return (
     <Link
       href={`/properties/${id}`}
       className="group overflow-hidden bg-white shadow-xl transition duration-300 hover:-translate-y-1"
     >
       <div className="relative overflow-hidden">
-        {image ? (
+        {showImage ? (
           <img
             src={image}
             alt={title}
+            onError={() => setImageError(true)}
             className="h-80 w-full object-cover transition duration-500 group-hover:scale-105"
           />
         ) : (
-          <div className="flex h-80 items-center justify-center bg-[#1A1A1A] text-white">
-            No Image
+          <div className="flex h-80 items-center justify-center bg-[#1A1A1A] px-6 text-center font-serif text-white">
+            Image Coming Soon
           </div>
         )}
 
