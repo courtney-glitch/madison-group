@@ -21,21 +21,30 @@ export default async function HomePage() {
 
   return (
     <main className="bg-[#F8F5EF] text-[#1A1A1A]">
-      <section className="relative overflow-hidden bg-[#F8F5EF]">
-        <div className="mx-auto grid min-h-[90vh] max-w-7xl items-center gap-12 px-6 py-20 md:grid-cols-2">
+      <section className="relative overflow-hidden bg-white">
+        <div className="absolute inset-y-0 right-0 hidden w-[62%] md:block">
+          <div className="h-full w-full bg-gradient-to-r from-white via-white/70 to-transparent" />
+          <img
+            src="https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?q=80&w=2000&auto=format&fit=crop"
+            alt="Luxury Bergen County home"
+            className="absolute inset-0 -z-10 h-full w-full object-cover"
+          />
+        </div>
+
+        <div className="mx-auto grid min-h-[78vh] max-w-7xl items-center px-6 py-20 md:grid-cols-[0.9fr_1.1fr]">
           <FadeIn>
-            <div className="relative z-20">
-              <p className="mb-5 font-serif text-sm tracking-[0.45em] text-[#B19A55]">
+            <div className="relative z-20 max-w-2xl">
+              <p className="mb-6 font-serif text-sm tracking-[0.45em] text-[#B19A55]">
                 BERGEN COUNTY LUXURY REAL ESTATE
               </p>
 
-              <h1 className="font-serif text-6xl font-bold leading-tight md:text-8xl">
+              <h1 className="font-serif text-6xl font-bold leading-[0.95] md:text-8xl">
                 Building
                 <br />
                 Beautiful Lives
               </h1>
 
-              <p className="mt-8 max-w-2xl text-xl leading-9 text-[#1A1A1A]/75">
+              <p className="mt-8 max-w-xl text-xl leading-9 text-[#1A1A1A]/75">
                 Curated homes, elevated service, and trusted guidance across
                 Bergen County&apos;s most desirable communities.
               </p>
@@ -50,7 +59,7 @@ export default async function HomePage() {
 
                 <Link
                   href="/contact"
-                  className="border border-[#1A1A1A]/20 bg-white/80 px-8 py-4 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-[#1A1A1A] transition hover:bg-[#B19A55] hover:text-white"
+                  className="border border-[#1A1A1A]/30 bg-white/80 px-8 py-4 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-[#1A1A1A] transition hover:bg-[#1A1A1A] hover:text-white"
                 >
                   Contact Us
                 </Link>
@@ -59,27 +68,19 @@ export default async function HomePage() {
           </FadeIn>
 
           <FadeIn delay={0.15}>
-            <div className="relative">
-              <div className="absolute -left-6 -top-6 h-full w-full border border-[#B19A55]/40" />
-
-              <div className="relative flex h-[620px] w-full items-center justify-center bg-gradient-to-br from-[#F8F5EF] via-[#E8DDC8] to-[#B19A55]/40 shadow-2xl">
-                <div className="border border-[#B19A55]/50 bg-white/70 px-10 py-8 text-center backdrop-blur">
-                  <p className="font-serif text-sm tracking-[0.35em] text-[#B19A55]">
-                    MADISON GROUP
-                  </p>
-
-                  <p className="mt-4 font-serif text-4xl font-bold">
-                    Bergen County Luxury Living
-                  </p>
-                </div>
-              </div>
+            <div className="mt-12 md:hidden">
+              <img
+                src="https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?q=80&w=1600&auto=format&fit=crop"
+                alt="Luxury Bergen County home"
+                className="h-[420px] w-full object-cover shadow-2xl"
+              />
             </div>
           </FadeIn>
         </div>
       </section>
 
       <FadeIn>
-        <section className="border-b border-[#1A1A1A]/10 bg-white px-6 py-10">
+        <section className="border-y border-[#1A1A1A]/10 bg-white px-6 py-10">
           <div className="mx-auto grid max-w-7xl gap-8 text-center md:grid-cols-4">
             <div>
               <p className="font-serif text-5xl font-bold text-[#B19A55]">
