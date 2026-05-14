@@ -22,19 +22,19 @@ export default async function HomePage() {
   return (
     <main className="bg-[#F8F5EF] text-[#1A1A1A]">
       <section className="relative overflow-hidden bg-white">
-        <div className="absolute inset-y-0 right-0 hidden w-[62%] md:block">
-          <div className="absolute inset-0 z-10 bg-gradient-to-r from-[#F8F5EF] via-[#F8F5EF]/85 to-transparent" />
-
+        <div className="absolute inset-y-0 right-0 hidden w-[65%] md:block">
           <img
             src="https://images.unsplash.com/photo-1613977257363-707ba9348227?q=80&w=2000&auto=format&fit=crop"
             alt="Bergen County Luxury Estate"
-            className="absolute inset-0 -z-10 h-full w-full object-cover"
+            className="absolute inset-0 z-0 h-full w-full object-cover"
           />
+
+          <div className="absolute inset-0 z-10 bg-gradient-to-r from-white via-white/80 to-white/10" />
         </div>
 
-        <div className="mx-auto grid min-h-[85vh] max-w-7xl items-center gap-12 px-6 py-20 md:grid-cols-[0.9fr_1.1fr]">
+        <div className="relative z-20 mx-auto grid min-h-[85vh] max-w-7xl items-center gap-12 px-6 py-20 md:grid-cols-[0.9fr_1.1fr]">
           <FadeIn>
-            <div className="relative z-20 max-w-2xl">
+            <div className="max-w-2xl">
               <p className="mb-6 font-serif text-sm tracking-[0.45em] text-[#B19A55]">
                 BERGEN COUNTY LUXURY REAL ESTATE
               </p>
@@ -53,14 +53,14 @@ export default async function HomePage() {
               <div className="mt-12 flex flex-col gap-4 sm:flex-row">
                 <Link
                   href="/properties"
-                  className="bg-[#B19A55] px-8 py-4 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-white transition hover:bg-[#9D884B]"
+                  className="bg-[#B19A55] px-8 py-4 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-white"
                 >
                   Explore Homes
                 </Link>
 
                 <Link
                   href="/contact"
-                  className="border border-[#1A1A1A]/30 bg-white/80 px-8 py-4 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-[#1A1A1A] transition hover:bg-[#1A1A1A] hover:text-white"
+                  className="border border-[#1A1A1A]/30 bg-white/80 px-8 py-4 text-center font-serif text-sm font-bold uppercase tracking-[0.25em]"
                 >
                   Contact Us
                 </Link>
@@ -83,45 +83,10 @@ export default async function HomePage() {
       <FadeIn>
         <section className="border-y border-[#1A1A1A]/10 bg-white px-6 py-10">
           <div className="mx-auto grid max-w-7xl gap-8 text-center md:grid-cols-4">
-            <div>
-              <p className="font-serif text-5xl font-bold text-[#B19A55]">
-                20+
-              </p>
-
-              <p className="mt-3 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">
-                Years Experience
-              </p>
-            </div>
-
-            <div>
-              <p className="font-serif text-5xl font-bold text-[#B19A55]">
-                500+
-              </p>
-
-              <p className="mt-3 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">
-                Homes Sold
-              </p>
-            </div>
-
-            <div>
-              <p className="font-serif text-5xl font-bold text-[#B19A55]">
-                $250M+
-              </p>
-
-              <p className="mt-3 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">
-                Sales Volume
-              </p>
-            </div>
-
-            <div>
-              <p className="font-serif text-5xl font-bold text-[#B19A55]">
-                Bergen
-              </p>
-
-              <p className="mt-3 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">
-                County Experts
-              </p>
-            </div>
+            <div><p className="font-serif text-5xl font-bold text-[#B19A55]">20+</p><p className="mt-3 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">Years Experience</p></div>
+            <div><p className="font-serif text-5xl font-bold text-[#B19A55]">500+</p><p className="mt-3 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">Homes Sold</p></div>
+            <div><p className="font-serif text-5xl font-bold text-[#B19A55]">$250M+</p><p className="mt-3 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">Sales Volume</p></div>
+            <div><p className="font-serif text-5xl font-bold text-[#B19A55]">Bergen</p><p className="mt-3 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">County Experts</p></div>
           </div>
         </section>
       </FadeIn>
@@ -134,7 +99,6 @@ export default async function HomePage() {
                 <p className="mb-3 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
                   FEATURED PROPERTIES
                 </p>
-
                 <h2 className="font-serif text-5xl font-bold leading-tight">
                   Exceptional Homes.
                   <br />
@@ -142,10 +106,7 @@ export default async function HomePage() {
                 </h2>
               </div>
 
-              <Link
-                href="/properties"
-                className="font-serif text-sm uppercase tracking-[0.25em] text-[#B19A55]"
-              >
+              <Link href="/properties" className="font-serif text-sm uppercase tracking-[0.25em] text-[#B19A55]">
                 View All Listings →
               </Link>
             </div>
@@ -166,75 +127,7 @@ export default async function HomePage() {
                   />
                 ))}
               </div>
-            ) : (
-              <div className="mt-10 border border-[#1A1A1A]/10 bg-white p-10 text-center">
-                <p className="font-serif text-2xl font-bold">
-                  No featured properties yet
-                </p>
-              </div>
-            )}
-          </div>
-        </section>
-      </FadeIn>
-
-      <FadeIn delay={0.2}>
-        <section className="bg-white px-6 py-24">
-          <div className="mx-auto max-w-7xl">
-            <div className="grid gap-12 lg:grid-cols-[1fr_0.7fr]">
-              <div>
-                <p className="mb-3 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
-                  BERGEN COUNTY COMMUNITIES
-                </p>
-
-                <h2 className="max-w-4xl font-serif text-5xl font-bold leading-tight">
-                  Local expertise in New Jersey&apos;s most desirable
-                  communities.
-                </h2>
-              </div>
-
-              <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-2">
-                {targetCities.map((city) => (
-                  <Link
-                    key={city}
-                    href={`/properties?city=${encodeURIComponent(city)}`}
-                    className="group border border-[#1A1A1A]/10 bg-[#F8F5EF] p-6 transition hover:border-[#B19A55] hover:bg-[#EFE7D6]"
-                  >
-                    <p className="font-serif text-xl font-bold transition group-hover:text-[#B19A55]">
-                      {city}
-                    </p>
-                  </Link>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-      </FadeIn>
-
-      <FadeIn delay={0.3}>
-        <section className="bg-[#1A1A1A] px-6 py-24 text-white">
-          <div className="mx-auto max-w-5xl text-center">
-            <p className="mb-3 font-serif text-sm tracking-[0.35em] text-[#D4B06A]">
-              MADISON GROUP
-            </p>
-
-            <h2 className="font-serif text-5xl font-bold leading-tight md:text-6xl">
-              A calmer, smarter approach to luxury real estate.
-            </h2>
-
-            <p className="mx-auto mt-8 max-w-3xl text-lg leading-9 text-white/75">
-              We guide buyers and sellers through major life decisions with
-              strategy, transparency, and elevated service tailored to Bergen
-              County luxury living.
-            </p>
-
-            <div className="mt-12">
-              <Link
-                href="/contact"
-                className="inline-block bg-[#B19A55] px-8 py-4 font-serif text-sm font-bold uppercase tracking-[0.25em] text-white transition hover:bg-[#9D884B]"
-              >
-                Schedule a Consultation
-              </Link>
-            </div>
+            ) : null}
           </div>
         </section>
       </FadeIn>
