@@ -22,58 +22,56 @@ export default async function HomePage() {
   return (
     <main className="bg-[#F8F5EF] text-[#1A1A1A]">
       {/* HERO */}
-      <section className="relative overflow-hidden bg-[#F8F5EF]">
-        <div className="mx-auto grid min-h-[88vh] max-w-[1600px] items-center lg:grid-cols-[0.9fr_1.1fr]">
-          
-          {/* LEFT CONTENT */}
-          <div className="relative z-20 flex items-center px-8 py-20 md:px-16">
-            <div className="max-w-2xl">
-              <p className="mb-8 font-serif text-sm tracking-[0.45em] text-[#B19A55]">
-                BERGEN COUNTY LUXURY REAL ESTATE
-              </p>
+      <section className="relative min-h-screen overflow-hidden bg-black">
+  {/* FULL IMAGE */}
+  <img
+    src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=2400&auto=format&fit=crop"
+    alt="Luxury Estate"
+    className="absolute inset-0 h-full w-full object-cover"
+  />
 
-              <h1 className="font-serif text-6xl font-bold leading-[0.92] tracking-[-0.03em] md:text-[110px]">
-                Building
-                <br />
-                Beautiful Lives
-              </h1>
+  {/* DARK OVERLAY */}
+  <div className="absolute inset-0 bg-black/35" />
 
-              <p className="mt-10 max-w-xl text-[22px] leading-[2.1rem] text-[#1A1A1A]/70">
-                Curated homes, elevated service, and trusted guidance across
-                Bergen County&apos;s most desirable communities.
-              </p>
+  {/* GOLD GRADIENT */}
+  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
 
-              <div className="mt-14 flex flex-col gap-4 sm:flex-row">
-                <Link
-                  href="/properties"
-                  className="bg-[#B19A55] px-10 py-5 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-white transition hover:bg-[#9D884B]"
-                >
-                  Explore Homes
-                </Link>
+  {/* CONTENT */}
+  <div className="relative z-20 mx-auto flex min-h-screen max-w-7xl items-center px-6">
+    <div className="max-w-2xl text-white">
+      <p className="mb-6 font-serif text-sm tracking-[0.45em] text-[#D4B06A]">
+        BERGEN COUNTY LUXURY REAL ESTATE
+      </p>
 
-                <Link
-                  href="/contact"
-                  className="border border-[#1A1A1A]/20 bg-white/70 px-10 py-5 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-[#1A1A1A] transition hover:bg-[#1A1A1A] hover:text-white"
-                >
-                  Contact Us
-                </Link>
-              </div>
-            </div>
-          </div>
+      <h1 className="font-serif text-6xl font-bold leading-[0.92] md:text-[110px]">
+        Building
+        <br />
+        Beautiful Lives
+      </h1>
 
-          {/* RIGHT IMAGE */}
-          <div className="relative hidden h-full min-h-[88vh] lg:block">
-            <img
-              src="https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?q=80&w=2200&auto=format&fit=crop"
-              alt="Luxury Estate"
-              className="absolute inset-0 h-full w-full object-cover"
-            />
+      <p className="mt-10 max-w-xl text-[22px] leading-[2.1rem] text-white/75">
+        Curated homes, elevated service, and trusted guidance across Bergen
+        County&apos;s most desirable communities.
+      </p>
 
-            {/* SOFT FADE */}
-            <div className="absolute inset-0 bg-gradient-to-r from-[#F8F5EF] via-[#F8F5EF]/70 to-transparent" />
-          </div>
-        </div>
-      </section>
+      <div className="mt-14 flex flex-col gap-4 sm:flex-row">
+        <Link
+          href="/properties"
+          className="bg-[#B19A55] px-10 py-5 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-white transition hover:bg-[#9D884B]"
+        >
+          Explore Homes
+        </Link>
+
+        <Link
+          href="/contact"
+          className="border border-white/20 bg-white/10 px-10 py-5 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-white backdrop-blur transition hover:bg-white hover:text-black"
+        >
+          Contact Us
+        </Link>
+      </div>
+    </div>
+  </div>
+</section>
 
       {/* STATS */}
       <FadeIn>
