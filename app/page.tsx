@@ -33,7 +33,7 @@ export default async function HomePage() {
               </p>
 
               <h1 className="font-serif text-6xl font-bold leading-[0.92] tracking-[-0.03em] md:text-[110px]">
-                Building TEST
+                Building
                 <br />
                 Beautiful Lives
               </h1>
