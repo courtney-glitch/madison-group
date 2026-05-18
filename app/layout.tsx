@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import "./globals.css";
 import { Navbar } from "@/components/Navbar";
+import { Footer } from "@/components/Footer";
 
 export const metadata: Metadata = {
   title: "Madison Group | Bergen County Real Estate",
@@ -37,6 +38,8 @@ export default function RootLayout({
         <Navbar />
 
         {children}
+        
+        <Footer />
 
         <footer className="mt-20 border-t border-[#1A1A1A]/10 bg-white px-6 py-14 text-[#1A1A1A]">
           <div className="mx-auto max-w-7xl">
