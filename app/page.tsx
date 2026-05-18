@@ -25,7 +25,7 @@ export default async function HomePage() {
       <section className="relative min-h-screen overflow-hidden bg-black">
   {/* FULL IMAGE */}
   <img
-    src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=2400&auto=format&fit=crop"
+    src="https://photos.zillowstatic.com/fp/a6445b7f0e2ce5ba2bc16a8d5c1a2fe9-p_e.jpg"
     alt="Luxury Estate"
     className="absolute inset-0 h-full w-full object-cover"
   />
