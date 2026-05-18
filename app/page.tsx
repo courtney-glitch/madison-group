@@ -25,7 +25,7 @@ export default async function HomePage() {
       <section className="relative min-h-screen overflow-hidden bg-black">
   {/* FULL IMAGE */}
   <img
-    src="https://photos.zillowstatic.com/fp/a6445b7f0e2ce5ba2bc16a8d5c1a2fe9-p_e.jpg"
+    src="https://imageresize.leadingre.com/IfHSWoHlyuIOiaKuNGck9SunwEy1YJbJmdplWdC-9AA/format:webp/sm:1/q:70/rs:fill/g:no/el:0/cb:2026-05-18144943/w:1280/h:960/aHR0cHM6Ly9zdGFyaW5wdXRkYXRhbHJlcHJvZC5ibG9iLmNvcmUud2luZG93cy5uZXQvc3RhcnByb2plY3QvSW1hZ2VzL3Byb3BlcnR5L29yaWdpbmFsLzE5Nzk2MzIvNzUxNTgyNTcuanBn.webp"
     alt="Luxury Estate"
     className="absolute inset-0 h-full w-full object-cover"
   />
