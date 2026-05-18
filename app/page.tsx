@@ -24,11 +24,17 @@ export default async function HomePage() {
       {/* HERO */}
       <section className="relative min-h-screen overflow-hidden bg-black">
   {/* FULL IMAGE */}
+  <{/* HERO IMAGE */}
+<div className="absolute inset-0 overflow-hidden">
   <img
     src="https://imageresize.leadingre.com/IfHSWoHlyuIOiaKuNGck9SunwEy1YJbJmdplWdC-9AA/format:webp/sm:1/q:70/rs:fill/g:no/el:0/cb:2026-05-18144943/w:1280/h:960/aHR0cHM6Ly9zdGFyaW5wdXRkYXRhbHJlcHJvZC5ibG9iLmNvcmUud2luZG93cy5uZXQvc3RhcnByb2plY3QvSW1hZ2VzL3Byb3BlcnR5L29yaWdpbmFsLzE5Nzk2MzIvNzUxNTgyNTcuanBn.webp"
     alt="Luxury Estate"
-    className="absolute inset-0 h-full w-full object-cover"
+    className="absolute inset-y-0 right-0 h-full w-[72%] object-cover"
   />
+
+  {/* WHITE LUXURY FADE */}
+  <div className="absolute inset-0 bg-gradient-to-r from-[#F8F5EF] via-[#F8F5EF]/92 via-[42%] to-transparent" />
+</div>
 
   {/* DARK OVERLAY */}
   <div className="absolute inset-0 bg-black/35" />
