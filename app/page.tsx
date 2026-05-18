@@ -22,62 +22,55 @@ export default async function HomePage() {
   return (
     <main className="bg-[#F8F5EF] text-[#1A1A1A]">
       {/* HERO */}
-      <section className="relative min-h-screen overflow-hidden bg-black">
-  {/* FULL IMAGE */}
-  <{/* HERO IMAGE */}
-<div className="absolute inset-0 overflow-hidden">
-  <img
-    src="https://imageresize.leadingre.com/IfHSWoHlyuIOiaKuNGck9SunwEy1YJbJmdplWdC-9AA/format:webp/sm:1/q:70/rs:fill/g:no/el:0/cb:2026-05-18144943/w:1280/h:960/aHR0cHM6Ly9zdGFyaW5wdXRkYXRhbHJlcHJvZC5ibG9iLmNvcmUud2luZG93cy5uZXQvc3RhcnByb2plY3QvSW1hZ2VzL3Byb3BlcnR5L29yaWdpbmFsLzE5Nzk2MzIvNzUxNTgyNTcuanBn.webp"
-    alt="Luxury Estate"
-    className="absolute inset-y-0 right-0 h-full w-[72%] object-cover"
-  />
+      <section className="relative min-h-screen overflow-hidden bg-[#F8F5EF]">
+        {/* HERO IMAGE */}
+        <div className="absolute inset-0 overflow-hidden">
+          <img
+            src="https://imageresize.leadingre.com/IfHSWoHlyuIOiaKuNGck9SunwEy1YJbJmdplWdC-9AA/format:webp/sm:1/q:70/rs:fill/g:no/el:0/cb:2026-05-18144943/w:1280/h:960/aHR0cHM6Ly9zdGFyaW5wdXRkYXRhbHJlcHJvZC5ibG9iLmNvcmUud2luZG93cy5uZXQvc3RhcnByb2plY3QvSW1hZ2VzL3Byb3BlcnR5L29yaWdpbmFsLzE5Nzk2MzIvNzUxNTgyNTcuanBn.webp"
+            alt="Luxury Estate"
+            className="absolute inset-y-0 right-0 h-full w-[72%] object-cover"
+          />
 
-  {/* WHITE LUXURY FADE */}
-  <div className="absolute inset-0 bg-gradient-to-r from-[#F8F5EF] via-[#F8F5EF]/92 via-[42%] to-transparent" />
-</div>
+          {/* WHITE LUXURY FADE */}
+          <div className="absolute inset-0 bg-gradient-to-r from-[#F8F5EF] via-[#F8F5EF]/92 via-[42%] to-transparent" />
+        </div>
 
-  {/* DARK OVERLAY */}
-  <div className="absolute inset-0 bg-black/35" />
+        {/* CONTENT */}
+        <div className="relative z-20 mx-auto flex min-h-screen max-w-7xl items-center px-6">
+          <div className="max-w-2xl text-[#1A1A1A]">
+            <p className="mb-6 font-serif text-sm tracking-[0.45em] text-[#B19A55]">
+              BERGEN COUNTY LUXURY REAL ESTATE
+            </p>
 
-  {/* GOLD GRADIENT */}
-  <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/30 to-transparent" />
+            <h1 className="font-serif text-6xl font-bold leading-[0.92] md:text-[110px]">
+              Building
+              <br />
+              Beautiful Lives
+            </h1>
 
-  {/* CONTENT */}
-  <div className="relative z-20 mx-auto flex min-h-screen max-w-7xl items-center px-6">
-    <div className="max-w-2xl text-white">
-      <p className="mb-6 font-serif text-sm tracking-[0.45em] text-[#D4B06A]">
-        BERGEN COUNTY LUXURY REAL ESTATE
-      </p>
+            <p className="mt-10 max-w-xl text-[22px] leading-[2.1rem] text-[#1A1A1A]/70">
+              Curated homes, elevated service, and trusted guidance across
+              Bergen County&apos;s most desirable communities.
+            </p>
 
-      <h1 className="font-serif text-6xl font-bold leading-[0.92] md:text-[110px]">
-        Building
-        <br />
-        Beautiful Lives
-      </h1>
+            <div className="mt-14 flex flex-col gap-4 sm:flex-row">
+              <Link
+                href="/properties"
+                className="bg-[#B19A55] px-10 py-5 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-white transition hover:bg-[#9D884B]"
+              >
+                Explore Homes
+              </Link>
 
-      <p className="mt-10 max-w-xl text-[22px] leading-[2.1rem] text-white/75">
-        Curated homes, elevated service, and trusted guidance across Bergen
-        County&apos;s most desirable communities.
-      </p>
-
-      <div className="mt-14 flex flex-col gap-4 sm:flex-row">
-        <Link
-          href="/properties"
-          className="bg-[#B19A55] px-10 py-5 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-white transition hover:bg-[#9D884B]"
-        >
-          Explore Homes
-        </Link>
-
-        <Link
-          href="/contact"
-          className="border border-white/20 bg-white/10 px-10 py-5 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-white backdrop-blur transition hover:bg-white hover:text-black"
-        >
-          Contact Us
-        </Link>
-      </div>
-    </div>
-  </div>
-</section>
+              <Link
+                href="/contact"
+                className="border border-[#1A1A1A]/20 bg-white/70 px-10 py-5 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-[#1A1A1A] transition hover:bg-[#1A1A1A] hover:text-white"
+              >
+                Contact Us
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
 
       {/* STATS */}
       <FadeIn>
@@ -189,7 +182,8 @@ export default async function HomePage() {
                 </p>
 
                 <h2 className="max-w-4xl font-serif text-6xl font-bold leading-tight">
-                  Local expertise in New Jersey&apos;s most desirable communities.
+                  Local expertise in New Jersey&apos;s most desirable
+                  communities.
                 </h2>
               </div>
 
