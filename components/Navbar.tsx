@@ -43,16 +43,20 @@ export function Navbar() {
   }
 
   const publicLinks = [
+    { href: "/", label: "Home" },
     { href: "/properties", label: "Home Search" },
-    { href: "/team", label: "Team" },
-    { href: "/about", label: "About" },
+    { href: "/map-search", label: "Map Search" },
+    { href: "/saved-searches", label: "Saved Searches" },
+    { href: "/favorites", label: "Favorites" },
+    { href: "/about", label: "Our Approach" },
     { href: "/contact", label: "Contact" },
   ];
 
   return (
     <header className="sticky top-0 z-50 border-b border-[#1A1A1A]/10 bg-white/95 backdrop-blur">
-      <div className="mx-auto max-w-6xl px-6">
+      <div className="mx-auto max-w-7xl px-6">
         <div className="flex items-center justify-between py-5">
+          {/* LOGO */}
           <Link
             href="/"
             className="font-serif text-xl font-bold tracking-wide text-[#1A1A1A]"
@@ -61,6 +65,7 @@ export function Navbar() {
             Madison Group
           </Link>
 
+          {/* MOBILE BUTTON */}
           <button
             type="button"
             onClick={() => setMenuOpen(!menuOpen)}
@@ -69,20 +74,33 @@ export function Navbar() {
             Menu
           </button>
 
-          <nav className="hidden items-center gap-6 text-sm md:flex">
+          {/* DESKTOP NAV */}
+          <nav className="hidden items-center gap-8 text-sm uppercase tracking-[0.18em] md:flex">
             {publicLinks.map((link) => (
-              <Link key={link.href} href={link.href}>
+              <Link
+                key={link.href}
+                href={link.href}
+                className="transition hover:text-[#B19A55]"
+              >
                 {link.label}
               </Link>
             ))}
 
-            <Link href="/favorites">Favorites</Link>
-
             {loggedIn ? (
               <>
-                <Link href="/saved-searches">Saved Searches</Link>
-                <Link href="/account">Account</Link>
-                <Link href="/admin">Admin</Link>
+                <Link
+                  href="/account"
+                  className="transition hover:text-[#B19A55]"
+                >
+                  Account
+                </Link>
+
+                <Link
+                  href="/admin"
+                  className="transition hover:text-[#B19A55]"
+                >
+                  Admin
+                </Link>
 
                 <button
                   type="button"
@@ -93,41 +111,43 @@ export function Navbar() {
                 </button>
               </>
             ) : (
-              <>
-                <Link href="/login">Login</Link>
-                <Link href="/signup">Signup</Link>
-              </>
+              <Link
+                href="/login"
+                className="transition hover:text-[#B19A55]"
+              >
+                Login
+              </Link>
             )}
           </nav>
         </div>
 
+        {/* MOBILE NAV */}
         {menuOpen && (
-          <nav className="grid gap-4 border-t border-[#1A1A1A]/10 py-5 text-sm md:hidden">
+          <nav className="grid gap-5 border-t border-[#1A1A1A]/10 py-5 text-sm uppercase tracking-[0.18em] md:hidden">
             {publicLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
+                className="transition hover:text-[#B19A55]"
               >
                 {link.label}
               </Link>
             ))}
 
-            <Link href="/favorites" onClick={() => setMenuOpen(false)}>
-              Favorites
-            </Link>
-
             {loggedIn ? (
               <>
-                <Link href="/saved-searches" onClick={() => setMenuOpen(false)}>
-                  Saved Searches
-                </Link>
-
-                <Link href="/account" onClick={() => setMenuOpen(false)}>
+                <Link
+                  href="/account"
+                  onClick={() => setMenuOpen(false)}
+                >
                   Account
                 </Link>
 
-                <Link href="/admin" onClick={() => setMenuOpen(false)}>
+                <Link
+                  href="/admin"
+                  onClick={() => setMenuOpen(false)}
+                >
                   Admin
                 </Link>
 
@@ -140,15 +160,12 @@ export function Navbar() {
                 </button>
               </>
             ) : (
-              <>
-                <Link href="/login" onClick={() => setMenuOpen(false)}>
-                  Login
-                </Link>
-
-                <Link href="/signup" onClick={() => setMenuOpen(false)}>
-                  Signup
-                </Link>
-              </>
+              <Link
+                href="/login"
+                onClick={() => setMenuOpen(false)}
+              >
+                Login
+              </Link>
             )}
           </nav>
         )}
