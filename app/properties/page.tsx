@@ -71,11 +71,11 @@ export default async function PropertiesPage({
     return (
       <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
         <section className="mx-auto max-w-7xl">
-          <p className="font-serif text-2xl font-bold">
+          <p className="font-serif text-xl font-bold">
             Something went wrong loading homes.
           </p>
 
-          <p className="mt-4 text-red-500">{error.message}</p>
+          <p className="mt-4 text-sm text-red-500">{error.message}</p>
         </section>
       </main>
     );
@@ -83,37 +83,37 @@ export default async function PropertiesPage({
 
   return (
     <main className="min-h-screen bg-[#F8F5EF] text-[#1A1A1A]">
-      <section className="bg-[#1A1A1A] px-6 py-20 text-white">
+      <section className="bg-[#1A1A1A] px-6 py-14 text-white md:py-16">
         <div className="mx-auto max-w-7xl">
-          <p className="mb-4 font-serif text-sm tracking-[0.35em] text-[#D4B06A]">
-            MADISON GROUP HOME SEARCH
+          <p className="mb-3 font-serif text-[11px] uppercase tracking-[0.32em] text-[#D4B06A]">
+            Madison Group Home Search
           </p>
 
-          <h1 className="max-w-4xl font-serif text-5xl font-bold leading-tight md:text-7xl">
+          <h1 className="max-w-4xl font-serif text-[clamp(2.4rem,5vw,4.4rem)] font-bold leading-tight">
             Search Bergen County homes with clarity and confidence.
           </h1>
 
-          <p className="mt-6 max-w-3xl text-lg leading-8 text-white/70">
+          <p className="mt-5 max-w-3xl text-base leading-8 text-white/65 md:text-lg">
             Browse curated luxury listings, filter by lifestyle needs, and save
             the searches that matter most.
           </p>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-6 py-12">
-        <div className="-mt-24 rounded-none border border-[#1A1A1A]/10 bg-white p-6 shadow-2xl">
+      <section className="mx-auto max-w-7xl px-6 py-10">
+        <div className="-mt-20 rounded-[1.5rem] border border-[#1A1A1A]/10 bg-white p-5 shadow-xl md:p-6">
           <PropertySearch />
           <PropertyFilters />
           <SaveSearchButton />
         </div>
 
-        <div className="mt-10 flex flex-col gap-4 border-b border-[#1A1A1A]/10 pb-6 md:flex-row md:items-end md:justify-between">
+        <div className="mt-9 flex flex-col gap-4 border-b border-[#1A1A1A]/10 pb-5 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="font-serif text-sm tracking-[0.35em] text-[#B19A55]">
-              AVAILABLE HOMES
+            <p className="font-serif text-[11px] uppercase tracking-[0.32em] text-[#B19A55]">
+              Available Homes
             </p>
 
-            <h2 className="mt-3 font-serif text-4xl font-bold">
+            <h2 className="mt-2 font-serif text-[clamp(2rem,4vw,3rem)] font-bold leading-tight">
               {params.city
                 ? `Homes in ${params.city}`
                 : params.search
@@ -122,21 +122,21 @@ export default async function PropertiesPage({
             </h2>
           </div>
 
-          <p className="text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">
+          <p className="text-[11px] uppercase tracking-[0.2em] text-[#1A1A1A]/55">
             Showing {properties?.length || 0} homes
           </p>
         </div>
 
         {properties?.length === 0 ? (
-          <div className="mt-10 border border-[#1A1A1A]/10 bg-white p-12 text-center shadow-xl">
-            <p className="font-serif text-3xl font-bold">No homes found</p>
+          <div className="mt-9 rounded-[1.5rem] border border-[#1A1A1A]/10 bg-white p-10 text-center shadow-lg">
+            <p className="font-serif text-2xl font-bold">No homes found</p>
 
-            <p className="mt-4 text-[#1A1A1A]/60">
+            <p className="mt-3 text-sm text-[#1A1A1A]/60">
               Try adjusting your filters or clearing your search.
             </p>
           </div>
         ) : (
-          <div className="mt-10 grid gap-8 md:grid-cols-3">
+          <div className="mt-9 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
             {properties?.map((property) => (
               <PropertyCard
                 key={property.id}
