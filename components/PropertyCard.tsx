@@ -38,7 +38,7 @@ export function PropertyCard({
   return (
     <Link
       href={`/properties/${id}`}
-      className="group overflow-hidden bg-white shadow-xl transition duration-300 hover:-translate-y-1"
+      className="group overflow-hidden rounded-3xl bg-white shadow-lg transition duration-300 hover:-translate-y-1 hover:shadow-xl"
     >
       <div className="relative overflow-hidden">
         {showImage ? (
@@ -46,17 +46,17 @@ export function PropertyCard({
             src={image}
             alt={title}
             onError={() => setImageError(true)}
-            className="h-80 w-full object-cover transition duration-500 group-hover:scale-105"
+            className="h-56 w-full object-cover transition duration-500 group-hover:scale-105 sm:h-60 lg:h-64"
           />
         ) : (
-          <div className="flex h-80 items-center justify-center bg-[#1A1A1A] px-6 text-center font-serif text-white">
+          <div className="flex h-56 items-center justify-center bg-[#1A1A1A] px-6 text-center font-serif text-sm text-white sm:h-60 lg:h-64">
             Image Coming Soon
           </div>
         )}
 
         {status && (
           <div
-            className={`absolute left-4 top-4 px-4 py-2 font-serif text-xs font-bold uppercase tracking-[0.2em] ${
+            className={`absolute left-4 top-4 rounded-full px-4 py-2 font-serif text-[10px] font-bold uppercase tracking-[0.18em] ${
               badgeStyles[status as keyof typeof badgeStyles] ||
               "bg-white text-[#1A1A1A]"
             }`}
@@ -66,20 +66,20 @@ export function PropertyCard({
         )}
       </div>
 
-      <div className="p-6">
-        <p className="font-serif text-sm tracking-[0.3em] text-[#B19A55]">
+      <div className="p-5">
+        <p className="font-serif text-[11px] tracking-[0.25em] text-[#B19A55]">
           {city}, NJ
         </p>
 
-        <h2 className="mt-3 font-serif text-3xl font-bold leading-tight">
+        <h2 className="mt-3 font-serif text-xl font-bold leading-tight text-[#1A1A1A] sm:text-2xl">
           {title}
         </h2>
 
-        <p className="mt-5 font-serif text-3xl font-bold text-[#B19A55]">
+        <p className="mt-4 font-serif text-2xl font-bold text-[#B19A55]">
           {price}
         </p>
 
-        <div className="mt-6 flex gap-6 text-sm uppercase tracking-[0.2em] text-[#1A1A1A]/60">
+        <div className="mt-5 flex flex-wrap gap-4 text-xs uppercase tracking-[0.18em] text-[#1A1A1A]/60">
           <span>{beds} Beds</span>
           <span>{baths} Baths</span>
         </div>
