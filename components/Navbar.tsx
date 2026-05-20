@@ -55,7 +55,7 @@ export function Navbar() {
 
     document.documentElement.style.setProperty(
       "--sidebar-width",
-      sidebarCollapsed ? "6rem" : "18rem"
+      sidebarCollapsed ? "5.5rem" : "17rem"
     );
   }, [sidebarCollapsed]);
 
@@ -124,15 +124,15 @@ export function Navbar() {
       {/* TOP HEADER */}
       <header
         className={`fixed right-0 top-0 z-50 border-b border-white/30 bg-white/70 backdrop-blur-2xl transition-all duration-300 ${
-          sidebarCollapsed ? "md:left-24" : "md:left-72"
+          sidebarCollapsed ? "md:left-[5.5rem]" : "md:left-[17rem]"
         } left-0`}
       >
-        <div className="relative flex h-20 items-center justify-center px-4 sm:px-8">
+        <div className="relative flex h-18 items-center justify-center px-4 sm:px-8">
           {/* MOBILE MENU */}
           <button
             type="button"
             onClick={() => setMenuOpen(!menuOpen)}
-            className="absolute left-4 rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-3 text-[11px] uppercase tracking-[0.25em] shadow-sm backdrop-blur md:hidden"
+            className="absolute left-4 rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[10px] uppercase tracking-[0.25em] shadow-sm backdrop-blur md:hidden"
           >
             Menu
           </button>
@@ -142,19 +142,19 @@ export function Navbar() {
             <img
               src="/madison-logo.jpg"
               alt="Madison Group"
-              className="h-12 w-auto object-contain sm:h-14"
+              className="h-11 w-auto object-contain"
             />
           </Link>
 
           {/* RIGHT BUTTONS */}
-          <div className="absolute right-4 hidden items-center gap-2 md:flex lg:right-8">
+          <div className="absolute right-4 hidden items-center gap-2 md:flex">
             {loggedIn ? (
               <>
                 <Link
                   href="/account"
-                  className="flex items-center gap-2 rounded-full border border-[#1A1A1A]/10 bg-white/60 px-4 py-2 text-[11px] uppercase tracking-[0.18em] shadow-sm backdrop-blur transition hover:border-[#B19A55]/40 hover:text-[#B19A55]"
+                  className="flex items-center gap-2 rounded-full border border-[#1A1A1A]/10 bg-white/60 px-4 py-2 text-[10px] uppercase tracking-[0.18em] shadow-sm backdrop-blur transition hover:border-[#B19A55]/40 hover:text-[#B19A55]"
                 >
-                  <User size={13} />
+                  <User size={12} />
 
                   <span className="hidden lg:inline">
                     Account
@@ -164,9 +164,9 @@ export function Navbar() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex items-center gap-2 rounded-full border border-[#B19A55]/20 bg-[#B19A55]/10 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-[#B19A55] transition hover:bg-[#B19A55] hover:text-white"
+                  className="flex items-center gap-2 rounded-full border border-[#B19A55]/20 bg-[#B19A55]/10 px-4 py-2 text-[10px] uppercase tracking-[0.18em] text-[#B19A55] transition hover:bg-[#B19A55] hover:text-white"
                 >
-                  <LogOut size={13} />
+                  <LogOut size={12} />
 
                   <span className="hidden lg:inline">
                     Logout
@@ -176,7 +176,7 @@ export function Navbar() {
             ) : (
               <Link
                 href="/login"
-                className="rounded-full border border-[#B19A55]/30 bg-[#B19A55]/10 px-5 py-2 text-[11px] uppercase tracking-[0.25em] text-[#B19A55] transition hover:bg-[#B19A55] hover:text-white"
+                className="rounded-full border border-[#B19A55]/30 bg-[#B19A55]/10 px-5 py-2 text-[10px] uppercase tracking-[0.25em] text-[#B19A55] transition hover:bg-[#B19A55] hover:text-white"
               >
                 Login
               </Link>
@@ -188,28 +188,29 @@ export function Navbar() {
       {/* SIDEBAR */}
       <aside
         className={`fixed left-0 top-0 z-50 hidden h-screen border-r border-white/20 bg-white/65 backdrop-blur-3xl transition-all duration-300 md:block ${
-          sidebarCollapsed ? "w-24" : "w-72"
+          sidebarCollapsed ? "w-[5.5rem]" : "w-[17rem]"
         }`}
       >
         <div
-          className={`flex h-full flex-col justify-between py-6 ${
-            sidebarCollapsed ? "px-3" : "px-5"
+          className={`flex h-full flex-col ${
+            sidebarCollapsed ? "px-3 py-5" : "px-4 py-5"
           }`}
         >
-          <div>
+          {/* SCROLLABLE CONTENT */}
+          <div className="flex-1 overflow-y-auto pr-1">
             {/* BRAND */}
             <div
-              className={`mb-7 ${
+              className={`mb-6 ${
                 sidebarCollapsed ? "text-center" : ""
               }`}
             >
               {!sidebarCollapsed && (
                 <>
-                  <p className="font-serif text-xs tracking-[0.4em] text-[#B19A55]">
+                  <p className="font-serif text-[10px] tracking-[0.35em] text-[#B19A55]">
                     MADISON GROUP
                   </p>
 
-                  <p className="mt-2 text-[10px] uppercase tracking-[0.25em] text-[#1A1A1A]/40">
+                  <p className="mt-2 text-[9px] uppercase tracking-[0.25em] text-[#1A1A1A]/40">
                     Luxury Real Estate
                   </p>
                 </>
@@ -219,29 +220,29 @@ export function Navbar() {
                 <img
                   src="/madison-logo.jpg"
                   alt="Madison Group"
-                  className="mx-auto h-10 w-auto object-contain"
+                  className="mx-auto h-9 w-auto object-contain"
                 />
               )}
             </div>
 
-            {/* SIDEBAR BUTTON */}
+            {/* SIDEBAR TOGGLE */}
             <button
               type="button"
               onClick={() =>
                 setSidebarCollapsed(!sidebarCollapsed)
               }
-              className={`mb-4 flex w-full items-center justify-center gap-3 rounded-2xl border border-[#1A1A1A]/10 bg-white/50 px-4 py-3 text-[#B19A55] shadow-sm transition hover:bg-white ${
+              className={`mb-4 flex w-full items-center justify-center gap-2 rounded-2xl border border-[#1A1A1A]/10 bg-white/50 px-3 py-3 text-[#B19A55] shadow-sm transition hover:bg-white ${
                 sidebarCollapsed ? "" : "justify-start"
               }`}
             >
               {sidebarCollapsed ? (
-                <PanelLeftOpen size={18} />
+                <PanelLeftOpen size={16} />
               ) : (
-                <PanelLeftClose size={18} />
+                <PanelLeftClose size={16} />
               )}
 
               {!sidebarCollapsed && (
-                <span className="font-serif text-xs font-bold">
+                <span className="font-serif text-[11px] font-bold">
                   Hide Sidebar
                 </span>
               )}
@@ -263,16 +264,16 @@ export function Navbar() {
                     }
                     className={`group flex items-center rounded-2xl border border-transparent bg-white/30 shadow-sm backdrop-blur transition hover:border-[#B19A55]/30 hover:bg-white/80 hover:shadow-lg ${
                       sidebarCollapsed
-                        ? "justify-center px-2 py-3"
-                        : "gap-3 px-4 py-3"
+                        ? "justify-center px-2 py-2.5"
+                        : "gap-3 px-3 py-2.5"
                     }`}
                   >
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#B19A55]/10 text-[#B19A55] transition group-hover:bg-[#B19A55] group-hover:text-white">
-                      <Icon size={18} />
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[#B19A55]/10 text-[#B19A55] transition group-hover:bg-[#B19A55] group-hover:text-white">
+                      <Icon size={16} />
                     </div>
 
                     {!sidebarCollapsed && (
-                      <p className="font-serif text-[15px] font-semibold text-[#1A1A1A]">
+                      <p className="font-serif text-[14px] font-semibold text-[#1A1A1A]">
                         {link.label}
                       </p>
                     )}
@@ -284,18 +285,18 @@ export function Navbar() {
 
           {/* FOOTER */}
           {!sidebarCollapsed && (
-            <div className="mt-3 rounded-3xl border border-white/30 bg-white/50 p-5 shadow-xl backdrop-blur">
+            <div className="mt-4 rounded-3xl border border-white/30 bg-white/50 p-4 shadow-xl backdrop-blur">
               <img
                 src="/madison-logo.jpg"
                 alt="Madison Group"
-                className="h-8 w-auto object-contain"
+                className="h-7 w-auto object-contain"
               />
 
-              <p className="mt-4 font-serif text-base text-[#1A1A1A]">
+              <p className="mt-3 font-serif text-sm text-[#1A1A1A]">
                 Bergen County Luxury Real Estate
               </p>
 
-              <p className="mt-2 text-sm leading-6 text-[#1A1A1A]/50">
+              <p className="mt-2 text-xs leading-5 text-[#1A1A1A]/50">
                 Calm guidance. Elevated service.
                 Strategic advocacy.
               </p>
@@ -311,7 +312,7 @@ export function Navbar() {
             <img
               src="/madison-logo.jpg"
               alt="Madison Group"
-              className="h-16 w-auto object-contain"
+              className="h-14 w-auto object-contain"
             />
 
             <button
@@ -323,7 +324,7 @@ export function Navbar() {
             </button>
           </div>
 
-          <nav className="grid gap-4">
+          <nav className="grid gap-3">
             {links.map((link) => {
               const Icon = link.icon;
 
@@ -332,13 +333,13 @@ export function Navbar() {
                   key={link.href}
                   href={link.href}
                   onClick={() => setMenuOpen(false)}
-                  className="flex items-center gap-5 rounded-2xl border border-white/40 bg-white/70 px-5 py-5 shadow-sm"
+                  className="flex items-center gap-4 rounded-2xl border border-white/40 bg-white/70 px-4 py-4 shadow-sm"
                 >
-                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-[#B19A55]/10 text-[#B19A55]">
-                    <Icon size={20} />
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#B19A55]/10 text-[#B19A55]">
+                    <Icon size={18} />
                   </div>
 
-                  <p className="font-serif text-xl text-[#1A1A1A]">
+                  <p className="font-serif text-lg text-[#1A1A1A]">
                     {link.label}
                   </p>
                 </Link>
@@ -349,7 +350,7 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="mt-4 rounded-2xl bg-[#B19A55] px-5 py-5 font-serif text-xl text-white"
+                className="mt-4 rounded-2xl bg-[#B19A55] px-5 py-4 font-serif text-lg text-white"
               >
                 Logout
               </button>
@@ -357,7 +358,7 @@ export function Navbar() {
               <Link
                 href="/login"
                 onClick={() => setMenuOpen(false)}
-                className="mt-4 rounded-2xl bg-[#B19A55] px-5 py-5 text-center font-serif text-xl text-white"
+                className="mt-4 rounded-2xl bg-[#B19A55] px-5 py-4 text-center font-serif text-lg text-white"
               >
                 Login
               </Link>
