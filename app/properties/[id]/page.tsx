@@ -3,10 +3,10 @@ import { supabase } from "@/lib/supabase";
 import { PropertyCard } from "@/components/PropertyCard";
 import { FavoriteButton } from "@/components/FavoriteButton";
 import { ShowingForm } from "@/components/ShowingForm";
-import { MortgageCalculator } from "@/components/MortgageCalculator";
 import { PropertyMap } from "@/components/PropertyMap";
 import { PropertyGallery } from "@/components/PropertyGallery";
 import { TrackPropertyView } from "@/components/TrackPropertyView";
+import { BuyerFinancialCenter } from "@/components/BuyerFinancialCenter";
 
 export default async function PropertyDetailPage({
   params,
@@ -74,19 +74,14 @@ export default async function PropertyDetailPage({
     <main className="min-h-screen bg-[#F8F5EF] text-[#1A1A1A]">
       <TrackPropertyView propertyId={property.id} />
 
-      {/* TOP BAR */}
       <section className="bg-[#1A1A1A] px-6 py-8 text-white">
         <div className="mx-auto max-w-7xl">
-          <Link
-            href="/properties"
-            className="font-serif text-sm text-[#D4B06A]"
-          >
+          <Link href="/properties" className="font-serif text-sm text-[#D4B06A]">
             ← Back to Home Search
           </Link>
         </div>
       </section>
 
-      {/* HERO */}
       <section className="bg-[#1A1A1A] px-6 pb-16 text-white">
         <div className="mx-auto max-w-7xl">
           <div className="grid gap-10 lg:grid-cols-[1fr_0.42fr] lg:items-end">
@@ -122,22 +117,18 @@ export default async function PropertyDetailPage({
         </div>
       </section>
 
-      {/* GALLERY */}
       <section className="mx-auto max-w-7xl px-6 py-10">
         <PropertyGallery images={allImages} title={property.title} />
       </section>
 
-      {/* MAIN CONTENT */}
       <section className="mx-auto max-w-7xl px-6 py-8">
         <div className="grid gap-10 lg:grid-cols-[1fr_0.38fr]">
           <section>
-            {/* STATS */}
             <div className="grid border-y border-[#1A1A1A]/10 bg-white shadow-sm sm:grid-cols-2 lg:grid-cols-4">
               <div className="p-8">
                 <p className="text-sm uppercase tracking-[0.25em] text-[#1A1A1A]/50">
                   Beds
                 </p>
-
                 <p className="mt-3 font-serif text-4xl font-bold">
                   {property.beds}
                 </p>
@@ -147,7 +138,6 @@ export default async function PropertyDetailPage({
                 <p className="text-sm uppercase tracking-[0.25em] text-[#1A1A1A]/50">
                   Baths
                 </p>
-
                 <p className="mt-3 font-serif text-4xl font-bold">
                   {property.baths}
                 </p>
@@ -157,11 +147,8 @@ export default async function PropertyDetailPage({
                 <p className="text-sm uppercase tracking-[0.25em] text-[#1A1A1A]/50">
                   Sq Ft
                 </p>
-
                 <p className="mt-3 font-serif text-4xl font-bold">
-                  {property.sqft
-                    ? property.sqft.toLocaleString()
-                    : "—"}
+                  {property.sqft ? property.sqft.toLocaleString() : "—"}
                 </p>
               </div>
 
@@ -169,14 +156,12 @@ export default async function PropertyDetailPage({
                 <p className="text-sm uppercase tracking-[0.25em] text-[#1A1A1A]/50">
                   Type
                 </p>
-
                 <p className="mt-3 font-serif text-3xl font-bold">
                   {property.property_type || "Home"}
                 </p>
               </div>
             </div>
 
-            {/* OVERVIEW */}
             <section className="py-16">
               <p className="mb-4 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
                 PROPERTY OVERVIEW
@@ -191,7 +176,6 @@ export default async function PropertyDetailPage({
               </p>
             </section>
 
-            {/* DETAILS */}
             {details.length > 0 && (
               <section className="border-t border-[#1A1A1A]/10 py-16">
                 <p className="mb-4 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
@@ -217,12 +201,10 @@ export default async function PropertyDetailPage({
               </section>
             )}
 
-            {/* MORTGAGE */}
             <section className="border-t border-[#1A1A1A]/10 py-16">
-              <MortgageCalculator price={property.price} />
+              <BuyerFinancialCenter price={property.price} />
             </section>
 
-            {/* MAP */}
             <section className="border-t border-[#1A1A1A]/10 py-16">
               <p className="mb-4 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
                 LOCATION
@@ -244,7 +226,6 @@ export default async function PropertyDetailPage({
             </section>
           </section>
 
-          {/* SIDEBAR */}
           <aside className="h-fit bg-white p-8 shadow-2xl lg:sticky lg:top-28">
             <p className="font-serif text-sm tracking-[0.35em] text-[#B19A55]">
               PRIVATE TOUR
@@ -273,14 +254,12 @@ export default async function PropertyDetailPage({
         </div>
       </section>
 
-      {/* SHOWING FORM */}
       <section id="showing" className="mx-auto max-w-4xl px-6 py-16">
         <div className="bg-white p-8 shadow-xl">
           <ShowingForm propertyId={property.id} />
         </div>
       </section>
 
-      {/* SIMILAR HOMES */}
       {similarHomes && similarHomes.length > 0 && (
         <section className="mx-auto max-w-7xl px-6 py-20">
           <div className="flex flex-col gap-6 border-t border-[#1A1A1A]/10 pt-14 md:flex-row md:items-end md:justify-between">
