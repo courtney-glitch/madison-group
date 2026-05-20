@@ -17,6 +17,7 @@ import {
   LogOut,
   PanelLeftClose,
   PanelLeftOpen,
+  Calculator,
 } from "lucide-react";
 
 export function Navbar() {
@@ -29,7 +30,9 @@ export function Navbar() {
   useEffect(() => {
     checkUser();
 
-    const savedSidebar = localStorage.getItem("madison-sidebar-collapsed");
+    const savedSidebar = localStorage.getItem(
+      "madison-sidebar-collapsed"
+    );
 
     if (savedSidebar === "true") {
       setSidebarCollapsed(true);
@@ -52,7 +55,7 @@ export function Navbar() {
 
     document.documentElement.style.setProperty(
       "--sidebar-width",
-      sidebarCollapsed ? "6rem" : "20rem"
+      sidebarCollapsed ? "6rem" : "18rem"
     );
   }, [sidebarCollapsed]);
 
@@ -66,7 +69,9 @@ export function Navbar() {
 
   async function handleLogout() {
     await supabase.auth.signOut();
+
     setMenuOpen(false);
+
     router.push("/login");
     router.refresh();
   }
@@ -81,6 +86,11 @@ export function Navbar() {
       href: "/properties",
       label: "Home Search",
       icon: Search,
+    },
+    {
+      href: "/budget-calculator",
+      label: "Budget Calculator",
+      icon: Calculator,
     },
     {
       href: "/map-search",
@@ -114,10 +124,10 @@ export function Navbar() {
       {/* TOP HEADER */}
       <header
         className={`fixed right-0 top-0 z-50 border-b border-white/30 bg-white/70 backdrop-blur-2xl transition-all duration-300 ${
-          sidebarCollapsed ? "md:left-24" : "md:left-80"
+          sidebarCollapsed ? "md:left-24" : "md:left-72"
         } left-0`}
       >
-        <div className="relative flex h-24 items-center justify-center px-4 sm:px-8">
+        <div className="relative flex h-20 items-center justify-center px-4 sm:px-8">
           {/* MOBILE MENU */}
           <button
             type="button"
@@ -132,35 +142,41 @@ export function Navbar() {
             <img
               src="/madison-logo.jpg"
               alt="Madison Group"
-              className="h-14 w-auto object-contain sm:h-16"
+              className="h-12 w-auto object-contain sm:h-14"
             />
           </Link>
 
           {/* RIGHT BUTTONS */}
-          <div className="absolute right-4 hidden items-center gap-2 md:flex lg:right-8 lg:gap-4">
+          <div className="absolute right-4 hidden items-center gap-2 md:flex lg:right-8">
             {loggedIn ? (
               <>
                 <Link
                   href="/account"
-                  className="flex items-center gap-2 rounded-full border border-[#1A1A1A]/10 bg-white/60 px-4 py-3 text-xs uppercase tracking-[0.18em] shadow-sm backdrop-blur transition hover:border-[#B19A55]/40 hover:text-[#B19A55] lg:px-5"
+                  className="flex items-center gap-2 rounded-full border border-[#1A1A1A]/10 bg-white/60 px-4 py-2 text-[11px] uppercase tracking-[0.18em] shadow-sm backdrop-blur transition hover:border-[#B19A55]/40 hover:text-[#B19A55]"
                 >
-                  <User size={14} />
-                  <span className="hidden lg:inline">Account</span>
+                  <User size={13} />
+
+                  <span className="hidden lg:inline">
+                    Account
+                  </span>
                 </Link>
 
                 <button
                   type="button"
                   onClick={handleLogout}
-                  className="flex items-center gap-2 rounded-full border border-[#B19A55]/20 bg-[#B19A55]/10 px-4 py-3 text-xs uppercase tracking-[0.18em] text-[#B19A55] transition hover:bg-[#B19A55] hover:text-white lg:px-5"
+                  className="flex items-center gap-2 rounded-full border border-[#B19A55]/20 bg-[#B19A55]/10 px-4 py-2 text-[11px] uppercase tracking-[0.18em] text-[#B19A55] transition hover:bg-[#B19A55] hover:text-white"
                 >
-                  <LogOut size={14} />
-                  <span className="hidden lg:inline">Logout</span>
+                  <LogOut size={13} />
+
+                  <span className="hidden lg:inline">
+                    Logout
+                  </span>
                 </button>
               </>
             ) : (
               <Link
                 href="/login"
-                className="rounded-full border border-[#B19A55]/30 bg-[#B19A55]/10 px-5 py-3 text-xs uppercase tracking-[0.25em] text-[#B19A55] transition hover:bg-[#B19A55] hover:text-white"
+                className="rounded-full border border-[#B19A55]/30 bg-[#B19A55]/10 px-5 py-2 text-[11px] uppercase tracking-[0.25em] text-[#B19A55] transition hover:bg-[#B19A55] hover:text-white"
               >
                 Login
               </Link>
@@ -169,27 +185,31 @@ export function Navbar() {
         </div>
       </header>
 
-      {/* DESKTOP SIDEBAR */}
+      {/* SIDEBAR */}
       <aside
         className={`fixed left-0 top-0 z-50 hidden h-screen border-r border-white/20 bg-white/65 backdrop-blur-3xl transition-all duration-300 md:block ${
-          sidebarCollapsed ? "w-24" : "w-80"
+          sidebarCollapsed ? "w-24" : "w-72"
         }`}
       >
         <div
-          className={`flex h-full flex-col justify-between py-8 ${
-            sidebarCollapsed ? "px-4" : "px-7"
+          className={`flex h-full flex-col justify-between py-6 ${
+            sidebarCollapsed ? "px-3" : "px-5"
           }`}
         >
           <div>
             {/* BRAND */}
-            <div className={`mb-10 ${sidebarCollapsed ? "text-center" : ""}`}>
+            <div
+              className={`mb-7 ${
+                sidebarCollapsed ? "text-center" : ""
+              }`}
+            >
               {!sidebarCollapsed && (
                 <>
-                  <p className="font-serif text-sm tracking-[0.45em] text-[#B19A55]">
+                  <p className="font-serif text-xs tracking-[0.4em] text-[#B19A55]">
                     MADISON GROUP
                   </p>
 
-                  <p className="mt-3 text-xs uppercase tracking-[0.3em] text-[#1A1A1A]/40">
+                  <p className="mt-2 text-[10px] uppercase tracking-[0.25em] text-[#1A1A1A]/40">
                     Luxury Real Estate
                   </p>
                 </>
@@ -199,34 +219,36 @@ export function Navbar() {
                 <img
                   src="/madison-logo.jpg"
                   alt="Madison Group"
-                  className="mx-auto h-12 w-auto object-contain"
+                  className="mx-auto h-10 w-auto object-contain"
                 />
               )}
             </div>
 
-            {/* HIDE / SHOW BUTTON */}
+            {/* SIDEBAR BUTTON */}
             <button
               type="button"
-              onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
-              className={`mb-5 flex w-full items-center justify-center gap-3 rounded-2xl border border-[#1A1A1A]/10 bg-white/50 px-4 py-4 text-[#B19A55] shadow-sm transition hover:bg-white ${
+              onClick={() =>
+                setSidebarCollapsed(!sidebarCollapsed)
+              }
+              className={`mb-4 flex w-full items-center justify-center gap-3 rounded-2xl border border-[#1A1A1A]/10 bg-white/50 px-4 py-3 text-[#B19A55] shadow-sm transition hover:bg-white ${
                 sidebarCollapsed ? "" : "justify-start"
               }`}
             >
               {sidebarCollapsed ? (
-                <PanelLeftOpen size={20} />
+                <PanelLeftOpen size={18} />
               ) : (
-                <PanelLeftClose size={20} />
+                <PanelLeftClose size={18} />
               )}
 
               {!sidebarCollapsed && (
-                <span className="font-serif text-sm font-bold">
+                <span className="font-serif text-xs font-bold">
                   Hide Sidebar
                 </span>
               )}
             </button>
 
             {/* NAVIGATION */}
-            <nav className="grid gap-3">
+            <nav className="grid gap-2">
               {links.map((link) => {
                 const Icon = link.icon;
 
@@ -234,19 +256,23 @@ export function Navbar() {
                   <Link
                     key={link.href}
                     href={link.href}
-                    title={sidebarCollapsed ? link.label : undefined}
-                    className={`group flex items-center rounded-2xl border border-transparent bg-white/30 shadow-sm backdrop-blur transition hover:border-[#B19A55]/30 hover:bg-white/80 hover:shadow-xl ${
+                    title={
                       sidebarCollapsed
-                        ? "justify-center px-3 py-4"
-                        : "gap-4 px-5 py-5"
+                        ? link.label
+                        : undefined
+                    }
+                    className={`group flex items-center rounded-2xl border border-transparent bg-white/30 shadow-sm backdrop-blur transition hover:border-[#B19A55]/30 hover:bg-white/80 hover:shadow-lg ${
+                      sidebarCollapsed
+                        ? "justify-center px-2 py-3"
+                        : "gap-3 px-4 py-3"
                     }`}
                   >
-                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-[#B19A55]/10 text-[#B19A55] transition group-hover:bg-[#B19A55] group-hover:text-white">
-                      <Icon size={20} />
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-[#B19A55]/10 text-[#B19A55] transition group-hover:bg-[#B19A55] group-hover:text-white">
+                      <Icon size={18} />
                     </div>
 
                     {!sidebarCollapsed && (
-                      <p className="font-serif text-lg font-semibold text-[#1A1A1A]">
+                      <p className="font-serif text-[15px] font-semibold text-[#1A1A1A]">
                         {link.label}
                       </p>
                     )}
@@ -258,19 +284,20 @@ export function Navbar() {
 
           {/* FOOTER */}
           {!sidebarCollapsed && (
-            <div className="rounded-3xl border border-white/30 bg-white/50 p-6 shadow-xl backdrop-blur">
+            <div className="mt-3 rounded-3xl border border-white/30 bg-white/50 p-5 shadow-xl backdrop-blur">
               <img
                 src="/madison-logo.jpg"
                 alt="Madison Group"
-                className="h-12 w-auto object-contain"
+                className="h-8 w-auto object-contain"
               />
 
-              <p className="mt-5 font-serif text-lg text-[#1A1A1A]">
+              <p className="mt-4 font-serif text-base text-[#1A1A1A]">
                 Bergen County Luxury Real Estate
               </p>
 
-              <p className="mt-2 text-sm leading-7 text-[#1A1A1A]/50">
-                Calm guidance. Elevated service. Strategic advocacy.
+              <p className="mt-2 text-sm leading-6 text-[#1A1A1A]/50">
+                Calm guidance. Elevated service.
+                Strategic advocacy.
               </p>
             </div>
           )}
