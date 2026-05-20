@@ -15,108 +15,137 @@ type PropertyGalleryProps = {
 export function PropertyGallery({ images, title }: PropertyGalleryProps) {
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
 
-  if (images.length === 0) {
+  const safeImages = images?.filter((image) => image.image_url) || [];
+  const mainImage = safeImages[0];
+  const sideImages = safeImages.slice(1, 5);
+
+  if (!mainImage) {
     return (
       <div className="flex h-[620px] w-full items-center justify-center bg-[#1A1A1A] text-white">
-        No Image Available
+        Image Coming Soon
       </div>
     );
   }
 
-  const activeImage = activeIndex !== null ? images[activeIndex] : null;
+  function openImage(index: number) {
+    setActiveIndex(index);
+  }
+
+  function closeImage() {
+    setActiveIndex(null);
+  }
 
   function nextImage() {
     if (activeIndex === null) return;
 
-    setActiveIndex((activeIndex + 1) % images.length);
+    setActiveIndex((activeIndex + 1) % safeImages.length);
   }
 
   function previousImage() {
     if (activeIndex === null) return;
 
-    setActiveIndex(activeIndex === 0 ? images.length - 1 : activeIndex - 1);
+    setActiveIndex(
+      activeIndex === 0 ? safeImages.length - 1 : activeIndex - 1
+    );
   }
 
   return (
     <>
-      <div className="grid gap-4">
+      <section className="grid gap-4 lg:grid-cols-[1.3fr_0.7fr]">
         <button
           type="button"
-          onClick={() => setActiveIndex(0)}
-          className="block text-left"
+          onClick={() => openImage(0)}
+          className="group relative overflow-hidden text-left"
         >
           <img
-            src={images[0].image_url}
+            src={mainImage.image_url}
             alt={title}
-            className="h-[560px] w-full object-cover shadow-2xl transition hover:opacity-90"
+            className="h-[720px] w-full object-cover transition duration-700 group-hover:scale-105"
           />
+
+          <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent opacity-80" />
+
+          <div className="absolute bottom-6 left-6 bg-white/90 px-5 py-3 backdrop-blur">
+            <p className="font-serif text-sm uppercase tracking-[0.25em] text-[#B19A55]">
+              View Gallery
+            </p>
+          </div>
         </button>
 
-        {images.length > 1 && (
-          <div className="grid gap-4 md:grid-cols-3">
-            {images.slice(1, 4).map((image, index) => (
+        <div className="grid gap-4">
+          {sideImages.length > 0 ? (
+            sideImages.map((image, index) => (
               <button
                 key={image.id}
                 type="button"
-                onClick={() => setActiveIndex(index + 1)}
-                className="block text-left"
+                onClick={() => openImage(index + 1)}
+                className="group relative overflow-hidden text-left"
               >
                 <img
                   src={image.image_url}
-                  alt={title}
-                  className="h-40 w-full object-cover transition hover:opacity-80"
+                  alt={`${title} ${index + 2}`}
+                  className="h-[170px] w-full object-cover transition duration-700 group-hover:scale-105"
                 />
-              </button>
-            ))}
-          </div>
-        )}
-      </div>
 
-      {activeImage && activeIndex !== null && (
-        <div className="fixed inset-0 z-[999] bg-black/95 px-6 py-6 text-white">
-          <div className="mx-auto flex h-full max-w-7xl flex-col">
-            <div className="flex items-center justify-between">
-              <p className="font-serif text-sm tracking-[0.35em] text-[#D4B06A]">
-                PROPERTY GALLERY
-              </p>
+                <div className="absolute inset-0 bg-black/0 transition group-hover:bg-black/20" />
 
-              <button
-                type="button"
-                onClick={() => setActiveIndex(null)}
-                className="border border-white/30 px-5 py-2 font-serif text-sm uppercase tracking-[0.2em]"
-              >
-                Close
+                {index === sideImages.length - 1 && safeImages.length > 5 && (
+                  <div className="absolute inset-0 flex items-center justify-center bg-black/55 text-white">
+                    <p className="font-serif text-2xl font-bold">
+                      +{safeImages.length - 5} More
+                    </p>
+                  </div>
+                )}
               </button>
+            ))
+          ) : (
+            <div className="grid gap-4">
+              <div className="h-[170px] bg-[#EFE7D6]" />
+              <div className="h-[170px] bg-[#EFE7D6]" />
+              <div className="h-[170px] bg-[#EFE7D6]" />
+              <div className="h-[170px] bg-[#EFE7D6]" />
             </div>
+          )}
+        </div>
+      </section>
 
-            <div className="relative mt-6 flex flex-1 items-center justify-center">
-              <button
-                type="button"
-                onClick={previousImage}
-                className="absolute left-0 z-10 bg-white/10 px-5 py-4 font-serif text-2xl backdrop-blur hover:bg-white/20"
-              >
-                ←
-              </button>
+      {activeIndex !== null && (
+        <div className="fixed inset-0 z-[100] bg-black/95 px-6 py-8 text-white">
+          <button
+            type="button"
+            onClick={closeImage}
+            className="absolute right-6 top-6 z-20 border border-white/20 px-5 py-3 font-serif text-xs uppercase tracking-[0.25em]"
+          >
+            Close
+          </button>
 
-              <img
-                src={activeImage.image_url}
-                alt={title}
-                className="max-h-[75vh] w-full object-contain"
-              />
+          <button
+            type="button"
+            onClick={previousImage}
+            className="absolute left-6 top-1/2 z-20 -translate-y-1/2 border border-white/20 px-5 py-4 font-serif text-xl"
+          >
+            ←
+          </button>
 
-              <button
-                type="button"
-                onClick={nextImage}
-                className="absolute right-0 z-10 bg-white/10 px-5 py-4 font-serif text-2xl backdrop-blur hover:bg-white/20"
-              >
-                →
-              </button>
-            </div>
+          <button
+            type="button"
+            onClick={nextImage}
+            className="absolute right-6 top-1/2 z-20 -translate-y-1/2 border border-white/20 px-5 py-4 font-serif text-xl"
+          >
+            →
+          </button>
 
-            <p className="mt-4 text-center text-sm text-white/60">
-              {activeIndex + 1} / {images.length}
-            </p>
+          <div className="flex h-full items-center justify-center">
+            <img
+              src={safeImages[activeIndex].image_url}
+              alt={title}
+              className="max-h-[85vh] max-w-[92vw] object-contain"
+            />
           </div>
+
+          <p className="absolute bottom-6 left-1/2 -translate-x-1/2 font-serif text-sm uppercase tracking-[0.25em] text-white/60">
+            {activeIndex + 1} / {safeImages.length}
+          </p>
         </div>
       )}
     </>
