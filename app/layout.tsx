@@ -18,7 +18,7 @@ export default function RootLayout({
       <body>
         <Navbar />
 
-        <div className="pt-20 md:pl-72">
+        <div className="pt-24 transition-all duration-300 md:pl-[var(--sidebar-width,20rem)]">
           {children}
           <Footer />
         </div>
