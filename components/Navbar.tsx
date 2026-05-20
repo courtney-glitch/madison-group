@@ -7,7 +7,6 @@ import { supabase } from "@/lib/supabase";
 
 export function Navbar() {
   const router = useRouter();
-
   const [loggedIn, setLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -20,9 +19,7 @@ export function Navbar() {
       checkUser();
     });
 
-    return () => {
-      subscription.unsubscribe();
-    };
+    return () => subscription.unsubscribe();
   }, []);
 
   async function checkUser() {
@@ -40,122 +37,144 @@ export function Navbar() {
     router.refresh();
   }
 
-  const publicLinks = [
-    { href: "/", label: "Home" },
+  const links = [
+    { href: "/", label: "Dashboard" },
     { href: "/properties", label: "Home Search" },
-    { href: "/map-search", label: "Map" },
+    { href: "/map-search", label: "Map Search" },
     { href: "/saved-searches", label: "Saved Searches" },
     { href: "/favorites", label: "Favorites" },
-    { href: "/about", label: "Approach" },
+    { href: "/communities/wyckoff", label: "Communities" },
+    { href: "/about", label: "Our Approach" },
     { href: "/contact", label: "Contact" },
   ];
 
   return (
-    <header className="sticky top-0 z-50 border-b border-[#1A1A1A]/10 bg-white/90 backdrop-blur-xl">
-      <div className="mx-auto max-w-[1500px] px-6">
-        <div className="flex h-20 items-center justify-between">
-          <Link
-            href="/"
-            onClick={() => setMenuOpen(false)}
-            className="font-serif text-[22px] font-semibold tracking-[-0.02em] text-[#1A1A1A]"
-          >
-            Madison Group
-          </Link>
-
+    <>
+      <header className="fixed left-0 right-0 top-0 z-50 border-b border-[#1A1A1A]/10 bg-white/95 backdrop-blur md:left-72">
+        <div className="relative flex h-20 items-center justify-center px-6">
           <button
             type="button"
             onClick={() => setMenuOpen(!menuOpen)}
-            className="border border-[#1A1A1A]/15 px-4 py-2 text-[11px] uppercase tracking-[0.22em] text-[#1A1A1A] md:hidden"
+            className="absolute left-6 border border-[#1A1A1A]/15 px-4 py-2 text-xs uppercase tracking-[0.25em] md:hidden"
           >
             Menu
           </button>
 
-          <nav className="hidden items-center gap-5 text-[11px] uppercase tracking-[0.2em] text-[#1A1A1A]/70 md:flex">
-            {publicLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="whitespace-nowrap transition hover:text-[#B19A55]"
-              >
-                {link.label}
-              </Link>
-            ))}
+          <Link href="/" className="flex items-center justify-center">
+            <img
+              src="/madison-logo.jpg"
+              alt="Madison Group"
+              className="h-14 w-auto object-contain"
+            />
+          </Link>
 
-            <span className="h-4 w-px bg-[#1A1A1A]/15" />
-
+          <div className="absolute right-6 hidden items-center gap-4 text-xs uppercase tracking-[0.2em] md:flex">
             {loggedIn ? (
               <>
-                <Link
-                  href="/account"
-                  className="whitespace-nowrap transition hover:text-[#B19A55]"
-                >
+                <Link href="/account" className="hover:text-[#B19A55]">
                   Account
                 </Link>
 
-                <Link
-                  href="/admin"
-                  className="whitespace-nowrap transition hover:text-[#B19A55]"
-                >
-                  Admin
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="whitespace-nowrap text-[#B19A55]"
-                >
+                <button onClick={handleLogout} className="text-[#B19A55]">
                   Logout
                 </button>
               </>
             ) : (
               <Link
                 href="/login"
-                className="whitespace-nowrap border border-[#B19A55] px-4 py-2 text-[#B19A55] transition hover:bg-[#B19A55] hover:text-white"
+                className="border border-[#B19A55] px-4 py-2 text-[#B19A55] hover:bg-[#B19A55] hover:text-white"
               >
                 Login
               </Link>
             )}
-          </nav>
+          </div>
         </div>
+      </header>
 
-        {menuOpen && (
-          <nav className="grid gap-5 border-t border-[#1A1A1A]/10 py-6 text-[12px] uppercase tracking-[0.2em] text-[#1A1A1A]/75 md:hidden">
-            {publicLinks.map((link) => (
+      <aside className="fixed left-0 top-0 z-50 hidden h-screen w-72 border-r border-white/10 bg-[#111111] text-white md:block">
+        <div className="flex h-full flex-col justify-between px-6 py-8">
+          <div>
+            <div className="mb-10">
+              <p className="font-serif text-sm tracking-[0.35em] text-[#D4B06A]">
+                MADISON GROUP
+              </p>
+              <p className="mt-2 text-xs uppercase tracking-[0.25em] text-white/45">
+                Luxury Real Estate
+              </p>
+            </div>
+
+            <nav className="grid gap-2">
+              {links.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="border-l-2 border-transparent px-4 py-4 font-serif text-base text-white/75 transition hover:border-[#B19A55] hover:bg-white/5 hover:text-[#D4B06A]"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          <div className="border-t border-white/10 pt-6">
+            <p className="font-serif text-sm text-white">Madison Group</p>
+            <p className="mt-1 text-xs text-white/45">
+              Bergen County, New Jersey
+            </p>
+          </div>
+        </div>
+      </aside>
+
+      {menuOpen && (
+        <div className="fixed inset-0 z-[60] bg-[#111111] px-6 py-8 text-white md:hidden">
+          <div className="mb-8 flex items-center justify-between">
+            <img
+              src="/madison-logo.jpg"
+              alt="Madison Group"
+              className="h-14 w-auto object-contain"
+            />
+
+            <button
+              type="button"
+              onClick={() => setMenuOpen(false)}
+              className="border border-white/20 px-4 py-2 text-xs uppercase tracking-[0.25em]"
+            >
+              Close
+            </button>
+          </div>
+
+          <nav className="grid gap-4">
+            {links.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
                 onClick={() => setMenuOpen(false)}
+                className="border-b border-white/10 py-4 font-serif text-xl"
               >
                 {link.label}
               </Link>
             ))}
 
             {loggedIn ? (
-              <>
-                <Link href="/account" onClick={() => setMenuOpen(false)}>
-                  Account
-                </Link>
-
-                <Link href="/admin" onClick={() => setMenuOpen(false)}>
-                  Admin
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="text-left text-[#B19A55]"
-                >
-                  Logout
-                </button>
-              </>
+              <button
+                type="button"
+                onClick={handleLogout}
+                className="py-4 text-left font-serif text-xl text-[#D4B06A]"
+              >
+                Logout
+              </button>
             ) : (
-              <Link href="/login" onClick={() => setMenuOpen(false)}>
+              <Link
+                href="/login"
+                onClick={() => setMenuOpen(false)}
+                className="py-4 font-serif text-xl text-[#D4B06A]"
+              >
                 Login
               </Link>
             )}
           </nav>
-        )}
-      </div>
-    </header>
+        </div>
+      )}
+    </>
   );
 }
