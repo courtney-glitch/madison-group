@@ -15,11 +15,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body>
+      <body className="bg-[#F8F5EF] text-[15px] text-[#1A1A1A] antialiased">
         <Navbar />
 
-        <div className="pt-24 transition-all duration-300 md:pl-[var(--sidebar-width,20rem)]">
-          {children}
+        <div className="pt-[4.5rem] transition-all duration-300 md:pl-[var(--sidebar-width,17rem)]">
+          <div className="min-w-0">{children}</div>
           <Footer />
         </div>
       </body>
