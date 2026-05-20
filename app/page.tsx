@@ -3,15 +3,6 @@ import { supabase } from "@/lib/supabase";
 import { PropertyCard } from "@/components/PropertyCard";
 import { FadeIn } from "@/components/FadeIn";
 
-const targetCities = [
-  "Wyckoff",
-  "Mahwah",
-  "Saddle River",
-  "Upper Saddle River",
-  "Allendale",
-  "Franklin Lakes",
-];
-
 export default async function HomePage() {
   const { data: featuredProperties } = await supabase
     .from("properties")
@@ -58,7 +49,7 @@ export default async function HomePage() {
                 href="/properties"
                 className="bg-[#B19A55] px-10 py-5 text-center font-serif text-sm font-bold uppercase tracking-[0.25em] text-white transition hover:bg-[#9D884B]"
               >
-                Explore Homes
+                Home Search
               </Link>
 
               <Link
@@ -175,31 +166,109 @@ export default async function HomePage() {
       <FadeIn delay={0.2}>
         <section className="bg-white px-6 py-28">
           <div className="mx-auto max-w-7xl">
-            <div className="grid gap-12 lg:grid-cols-[1fr_0.7fr]">
+            <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
               <div>
                 <p className="mb-4 font-serif text-sm tracking-[0.35em] text-[#B19A55]">
                   BERGEN COUNTY COMMUNITIES
                 </p>
 
                 <h2 className="max-w-4xl font-serif text-6xl font-bold leading-tight">
-                  Local expertise in New Jersey&apos;s most desirable
-                  communities.
+                  Explore Northern New Jersey&apos;s most desirable communities.
                 </h2>
               </div>
 
-              <div className="grid gap-4 sm:grid-cols-2">
-                {targetCities.map((city) => (
-                  <Link
-                    key={city}
-                    href={`/properties?city=${encodeURIComponent(city)}`}
-                    className="group border border-[#1A1A1A]/10 bg-[#F8F5EF] p-8 transition hover:border-[#B19A55] hover:bg-[#EFE7D6]"
-                  >
-                    <p className="font-serif text-2xl font-bold transition group-hover:text-[#B19A55]">
-                      {city}
-                    </p>
-                  </Link>
-                ))}
-              </div>
+              <Link
+                href="/properties"
+                className="font-serif text-sm uppercase tracking-[0.25em] text-[#B19A55]"
+              >
+                View All Homes →
+              </Link>
+            </div>
+
+            <div className="mt-16 grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+              {/* WYCKOFF */}
+              <Link
+                href="/communities/wyckoff"
+                className="group relative overflow-hidden"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1600607687644-c7171b42498f?q=80&w=1400&auto=format&fit=crop"
+                  alt="Wyckoff"
+                  className="h-[520px] w-full object-cover transition duration-700 group-hover:scale-105"
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+
+                <div className="absolute bottom-0 p-8 text-white">
+                  <p className="text-sm uppercase tracking-[0.25em] text-white/70">
+                    Bergen County
+                  </p>
+
+                  <h3 className="mt-3 font-serif text-4xl font-bold">
+                    Wyckoff
+                  </h3>
+
+                  <p className="mt-4 max-w-sm leading-7 text-white/75">
+                    Luxury homes, tree-lined streets, and timeless suburban elegance.
+                  </p>
+                </div>
+              </Link>
+
+              {/* FRANKLIN LAKES */}
+              <Link
+                href="/communities/franklin-lakes"
+                className="group relative overflow-hidden"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1600585154526-990dced4db0d?q=80&w=1400&auto=format&fit=crop"
+                  alt="Franklin Lakes"
+                  className="h-[520px] w-full object-cover transition duration-700 group-hover:scale-105"
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+
+                <div className="absolute bottom-0 p-8 text-white">
+                  <p className="text-sm uppercase tracking-[0.25em] text-white/70">
+                    Bergen County
+                  </p>
+
+                  <h3 className="mt-3 font-serif text-4xl font-bold">
+                    Franklin Lakes
+                  </h3>
+
+                  <p className="mt-4 max-w-sm leading-7 text-white/75">
+                    Prestigious estates, private luxury, and elevated living.
+                  </p>
+                </div>
+              </Link>
+
+              {/* SADDLE RIVER */}
+              <Link
+                href="/communities/saddle-river"
+                className="group relative overflow-hidden"
+              >
+                <img
+                  src="https://images.unsplash.com/photo-1600047509807-ba8f99d2cdde?q=80&w=1400&auto=format&fit=crop"
+                  alt="Saddle River"
+                  className="h-[520px] w-full object-cover transition duration-700 group-hover:scale-105"
+                />
+
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/10 to-transparent" />
+
+                <div className="absolute bottom-0 p-8 text-white">
+                  <p className="text-sm uppercase tracking-[0.25em] text-white/70">
+                    Bergen County
+                  </p>
+
+                  <h3 className="mt-3 font-serif text-4xl font-bold">
+                    Saddle River
+                  </h3>
+
+                  <p className="mt-4 max-w-sm leading-7 text-white/75">
+                    Grand estate living with privacy, prestige, and sophistication.
+                  </p>
+                </div>
+              </Link>
             </div>
           </div>
         </section>
