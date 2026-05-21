@@ -17,6 +17,7 @@ import {
   LogOut,
   Calculator,
   Scale,
+  Activity,
 } from "lucide-react";
 
 export function Navbar() {
@@ -94,6 +95,11 @@ export function Navbar() {
       href: "/communities/wyckoff",
       label: "Communities",
       icon: Building2,
+    },
+    {
+      href: "/admin/client-activity",
+      label: "Client Activity",
+      icon: Activity,
     },
     {
       href: "/contact",
