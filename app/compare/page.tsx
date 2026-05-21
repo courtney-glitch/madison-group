@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Scale, Star, Heart, Home } from "lucide-react";
 
@@ -14,12 +17,97 @@ function money(value: string | number | null) {
   });
 }
 
-export default async function ComparePage() {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export default function ComparePage() {
+  const [loading, setLoading] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [compareItems, setCompareItems] = useState<any[]>([]);
 
-  if (!user) {
+  useEffect(() => {
+    loadCompareData();
+  }, []);
+
+  async function loadCompareData() {
+    setLoading(true);
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      setLoggedIn(false);
+      setLoading(false);
+      return;
+    }
+
+    setLoggedIn(true);
+
+    const { data: notes } = await supabase
+      .from("property_notes")
+      .select(
+        `
+        id,
+        rating,
+        note,
+        properties (
+          id,
+          title,
+          city,
+          price,
+          beds,
+          baths,
+          sqft,
+          property_type,
+          taxes,
+          image,
+          status
+        )
+      `
+      )
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(3);
+
+    const { data: favorites } = await supabase
+      .from("favorites")
+      .select(
+        `
+        id,
+        properties (
+          id,
+          title,
+          city,
+          price,
+          beds,
+          baths,
+          sqft,
+          property_type,
+          taxes,
+          image,
+          status
+        )
+      `
+      )
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(3);
+
+    const items = notes && notes.length > 0 ? notes : favorites || [];
+
+    setCompareItems(items);
+    setLoading(false);
+  }
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
+        <section className="mx-auto max-w-5xl rounded-[1.5rem] bg-white p-8 shadow-xl">
+          <p className="font-serif text-2xl font-bold">Loading compare board...</p>
+        </section>
+      </main>
+    );
+  }
+
+  if (!loggedIn) {
     return (
       <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
         <section className="mx-auto max-w-5xl rounded-[1.5rem] bg-white p-8 shadow-xl">
@@ -45,59 +133,6 @@ export default async function ComparePage() {
       </main>
     );
   }
-
-  const { data: notes } = await supabase
-    .from("property_notes")
-    .select(
-      `
-      id,
-      rating,
-      note,
-      properties (
-        id,
-        title,
-        city,
-        price,
-        beds,
-        baths,
-        sqft,
-        property_type,
-        taxes,
-        image,
-        status
-      )
-    `
-    )
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(3);
-
-  const { data: favorites } = await supabase
-    .from("favorites")
-    .select(
-      `
-      id,
-      properties (
-        id,
-        title,
-        city,
-        price,
-        beds,
-        baths,
-        sqft,
-        property_type,
-        taxes,
-        image,
-        status
-      )
-    `
-    )
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(3);
-
-  const compareItems =
-    notes && notes.length > 0 ? notes : favorites || [];
 
   return (
     <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
