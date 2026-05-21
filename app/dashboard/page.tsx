@@ -42,7 +42,8 @@ export default async function DashboardPage() {
           </h1>
 
           <p className="mt-4 text-[#1A1A1A]/60">
-            Login to view your saved homes, budgets, searches, and activity.
+            Login to view your saved homes, budgets, searches, messages, and
+            activity.
           </p>
 
           <Link
@@ -147,8 +148,8 @@ export default async function DashboardPage() {
             </h1>
 
             <p className="mt-5 max-w-3xl text-base leading-8 text-[#1A1A1A]/65">
-              Your saved homes, buyer notes, budgets, and property activity are
-              organized into one luxury client experience.
+              Your saved homes, messages, buyer notes, budgets, and property
+              activity are organized into one luxury client experience.
             </p>
           </div>
 
@@ -191,6 +192,10 @@ export default async function DashboardPage() {
             value={1}
           />
         </div>
+
+        <section className="mt-10">
+          <ClientMessages />
+        </section>
 
         <div className="mt-10 grid gap-8 lg:grid-cols-[1.1fr_0.9fr]">
           <section className="rounded-[1.5rem] bg-white p-6 shadow-xl">
@@ -274,10 +279,6 @@ export default async function DashboardPage() {
             </div>
           </section>
         </div>
-
-        <section className="mt-10">
-          <ClientMessages />
-        </section>
 
         <section className="mt-10 rounded-[1.5rem] bg-white p-6 shadow-xl">
           <div className="flex items-center gap-3">
@@ -425,10 +426,7 @@ export default async function DashboardPage() {
                     value={money(budget.annual_income)}
                   />
 
-                  <InfoSmall
-                    label="Savings"
-                    value={money(budget.savings)}
-                  />
+                  <InfoSmall label="Savings" value={money(budget.savings)} />
                 </div>
               ))
             ) : (
