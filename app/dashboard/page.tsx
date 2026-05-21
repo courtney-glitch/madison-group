@@ -1,15 +1,17 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { PropertyCard } from "@/components/PropertyCard";
+import { ClientMessages } from "@/components/ClientMessages";
+
 import {
   LayoutDashboard,
   Heart,
   Calculator,
-  CalendarDays,
   Search,
   TrendingUp,
   MessageSquareText,
   Star,
+  MessageCircle,
 } from "lucide-react";
 
 function money(value: number | null) {
@@ -105,32 +107,6 @@ export default async function DashboardPage() {
     .order("created_at", { ascending: false })
     .limit(3);
 
-  const { data: showingRequests } = await supabase
-    .from("showing_requests")
-    .select(
-      `
-      id,
-      full_name,
-      email,
-      phone,
-      message,
-      created_at,
-      properties (
-        id,
-        title,
-        city,
-        price,
-        beds,
-        baths,
-        image,
-        status
-      )
-    `
-    )
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(3);
-
   const { data: propertyNotes } = await supabase
     .from("property_notes")
     .select(
@@ -184,7 +160,7 @@ export default async function DashboardPage() {
           </Link>
         </div>
 
-        <div className="mt-10 grid gap-5 md:grid-cols-4">
+        <div className="mt-10 grid gap-5 md:grid-cols-5">
           <DashboardStat
             icon={<Calculator size={18} />}
             label="Saved Budgets"
@@ -207,6 +183,12 @@ export default async function DashboardPage() {
             icon={<MessageSquareText size={18} />}
             label="Property Notes"
             value={propertyNotes?.length || 0}
+          />
+
+          <DashboardStat
+            icon={<MessageCircle size={18} />}
+            label="Messages"
+            value={1}
           />
         </div>
 
@@ -292,6 +274,10 @@ export default async function DashboardPage() {
             </div>
           </section>
         </div>
+
+        <section className="mt-10">
+          <ClientMessages />
+        </section>
 
         <section className="mt-10 rounded-[1.5rem] bg-white p-6 shadow-xl">
           <div className="flex items-center gap-3">
