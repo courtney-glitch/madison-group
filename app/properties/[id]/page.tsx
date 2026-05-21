@@ -7,6 +7,7 @@ import { PropertyMap } from "@/components/PropertyMap";
 import { PropertyGallery } from "@/components/PropertyGallery";
 import { TrackPropertyView } from "@/components/TrackPropertyView";
 import { BuyerFinancialCenter } from "@/components/BuyerFinancialCenter";
+import { PropertyNotes } from "@/components/PropertyNotes";
 
 export default async function PropertyDetailPage({
   params,
@@ -129,6 +130,7 @@ export default async function PropertyDetailPage({
                 <p className="text-sm uppercase tracking-[0.25em] text-[#1A1A1A]/50">
                   Beds
                 </p>
+
                 <p className="mt-3 font-serif text-4xl font-bold">
                   {property.beds}
                 </p>
@@ -138,6 +140,7 @@ export default async function PropertyDetailPage({
                 <p className="text-sm uppercase tracking-[0.25em] text-[#1A1A1A]/50">
                   Baths
                 </p>
+
                 <p className="mt-3 font-serif text-4xl font-bold">
                   {property.baths}
                 </p>
@@ -147,6 +150,7 @@ export default async function PropertyDetailPage({
                 <p className="text-sm uppercase tracking-[0.25em] text-[#1A1A1A]/50">
                   Sq Ft
                 </p>
+
                 <p className="mt-3 font-serif text-4xl font-bold">
                   {property.sqft ? property.sqft.toLocaleString() : "—"}
                 </p>
@@ -156,6 +160,7 @@ export default async function PropertyDetailPage({
                 <p className="text-sm uppercase tracking-[0.25em] text-[#1A1A1A]/50">
                   Type
                 </p>
+
                 <p className="mt-3 font-serif text-3xl font-bold">
                   {property.property_type || "Home"}
                 </p>
@@ -226,30 +231,34 @@ export default async function PropertyDetailPage({
             </section>
           </section>
 
-          <aside className="h-fit bg-white p-8 shadow-2xl lg:sticky lg:top-28">
-            <p className="font-serif text-sm tracking-[0.35em] text-[#B19A55]">
-              PRIVATE TOUR
-            </p>
+          <aside className="grid h-fit gap-6 lg:sticky lg:top-28">
+            <div className="bg-white p-8 shadow-2xl">
+              <p className="font-serif text-sm tracking-[0.35em] text-[#B19A55]">
+                PRIVATE TOUR
+              </p>
 
-            <h2 className="mt-4 font-serif text-4xl font-bold leading-tight">
-              Schedule a private showing.
-            </h2>
+              <h2 className="mt-4 font-serif text-4xl font-bold leading-tight">
+                Schedule a private showing.
+              </h2>
 
-            <p className="mt-5 leading-8 text-[#1A1A1A]/70">
-              Request a tour and a Madison Group advisor will follow up with
-              availability, next steps, and local guidance.
-            </p>
+              <p className="mt-5 leading-8 text-[#1A1A1A]/70">
+                Request a tour and a Madison Group advisor will follow up with
+                availability, next steps, and local guidance.
+              </p>
 
-            <div className="mt-8 grid gap-4">
-              <Link
-                href="#showing"
-                className="bg-[#B19A55] px-8 py-4 text-center font-serif text-sm font-bold uppercase tracking-[0.2em] text-white"
-              >
-                Request Showing
-              </Link>
+              <div className="mt-8 grid gap-4">
+                <Link
+                  href="#showing"
+                  className="bg-[#B19A55] px-8 py-4 text-center font-serif text-sm font-bold uppercase tracking-[0.2em] text-white"
+                >
+                  Request Showing
+                </Link>
 
-              <FavoriteButton propertyId={property.id} />
+                <FavoriteButton propertyId={property.id} />
+              </div>
             </div>
+
+            <PropertyNotes propertyId={property.id} />
           </aside>
         </div>
       </section>
