@@ -22,6 +22,30 @@ export function ClientMessages() {
     loadConversation();
   }, []);
 
+  useEffect(() => {
+    if (!conversationId) return;
+
+    const channel = supabase
+      .channel(`messages-${conversationId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "messages",
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        async () => {
+          await refreshMessages(conversationId);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [conversationId]);
+
   async function loadConversation() {
     setLoading(true);
 
@@ -65,14 +89,19 @@ export function ClientMessages() {
 
     setConversationId(activeConversationId);
 
+    await refreshMessages(activeConversationId);
+
+    setLoading(false);
+  }
+
+  async function refreshMessages(id: string) {
     const { data: loadedMessages } = await supabase
       .from("messages")
       .select("*")
-      .eq("conversation_id", activeConversationId)
+      .eq("conversation_id", id)
       .order("created_at", { ascending: true });
 
     setMessages(loadedMessages || []);
-    setLoading(false);
   }
 
   async function sendMessage() {
@@ -92,7 +121,6 @@ export function ClientMessages() {
     }
 
     setNewMessage("");
-    await loadConversation();
   }
 
   return (
@@ -113,7 +141,9 @@ export function ClientMessages() {
 
       <div className="mt-6 rounded-3xl bg-[#F8F5EF] p-5">
         {loading ? (
-          <p className="text-sm text-[#1A1A1A]/60">Loading messages...</p>
+          <p className="text-sm text-[#1A1A1A]/60">
+            Loading messages...
+          </p>
         ) : messages.length > 0 ? (
           <div className="grid gap-4">
             {messages.map((item) => (
@@ -125,7 +155,9 @@ export function ClientMessages() {
                     : "bg-white text-[#1A1A1A]"
                 }`}
               >
-                <p className="text-sm leading-6">{item.message}</p>
+                <p className="text-sm leading-6">
+                  {item.message}
+                </p>
 
                 <p
                   className={`mt-2 text-[10px] uppercase tracking-[0.18em] ${
