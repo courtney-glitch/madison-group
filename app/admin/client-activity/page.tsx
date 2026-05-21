@@ -1,10 +1,9 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+
 import {
-  Activity,
   Calculator,
   CalendarDays,
-  Heart,
   MessageCircle,
   MessageSquareText,
   Star,
@@ -256,7 +255,14 @@ export default async function ClientActivityPage() {
                               : "bg-white text-[#1A1A1A]/20"
                           }`}
                         >
-                          <Star size={15} fill={star <= note.rating ? "currentColor" : "none"} />
+                          <Star
+                            size={15}
+                            fill={
+                              star <= note.rating
+                                ? "currentColor"
+                                : "none"
+                            }
+                          />
                         </div>
                       ))}
                     </div>
@@ -297,7 +303,11 @@ export default async function ClientActivityPage() {
                   </p>
 
                   <p className="mt-3 text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/35">
-                    User: {message.conversations?.user_id?.slice(0, 8)}
+                    User:{" "}
+                    {message.conversations &&
+                    Array.isArray(message.conversations)
+                      ? message.conversations[0]?.user_id?.slice(0, 8)
+                      : "Unknown"}
                   </p>
                 </div>
               ))
@@ -349,7 +359,13 @@ function SectionTitle({
   );
 }
 
-function InfoSmall({ label, value }: { label: string }) {
+function InfoSmall({
+  label,
+  value,
+}: {
+  label: string;
+  value: string;
+}) {
   return (
     <div>
       <p className="text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/45">
