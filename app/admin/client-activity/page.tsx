@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { AdminMessageReply } from "@/components/AdminMessageReply";
 
 import {
   Calculator,
@@ -76,6 +77,7 @@ export default async function ClientActivityPage() {
       sender_type,
       message,
       created_at,
+      conversation_id,
       conversations (
         id,
         user_id
@@ -309,6 +311,12 @@ export default async function ClientActivityPage() {
                       ? message.conversations[0]?.user_id?.slice(0, 8)
                       : "Unknown"}
                   </p>
+
+                  {message.conversation_id && (
+                    <AdminMessageReply
+                      conversationId={message.conversation_id}
+                    />
+                  )}
                 </div>
               ))
             ) : (
