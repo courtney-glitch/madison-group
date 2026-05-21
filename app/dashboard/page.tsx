@@ -81,6 +81,28 @@ export default async function DashboardPage() {
     .order("created_at", { ascending: false })
     .limit(3);
 
+  const { data: recentlyViewed } = await supabase
+    .from("property_views")
+    .select(
+      `
+      id,
+      property_id,
+      properties (
+        id,
+        title,
+        city,
+        price,
+        beds,
+        baths,
+        image,
+        status
+      )
+    `
+    )
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(3);
+
   const latestBudget = budgets?.[0];
 
   return (
@@ -97,8 +119,8 @@ export default async function DashboardPage() {
             </h1>
 
             <p className="mt-5 max-w-3xl text-base leading-8 text-[#1A1A1A]/65">
-              Your saved homes, budgets, searches, and buyer activity are kept
-              together in one private dashboard.
+              Your saved homes, recently viewed listings, budgets, searches,
+              and buyer activity are kept together in one private dashboard.
             </p>
           </div>
 
@@ -123,7 +145,11 @@ export default async function DashboardPage() {
             value={favorites?.length || 0}
           />
 
-          <DashboardStat icon={<Search size={18} />} label="Saved Searches" value={0} />
+          <DashboardStat
+            icon={<Search size={18} />}
+            label="Viewed Homes"
+            value={recentlyViewed?.length || 0}
+          />
 
           <DashboardStat
             icon={<CalendarDays size={18} />}
@@ -263,6 +289,57 @@ export default async function DashboardPage() {
               <p className="mt-3 text-sm leading-7 text-[#1A1A1A]/60">
                 Start saving homes from the Home Search page so they appear
                 here in your private dashboard.
+              </p>
+
+              <Link
+                href="/properties"
+                className="mt-6 inline-block rounded-full bg-[#B19A55] px-6 py-3 font-serif text-[11px] font-bold uppercase tracking-[0.2em] text-white"
+              >
+                Browse Homes
+              </Link>
+            </div>
+          )}
+        </section>
+
+        <section className="mt-10 rounded-[1.5rem] bg-white p-6 shadow-xl">
+          <div className="flex items-center gap-3">
+            <Search className="text-[#B19A55]" />
+
+            <h2 className="font-serif text-2xl font-bold">
+              Recently Viewed Homes
+            </h2>
+          </div>
+
+          {recentlyViewed && recentlyViewed.length > 0 ? (
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {recentlyViewed.map((view: any) => {
+                const property = view.properties;
+
+                if (!property) return null;
+
+                return (
+                  <PropertyCard
+                    key={view.id}
+                    id={property.id}
+                    title={property.title}
+                    city={property.city}
+                    price={property.price}
+                    beds={property.beds}
+                    baths={property.baths}
+                    image={property.image}
+                    status={property.status}
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <div className="mt-8 rounded-3xl bg-[#F8F5EF] p-8">
+              <p className="font-serif text-2xl font-bold">
+                No recently viewed homes.
+              </p>
+
+              <p className="mt-3 text-sm leading-7 text-[#1A1A1A]/60">
+                Homes you open will automatically appear here.
               </p>
 
               <Link
