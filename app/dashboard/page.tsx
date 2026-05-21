@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { PropertyCard } from "@/components/PropertyCard";
 import {
   LayoutDashboard,
   Heart,
@@ -58,6 +59,28 @@ export default async function DashboardPage() {
     .order("created_at", { ascending: false })
     .limit(3);
 
+  const { data: favorites } = await supabase
+    .from("favorites")
+    .select(
+      `
+      id,
+      property_id,
+      properties (
+        id,
+        title,
+        city,
+        price,
+        beds,
+        baths,
+        image,
+        status
+      )
+    `
+    )
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(3);
+
   const latestBudget = budgets?.[0];
 
   return (
@@ -74,7 +97,7 @@ export default async function DashboardPage() {
             </h1>
 
             <p className="mt-5 max-w-3xl text-base leading-8 text-[#1A1A1A]/65">
-              Your saved budgets, property activity, and buyer tools are kept
+              Your saved homes, budgets, searches, and buyer activity are kept
               together in one private dashboard.
             </p>
           </div>
@@ -94,13 +117,13 @@ export default async function DashboardPage() {
             value={budgets?.length || 0}
           />
 
-          <DashboardStat icon={<Heart size={18} />} label="Saved Homes" value={0} />
-
           <DashboardStat
-            icon={<Search size={18} />}
-            label="Saved Searches"
-            value={0}
+            icon={<Heart size={18} />}
+            label="Saved Homes"
+            value={favorites?.length || 0}
           />
+
+          <DashboardStat icon={<Search size={18} />} label="Saved Searches" value={0} />
 
           <DashboardStat
             icon={<CalendarDays size={18} />}
@@ -136,10 +159,7 @@ export default async function DashboardPage() {
                   value={money(latestBudget.annual_income)}
                 />
 
-                <InfoCard
-                  label="Savings"
-                  value={money(latestBudget.savings)}
-                />
+                <InfoCard label="Savings" value={money(latestBudget.savings)} />
               </div>
             ) : (
               <div className="mt-8 rounded-3xl bg-[#F8F5EF] p-8">
@@ -207,6 +227,56 @@ export default async function DashboardPage() {
 
         <section className="mt-10 rounded-[1.5rem] bg-white p-6 shadow-xl">
           <div className="flex items-center gap-3">
+            <Heart className="text-[#B19A55]" />
+
+            <h2 className="font-serif text-2xl font-bold">Saved Homes</h2>
+          </div>
+
+          {favorites && favorites.length > 0 ? (
+            <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
+              {favorites.map((favorite: any) => {
+                const property = favorite.properties;
+
+                if (!property) return null;
+
+                return (
+                  <PropertyCard
+                    key={favorite.id}
+                    id={property.id}
+                    title={property.title}
+                    city={property.city}
+                    price={property.price}
+                    beds={property.beds}
+                    baths={property.baths}
+                    image={property.image}
+                    status={property.status}
+                  />
+                );
+              })}
+            </div>
+          ) : (
+            <div className="mt-8 rounded-3xl bg-[#F8F5EF] p-8">
+              <p className="font-serif text-2xl font-bold">
+                No saved homes yet.
+              </p>
+
+              <p className="mt-3 text-sm leading-7 text-[#1A1A1A]/60">
+                Start saving homes from the Home Search page so they appear
+                here in your private dashboard.
+              </p>
+
+              <Link
+                href="/properties"
+                className="mt-6 inline-block rounded-full bg-[#B19A55] px-6 py-3 font-serif text-[11px] font-bold uppercase tracking-[0.2em] text-white"
+              >
+                Browse Homes
+              </Link>
+            </div>
+          )}
+        </section>
+
+        <section className="mt-10 rounded-[1.5rem] bg-white p-6 shadow-xl">
+          <div className="flex items-center gap-3">
             <LayoutDashboard className="text-[#B19A55]" />
 
             <h2 className="font-serif text-2xl font-bold">
@@ -221,45 +291,22 @@ export default async function DashboardPage() {
                   key={budget.id}
                   className="grid gap-4 rounded-3xl border border-[#1A1A1A]/10 bg-[#F8F5EF] p-5 md:grid-cols-4"
                 >
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/45">
-                      Home Budget
-                    </p>
+                  <InfoSmall
+                    label="Home Budget"
+                    value={money(budget.estimated_home_price)}
+                  />
 
-                    <p className="mt-2 font-serif text-xl font-bold">
-                      {money(budget.estimated_home_price)}
-                    </p>
-                  </div>
+                  <InfoSmall
+                    label="Monthly Payment"
+                    value={money(budget.estimated_monthly_payment)}
+                  />
 
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/45">
-                      Monthly Payment
-                    </p>
+                  <InfoSmall
+                    label="Income"
+                    value={money(budget.annual_income)}
+                  />
 
-                    <p className="mt-2 font-serif text-xl font-bold">
-                      {money(budget.estimated_monthly_payment)}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/45">
-                      Income
-                    </p>
-
-                    <p className="mt-2 font-serif text-xl font-bold">
-                      {money(budget.annual_income)}
-                    </p>
-                  </div>
-
-                  <div>
-                    <p className="text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/45">
-                      Savings
-                    </p>
-
-                    <p className="mt-2 font-serif text-xl font-bold">
-                      {money(budget.savings)}
-                    </p>
-                  </div>
+                  <InfoSmall label="Savings" value={money(budget.savings)} />
                 </div>
               ))
             ) : (
@@ -304,6 +351,18 @@ function InfoCard({ label, value }: { label: string; value: string }) {
       </p>
 
       <p className="mt-3 font-serif text-2xl font-bold">{value}</p>
+    </div>
+  );
+}
+
+function InfoSmall({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <p className="text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/45">
+        {label}
+      </p>
+
+      <p className="mt-2 font-serif text-xl font-bold">{value}</p>
     </div>
   );
 }
