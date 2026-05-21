@@ -8,6 +8,8 @@ import {
   CalendarDays,
   Search,
   TrendingUp,
+  MessageSquareText,
+  Star,
 } from "lucide-react";
 
 function money(value: number | null) {
@@ -129,6 +131,30 @@ export default async function DashboardPage() {
     .order("created_at", { ascending: false })
     .limit(3);
 
+  const { data: propertyNotes } = await supabase
+    .from("property_notes")
+    .select(
+      `
+      id,
+      rating,
+      note,
+      created_at,
+      properties (
+        id,
+        title,
+        city,
+        price,
+        beds,
+        baths,
+        image,
+        status
+      )
+    `
+    )
+    .eq("user_id", user.id)
+    .order("created_at", { ascending: false })
+    .limit(5);
+
   const latestBudget = budgets?.[0];
 
   return (
@@ -145,8 +171,8 @@ export default async function DashboardPage() {
             </h1>
 
             <p className="mt-5 max-w-3xl text-base leading-8 text-[#1A1A1A]/65">
-              Your saved homes, recently viewed listings, budgets, searches,
-              and buyer activity are kept together in one private dashboard.
+              Your saved homes, buyer notes, budgets, and property activity are
+              organized into one luxury client experience.
             </p>
           </div>
 
@@ -178,9 +204,9 @@ export default async function DashboardPage() {
           />
 
           <DashboardStat
-            icon={<CalendarDays size={18} />}
-            label="Showing Requests"
-            value={showingRequests?.length || 0}
+            icon={<MessageSquareText size={18} />}
+            label="Property Notes"
+            value={propertyNotes?.length || 0}
           />
         </div>
 
@@ -217,23 +243,10 @@ export default async function DashboardPage() {
                 />
               </div>
             ) : (
-              <div className="mt-8 rounded-3xl bg-[#F8F5EF] p-8">
-                <p className="font-serif text-2xl font-bold">
-                  No budget saved yet.
-                </p>
-
-                <p className="mt-3 text-sm leading-7 text-[#1A1A1A]/60">
-                  Start by using the Budget Calculator and save your first buyer
-                  profile.
-                </p>
-
-                <Link
-                  href="/budget-calculator"
-                  className="mt-6 inline-block rounded-full bg-[#B19A55] px-6 py-3 font-serif text-[11px] font-bold uppercase tracking-[0.2em] text-white"
-                >
-                  Create Budget
-                </Link>
-              </div>
+              <EmptyBox
+                title="No budget saved yet."
+                description="Start by using the Budget Calculator and save your first buyer profile."
+              />
             )}
           </section>
 
@@ -257,8 +270,8 @@ export default async function DashboardPage() {
 
               <p className="mt-4 text-sm leading-7 text-white/65">
                 {latestBudget
-                  ? "Your financial profile is saved. Next step is matching homes to your budget."
-                  : "Save a budget to start building your private buyer profile."}
+                  ? "Your buyer profile is active and property engagement is being tracked."
+                  : "Save a budget to activate your buyer profile."}
               </p>
             </div>
 
@@ -279,6 +292,84 @@ export default async function DashboardPage() {
             </div>
           </section>
         </div>
+
+        <section className="mt-10 rounded-[1.5rem] bg-white p-6 shadow-xl">
+          <div className="flex items-center gap-3">
+            <MessageSquareText className="text-[#B19A55]" />
+
+            <h2 className="font-serif text-2xl font-bold">
+              Buyer Notes & Ratings
+            </h2>
+          </div>
+
+          {propertyNotes && propertyNotes.length > 0 ? (
+            <div className="mt-8 grid gap-6">
+              {propertyNotes.map((entry: any) => {
+                const property = entry.properties;
+
+                if (!property) return null;
+
+                return (
+                  <div
+                    key={entry.id}
+                    className="rounded-3xl border border-[#1A1A1A]/10 bg-[#F8F5EF] p-6"
+                  >
+                    <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+                      <div className="flex-1">
+                        <p className="text-[10px] uppercase tracking-[0.2em] text-[#B19A55]">
+                          Property
+                        </p>
+
+                        <h3 className="mt-2 font-serif text-2xl font-bold">
+                          {property.title}
+                        </h3>
+
+                        <p className="mt-2 text-sm text-[#1A1A1A]/60">
+                          {property.city}
+                        </p>
+
+                        {entry.note && (
+                          <div className="mt-5 rounded-2xl bg-white p-4">
+                            <p className="text-sm leading-7 text-[#1A1A1A]/70">
+                              {entry.note}
+                            </p>
+                          </div>
+                        )}
+                      </div>
+
+                      <div className="flex gap-2">
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <div
+                            key={star}
+                            className={`rounded-full p-2 ${
+                              star <= entry.rating
+                                ? "bg-[#B19A55] text-white"
+                                : "bg-white text-[#1A1A1A]/20"
+                            }`}
+                          >
+                            <Star
+                              size={16}
+                              fill={
+                                star <= entry.rating
+                                  ? "currentColor"
+                                  : "none"
+                              }
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          ) : (
+            <EmptyBox
+              title="No property notes yet."
+              description="Your saved property feedback and ratings will appear here."
+            />
+          )}
+        </section>
 
         <section className="mt-10 rounded-[1.5rem] bg-white p-6 shadow-xl">
           <div className="flex items-center gap-3">
@@ -310,118 +401,9 @@ export default async function DashboardPage() {
               })}
             </div>
           ) : (
-            <EmptyState
+            <EmptyBox
               title="No saved homes yet."
-              description="Start saving homes from the Home Search page so they appear here in your private dashboard."
-            />
-          )}
-        </section>
-
-        <section className="mt-10 rounded-[1.5rem] bg-white p-6 shadow-xl">
-          <div className="flex items-center gap-3">
-            <Search className="text-[#B19A55]" />
-
-            <h2 className="font-serif text-2xl font-bold">
-              Recently Viewed Homes
-            </h2>
-          </div>
-
-          {recentlyViewed && recentlyViewed.length > 0 ? (
-            <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
-              {recentlyViewed.map((view: any) => {
-                const property = view.properties;
-
-                if (!property) return null;
-
-                return (
-                  <PropertyCard
-                    key={view.id}
-                    id={property.id}
-                    title={property.title}
-                    city={property.city}
-                    price={property.price}
-                    beds={property.beds}
-                    baths={property.baths}
-                    image={property.image}
-                    status={property.status}
-                  />
-                );
-              })}
-            </div>
-          ) : (
-            <EmptyState
-              title="No recently viewed homes."
-              description="Homes you open will automatically appear here."
-            />
-          )}
-        </section>
-
-        <section className="mt-10 rounded-[1.5rem] bg-white p-6 shadow-xl">
-          <div className="flex items-center gap-3">
-            <CalendarDays className="text-[#B19A55]" />
-
-            <h2 className="font-serif text-2xl font-bold">
-              Showing Request History
-            </h2>
-          </div>
-
-          {showingRequests && showingRequests.length > 0 ? (
-            <div className="mt-8 grid gap-6">
-              {showingRequests.map((request: any) => {
-                const property = request.properties;
-
-                return (
-                  <div
-                    key={request.id}
-                    className="rounded-3xl border border-[#1A1A1A]/10 bg-[#F8F5EF] p-6"
-                  >
-                    <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
-                      <div>
-                        <p className="text-[10px] uppercase tracking-[0.2em] text-[#B19A55]">
-                          Requested Property
-                        </p>
-
-                        <h3 className="mt-2 font-serif text-2xl font-bold">
-                          {property?.title}
-                        </h3>
-
-                        <p className="mt-2 text-sm text-[#1A1A1A]/60">
-                          {property?.city}
-                        </p>
-                      </div>
-
-                      <div className="grid gap-3 text-sm text-[#1A1A1A]/70">
-                        <p>
-                          <strong>Name:</strong> {request.full_name}
-                        </p>
-
-                        <p>
-                          <strong>Email:</strong> {request.email}
-                        </p>
-
-                        {request.phone && (
-                          <p>
-                            <strong>Phone:</strong> {request.phone}
-                          </p>
-                        )}
-                      </div>
-                    </div>
-
-                    {request.message && (
-                      <div className="mt-5 rounded-2xl bg-white p-4">
-                        <p className="text-sm leading-7 text-[#1A1A1A]/70">
-                          {request.message}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          ) : (
-            <EmptyState
-              title="No showing requests yet."
-              description="Tour requests you submit will appear here."
+              description="Start saving homes from the Home Search page."
             />
           )}
         </section>
@@ -521,7 +503,7 @@ function InfoSmall({ label, value }: { label: string; value: string }) {
   );
 }
 
-function EmptyState({
+function EmptyBox({
   title,
   description,
 }: {
