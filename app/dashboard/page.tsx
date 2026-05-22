@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { PropertyCard } from "@/components/PropertyCard";
 import { ClientMessages } from "@/components/ClientMessages";
+import { TransactionTimeline } from "@/components/TransactionTimeline";
 
 import {
   LayoutDashboard,
@@ -15,6 +16,7 @@ import {
   MessageSquareText,
   Star,
   MessageCircle,
+  ListChecks,
 } from "lucide-react";
 
 function money(value: number | null) {
@@ -189,8 +191,8 @@ export default function DashboardPage() {
             </h1>
 
             <p className="mt-5 max-w-3xl text-base leading-8 text-[#1A1A1A]/65">
-              Your saved homes, messages, buyer notes, budgets, and property
-              activity are organized into one luxury client experience.
+              Your saved homes, messages, buyer journey, notes, budgets, and
+              property activity are organized into one luxury client experience.
             </p>
           </div>
 
@@ -202,7 +204,7 @@ export default function DashboardPage() {
           </Link>
         </div>
 
-        <div className="mt-10 grid gap-5 md:grid-cols-5">
+        <div className="mt-10 grid gap-5 md:grid-cols-6">
           <DashboardStat
             icon={<Calculator size={18} />}
             label="Saved Budgets"
@@ -232,7 +234,17 @@ export default function DashboardPage() {
             label="Messages"
             value={1}
           />
+
+          <DashboardStat
+            icon={<ListChecks size={18} />}
+            label="Timeline"
+            value={1}
+          />
         </div>
+
+        <section className="mt-10">
+          <TransactionTimeline />
+        </section>
 
         <section className="mt-10">
           <ClientMessages />
