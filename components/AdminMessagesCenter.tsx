@@ -81,12 +81,6 @@ export function AdminMessagesCenter() {
       .eq("id", user.id)
       .maybeSingle();
 
-    if (profile?.role !== "admin") {
-      setStatus("Admin access only.");
-      setLoading(false);
-      return;
-    }
-
     setAdminFirstName(
       profile?.full_name?.split(" ")[0] || firstNameFromEmail(user.email)
     );
