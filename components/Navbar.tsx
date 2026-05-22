@@ -19,6 +19,7 @@ import {
   Scale,
   Activity,
   MessageCircle,
+  ListChecks,
 } from "lucide-react";
 
 export function Navbar() {
@@ -131,6 +132,11 @@ export function Navbar() {
       label: "Messages",
       icon: MessageCircle,
       badge: unreadCount,
+    },
+    {
+      href: "/timeline",
+      label: "Timeline",
+      icon: ListChecks,
     },
     {
       href: "/properties",
