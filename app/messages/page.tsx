@@ -1,6 +1,63 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import { AdminMessagesCenter } from "@/components/AdminMessagesCenter";
 import { ClientMessages } from "@/components/ClientMessages";
+import { supabase } from "@/lib/supabase";
 
 export default function MessagesPage() {
+  const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    checkRole();
+  }, []);
+
+  async function checkRole() {
+    setLoading(true);
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      setIsAdmin(false);
+      setLoading(false);
+      return;
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    setIsAdmin(profile?.role === "admin");
+    setLoading(false);
+  }
+
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
+        <section className="mx-auto max-w-6xl rounded-[1.5rem] bg-white p-8 shadow-xl">
+          <p className="font-serif text-2xl font-bold">
+            Loading messages...
+          </p>
+        </section>
+      </main>
+    );
+  }
+
+  if (isAdmin) {
+    return (
+      <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
+        <section className="mx-auto max-w-7xl">
+          <AdminMessagesCenter />
+        </section>
+      </main>
+    );
+  }
+
   return (
     <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
       <section className="mx-auto max-w-5xl">
