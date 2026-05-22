@@ -2,9 +2,18 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { MessageCircle, Search, Send, UserRound, Home } from "lucide-react";
+import {
+  Home,
+  MessageCircle,
+  Paperclip,
+  Search,
+  Send,
+  UserRound,
+} from "lucide-react";
+
 import { supabase } from "@/lib/supabase";
 import { ChatPropertyPicker } from "@/components/ChatPropertyPicker";
+import { ChatAttachmentUpload } from "@/components/ChatAttachmentUpload";
 
 type ConversationItem = {
   id: string;
@@ -36,23 +45,45 @@ type MessageProperty = {
   } | null;
 };
 
+type MessageAttachment = {
+  id: string;
+  message_id: string;
+  file_url: string;
+  file_name: string;
+  file_type: string;
+};
+
 function firstNameFromEmail(email?: string | null) {
   if (!email) return "Advisor";
+
   return email.split("@")[0].split(".")[0] || "Advisor";
 }
 
 export function AdminMessagesCenter() {
   const [adminFirstName, setAdminFirstName] = useState("Advisor");
+
   const [conversations, setConversations] = useState<ConversationItem[]>([]);
+
   const [messages, setMessages] = useState<MessageItem[]>([]);
-  const [messageProperties, setMessageProperties] = useState<MessageProperty[]>(
-    []
-  );
+
+  const [messageProperties, setMessageProperties] = useState<
+    MessageProperty[]
+  >([]);
+
+  const [messageAttachments, setMessageAttachments] = useState<
+    MessageAttachment[]
+  >([]);
+
   const [selectedConversationId, setSelectedConversationId] = useState("");
+
   const [reply, setReply] = useState("");
+
   const [searchText, setSearchText] = useState("");
+
   const [filter, setFilter] = useState<"all" | "unread">("all");
+
   const [loading, setLoading] = useState(true);
+
   const [status, setStatus] = useState("");
 
   useEffect(() => {
@@ -84,6 +115,17 @@ export function AdminMessagesCenter() {
           await loadAdminMessages(false);
         }
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "message_attachments",
+        },
+        async () => {
+          await loadAdminMessages(false);
+        }
+      )
       .subscribe();
 
     return () => {
@@ -93,6 +135,7 @@ export function AdminMessagesCenter() {
 
   async function loadAdminMessages(showLoading = true) {
     if (showLoading) setLoading(true);
+
     setStatus("");
 
     const {
@@ -107,7 +150,7 @@ export function AdminMessagesCenter() {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("full_name, role")
+      .select("full_name")
       .eq("id", user.id)
       .maybeSingle();
 
@@ -140,11 +183,23 @@ export function AdminMessagesCenter() {
         )
       `);
 
-    setConversations(conversationData || []);
-    setMessages(messageData || []);
-    setMessageProperties((propertyData || []) as unknown as MessageProperty[]);
+    const { data: attachmentData } = await supabase
+      .from("message_attachments")
+      .select("*");
 
-    if (!selectedConversationId && conversationData && conversationData[0]) {
+    setConversations(conversationData || []);
+
+    setMessages(messageData || []);
+
+    setMessageProperties(
+      (propertyData || []) as unknown as MessageProperty[]
+    );
+
+    setMessageAttachments(
+      (attachmentData || []) as MessageAttachment[]
+    );
+
+    if (!selectedConversationId && conversationData?.[0]) {
       setSelectedConversationId(conversationData[0].id);
     }
 
@@ -162,7 +217,8 @@ export function AdminMessagesCenter() {
 
         const unreadCount = threadMessages.filter(
           (message) =>
-            message.sender_type === "client" && message.read_by_admin === false
+            message.sender_type === "client" &&
+            message.read_by_admin === false
         ).length;
 
         return {
@@ -181,22 +237,34 @@ export function AdminMessagesCenter() {
             .includes(searchValue);
 
         const matchesFilter =
-          filter === "all" ? true : conversation.unreadCount > 0;
+          filter === "all"
+            ? true
+            : conversation.unreadCount > 0;
 
         return matchesSearch && matchesFilter;
       });
   }, [conversations, messages, searchText, filter]);
 
   const selectedMessages = messages.filter(
-    (message) => message.conversation_id === selectedConversationId
+    (message) =>
+      message.conversation_id === selectedConversationId
   );
 
   const selectedConversation = conversations.find(
-    (conversation) => conversation.id === selectedConversationId
+    (conversation) =>
+      conversation.id === selectedConversationId
   );
 
   function getMessageProperty(messageId: string) {
-    return messageProperties.find((item) => item.message_id === messageId);
+    return messageProperties.find(
+      (item) => item.message_id === messageId
+    );
+  }
+
+  function getMessageAttachment(messageId: string) {
+    return messageAttachments.find(
+      (item) => item.message_id === messageId
+    );
   }
 
   async function openConversation(conversationId: string) {
@@ -204,7 +272,9 @@ export function AdminMessagesCenter() {
 
     await supabase
       .from("messages")
-      .update({ read_by_admin: true })
+      .update({
+        read_by_admin: true,
+      })
       .eq("conversation_id", conversationId)
       .eq("sender_type", "client");
 
@@ -214,13 +284,15 @@ export function AdminMessagesCenter() {
   async function sendReply() {
     if (!reply.trim() || !selectedConversationId) return;
 
-    const { error } = await supabase.from("messages").insert({
-      conversation_id: selectedConversationId,
-      sender_type: "advisor",
-      message: reply.trim(),
-      read_by_admin: true,
-      read_by_client: false,
-    });
+    const { error } = await supabase
+      .from("messages")
+      .insert({
+        conversation_id: selectedConversationId,
+        sender_type: "advisor",
+        message: reply.trim(),
+        read_by_admin: true,
+        read_by_client: false,
+      });
 
     if (error) {
       setStatus(error.message);
@@ -228,13 +300,16 @@ export function AdminMessagesCenter() {
     }
 
     setReply("");
+
     await loadAdminMessages(false);
   }
 
   if (loading) {
     return (
       <section className="rounded-[1.5rem] bg-white p-8 shadow-xl">
-        <p className="font-serif text-2xl font-bold">Loading messages...</p>
+        <p className="font-serif text-2xl font-bold">
+          Loading messages...
+        </p>
       </section>
     );
   }
@@ -242,7 +317,9 @@ export function AdminMessagesCenter() {
   if (status) {
     return (
       <section className="rounded-[1.5rem] bg-white p-8 shadow-xl">
-        <p className="text-sm text-[#1A1A1A]/60">{status}</p>
+        <p className="text-sm text-[#1A1A1A]/60">
+          {status}
+        </p>
       </section>
     );
   }
@@ -305,63 +382,62 @@ export function AdminMessagesCenter() {
           </div>
 
           <div className="mt-5 grid gap-3">
-            {conversationCards.length > 0 ? (
-              conversationCards.map((conversation) => {
-                const active = conversation.id === selectedConversationId;
+            {conversationCards.map((conversation) => {
+              const active =
+                conversation.id === selectedConversationId;
 
-                return (
-                  <button
-                    key={conversation.id}
-                    type="button"
-                    onClick={() => openConversation(conversation.id)}
-                    className={`rounded-3xl p-4 text-left transition ${
-                      active
-                        ? "bg-[#1A1A1A] text-white"
-                        : "bg-white text-[#1A1A1A] hover:bg-[#F8F5EF]"
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-4">
-                      <div className="flex gap-3">
-                        <div
-                          className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${
-                            active
-                              ? "bg-white/15 text-white"
-                              : "bg-[#B19A55]/10 text-[#B19A55]"
-                          }`}
-                        >
-                          <UserRound size={18} />
-                        </div>
-
-                        <div>
-                          <p className="font-serif text-base font-bold">
-                            Client {conversation.user_id.slice(0, 6)}
-                          </p>
-
-                          <p
-                            className={`mt-1 line-clamp-2 text-xs leading-5 ${
-                              active ? "text-white/60" : "text-[#1A1A1A]/50"
-                            }`}
-                          >
-                            {conversation.latestMessage?.message ||
-                              "No messages yet."}
-                          </p>
-                        </div>
+              return (
+                <button
+                  key={conversation.id}
+                  type="button"
+                  onClick={() =>
+                    openConversation(conversation.id)
+                  }
+                  className={`rounded-3xl p-4 text-left transition ${
+                    active
+                      ? "bg-[#1A1A1A] text-white"
+                      : "bg-white text-[#1A1A1A]"
+                  }`}
+                >
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="flex gap-3">
+                      <div
+                        className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full ${
+                          active
+                            ? "bg-white/15 text-white"
+                            : "bg-[#B19A55]/10 text-[#B19A55]"
+                        }`}
+                      >
+                        <UserRound size={18} />
                       </div>
 
-                      {conversation.unreadCount > 0 && (
-                        <span className="flex h-7 min-w-[28px] items-center justify-center rounded-full bg-red-500 px-2 text-xs font-bold text-white">
-                          {conversation.unreadCount}
-                        </span>
-                      )}
+                      <div>
+                        <p className="font-serif text-base font-bold">
+                          Client {conversation.user_id.slice(0, 6)}
+                        </p>
+
+                        <p
+                          className={`mt-1 line-clamp-2 text-xs leading-5 ${
+                            active
+                              ? "text-white/60"
+                              : "text-[#1A1A1A]/50"
+                          }`}
+                        >
+                          {conversation.latestMessage?.message ||
+                            "No messages yet."}
+                        </p>
+                      </div>
                     </div>
-                  </button>
-                );
-              })
-            ) : (
-              <div className="rounded-3xl bg-white p-6 text-sm text-[#1A1A1A]/60">
-                No conversations found.
-              </div>
-            )}
+
+                    {conversation.unreadCount > 0 && (
+                      <span className="flex h-7 min-w-[28px] items-center justify-center rounded-full bg-red-500 px-2 text-xs font-bold text-white">
+                        {conversation.unreadCount}
+                      </span>
+                    )}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </aside>
 
@@ -387,102 +463,140 @@ export function AdminMessagesCenter() {
           </div>
 
           <div className="flex-1 overflow-y-auto bg-[#F8F5EF] p-6">
-            {selectedMessages.length > 0 ? (
-              <div className="grid gap-4">
-                {selectedMessages.map((message) => {
-                  const attachedProperty = getMessageProperty(message.id);
-                  const property = attachedProperty?.properties;
+            <div className="grid gap-4">
+              {selectedMessages.map((message) => {
+                const attachedProperty =
+                  getMessageProperty(message.id);
 
-                  return (
-                    <div
-                      key={message.id}
-                      className={`max-w-[82%] rounded-3xl px-5 py-4 ${
-                        message.sender_type === "advisor"
-                          ? "ml-auto bg-[#B19A55] text-white"
-                          : "bg-white text-[#1A1A1A]"
-                      }`}
-                    >
-                      <p className="text-sm leading-6">{message.message}</p>
+                const property =
+                  attachedProperty?.properties;
 
-                      {property && (
-                        <Link
-                          href={`/properties/${property.id}`}
-                          className={`mt-4 block overflow-hidden rounded-2xl border ${
-                            message.sender_type === "advisor"
-                              ? "border-white/25 bg-white text-[#1A1A1A]"
-                              : "border-[#1A1A1A]/10 bg-[#F8F5EF]"
-                          }`}
-                        >
-                          {property.image ? (
-                            <img
-                              src={property.image}
-                              alt={property.title}
-                              className="h-36 w-full object-cover"
-                            />
-                          ) : (
-                            <div className="flex h-36 items-center justify-center bg-[#1A1A1A] text-sm text-white">
-                              Image Coming Soon
-                            </div>
-                          )}
+                const attachment =
+                  getMessageAttachment(message.id);
 
-                          <div className="p-4">
-                            <div className="flex items-center gap-2 text-[#B19A55]">
-                              <Home size={15} />
-                              <p className="text-[10px] uppercase tracking-[0.2em]">
-                                Shared Property
-                              </p>
-                            </div>
+                return (
+                  <div
+                    key={message.id}
+                    className={`max-w-[82%] rounded-3xl px-5 py-4 ${
+                      message.sender_type === "advisor"
+                        ? "ml-auto bg-[#B19A55] text-white"
+                        : "bg-white text-[#1A1A1A]"
+                    }`}
+                  >
+                    <p className="text-sm leading-6">
+                      {message.message}
+                    </p>
 
-                            <h3 className="mt-2 font-serif text-lg font-bold">
-                              {property.title}
-                            </h3>
-
-                            <p className="mt-1 text-sm text-[#1A1A1A]/60">
-                              {property.city}
-                            </p>
-
-                            <div className="mt-3 flex items-center justify-between gap-3">
-                              <p className="font-serif text-lg font-bold text-[#B19A55]">
-                                {property.price}
-                              </p>
-
-                              {property.status && (
-                                <span className="rounded-full bg-[#1A1A1A] px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-white">
-                                  {property.status}
-                                </span>
-                              )}
-                            </div>
-                          </div>
-                        </Link>
-                      )}
-
-                      <p
-                        className={`mt-2 text-[10px] uppercase tracking-[0.18em] ${
+                    {property && (
+                      <Link
+                        href={`/properties/${property.id}`}
+                        className={`mt-4 block overflow-hidden rounded-2xl border ${
                           message.sender_type === "advisor"
-                            ? "text-white/60"
-                            : "text-[#1A1A1A]/40"
+                            ? "border-white/25 bg-white text-[#1A1A1A]"
+                            : "border-[#1A1A1A]/10 bg-[#F8F5EF]"
                         }`}
                       >
-                        {message.sender_type}
-                      </p>
-                    </div>
-                  );
-                })}
-              </div>
-            ) : (
-              <div className="rounded-3xl bg-white p-6 text-sm text-[#1A1A1A]/60">
-                Select a conversation to start replying.
-              </div>
-            )}
+                        {property.image ? (
+                          <img
+                            src={property.image}
+                            alt={property.title}
+                            className="h-36 w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-36 items-center justify-center bg-[#1A1A1A] text-sm text-white">
+                            Image Coming Soon
+                          </div>
+                        )}
+
+                        <div className="p-4">
+                          <div className="flex items-center gap-2 text-[#B19A55]">
+                            <Home size={15} />
+
+                            <p className="text-[10px] uppercase tracking-[0.2em]">
+                              Shared Property
+                            </p>
+                          </div>
+
+                          <h3 className="mt-2 font-serif text-lg font-bold">
+                            {property.title}
+                          </h3>
+
+                          <p className="mt-1 text-sm text-[#1A1A1A]/60">
+                            {property.city}
+                          </p>
+
+                          <div className="mt-3 flex items-center justify-between gap-3">
+                            <p className="font-serif text-lg font-bold text-[#B19A55]">
+                              {property.price}
+                            </p>
+
+                            {property.status && (
+                              <span className="rounded-full bg-[#1A1A1A] px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-white">
+                                {property.status}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    )}
+
+                    {attachment && (
+                      <div className="mt-4 overflow-hidden rounded-2xl border border-[#1A1A1A]/10 bg-white">
+                        {attachment.file_type.startsWith(
+                          "image"
+                        ) ? (
+                          <img
+                            src={attachment.file_url}
+                            alt={attachment.file_name}
+                            className="max-h-[420px] w-full object-cover"
+                          />
+                        ) : (
+                          <a
+                            href={attachment.file_url}
+                            target="_blank"
+                            className="flex items-center gap-2 p-4 text-sm font-medium text-[#B19A55]"
+                          >
+                            <Paperclip size={15} />
+                            {attachment.file_name}
+                          </a>
+                        )}
+                      </div>
+                    )}
+
+                    <p
+                      className={`mt-2 text-[10px] uppercase tracking-[0.18em] ${
+                        message.sender_type === "advisor"
+                          ? "text-white/60"
+                          : "text-[#1A1A1A]/40"
+                      }`}
+                    >
+                      {message.sender_type}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
           <div className="border-t border-[#1A1A1A]/10 bg-white p-5">
             {selectedConversationId && (
-              <ChatPropertyPicker
-                conversationId={selectedConversationId}
-                senderType="advisor"
-                onSent={() => loadAdminMessages(false)}
-              />
+              <>
+                <ChatPropertyPicker
+                  conversationId={selectedConversationId}
+                  senderType="advisor"
+                  onSent={() =>
+                    loadAdminMessages(false)
+                  }
+                />
+
+                <ChatAttachmentUpload
+                  conversationId={selectedConversationId}
+                  senderType="advisor"
+                  onSent={() =>
+                    loadAdminMessages(false)
+                  }
+                />
+              </>
             )}
 
             <textarea
@@ -496,7 +610,10 @@ export function AdminMessagesCenter() {
             <button
               type="button"
               onClick={sendReply}
-              disabled={!selectedConversationId || !reply.trim()}
+              disabled={
+                !selectedConversationId ||
+                !reply.trim()
+              }
               className="mt-3 flex items-center justify-center gap-2 rounded-full bg-[#B19A55] px-6 py-4 font-serif text-[11px] font-bold uppercase tracking-[0.2em] text-white transition hover:bg-[#9C8749] disabled:opacity-50"
             >
               <Send size={15} />
