@@ -32,7 +32,10 @@ export default function MessagesPage() {
       .eq("id", user.id)
       .maybeSingle();
 
-    setIsAdmin(profile?.role === "admin");
+    const adminByRole = profile?.role === "admin";
+    const adminByEmail = user.email === "ronaviljoyc@gmail.com";
+
+    setIsAdmin(adminByRole || adminByEmail);
     setLoading(false);
   }
 
@@ -40,9 +43,7 @@ export default function MessagesPage() {
     return (
       <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
         <section className="mx-auto max-w-6xl rounded-[1.5rem] bg-white p-8 shadow-xl">
-          <p className="font-serif text-2xl font-bold">
-            Loading messages...
-          </p>
+          <p className="font-serif text-2xl font-bold">Loading messages...</p>
         </section>
       </main>
     );
