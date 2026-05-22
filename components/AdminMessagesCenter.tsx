@@ -142,7 +142,7 @@ export function AdminMessagesCenter() {
 
     setConversations(conversationData || []);
     setMessages(messageData || []);
-    setMessageProperties((propertyData as MessageProperty[]) || []);
+    setMessageProperties((propertyData || []) as unknown as MessageProperty[]);
 
     if (!selectedConversationId && conversationData && conversationData[0]) {
       setSelectedConversationId(conversationData[0].id);
