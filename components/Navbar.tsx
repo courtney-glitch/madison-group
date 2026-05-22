@@ -18,6 +18,7 @@ import {
   Calculator,
   Scale,
   Activity,
+  MessageCircle,
 } from "lucide-react";
 
 export function Navbar() {
@@ -26,6 +27,7 @@ export function Navbar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     checkUser();
@@ -38,6 +40,29 @@ export function Navbar() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (!loggedIn) return;
+
+    const channel = supabase
+      .channel("navbar-messages")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "messages",
+        },
+        async () => {
+          await loadUnreadCount();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [loggedIn, isAdmin]);
 
   async function checkUser() {
     const {
@@ -57,7 +82,33 @@ export function Navbar() {
       .eq("id", user.id)
       .maybeSingle();
 
-    setIsAdmin(profile?.role === "admin");
+    const admin = profile?.role === "admin";
+
+    setIsAdmin(admin);
+
+    await loadUnreadCount(admin);
+  }
+
+  async function loadUnreadCount(adminOverride?: boolean) {
+    const admin =
+      typeof adminOverride === "boolean"
+        ? adminOverride
+        : isAdmin;
+
+    let query = supabase.from("messages").select("*", {
+      count: "exact",
+      head: true,
+    });
+
+    if (admin) {
+      query = query.eq("read_by_admin", false);
+    } else {
+      query = query.eq("read_by_client", false);
+    }
+
+    const { count } = await query;
+
+    setUnreadCount(count || 0);
   }
 
   async function handleLogout() {
@@ -71,9 +122,15 @@ export function Navbar() {
 
   const links = [
     {
-      href: "/",
+      href: "/dashboard",
       label: "Dashboard",
       icon: LayoutDashboard,
+    },
+    {
+      href: "/messages",
+      label: "Messages",
+      icon: MessageCircle,
+      badge: unreadCount,
     },
     {
       href: "/properties",
@@ -191,24 +248,30 @@ export function Navbar() {
             </div>
 
             <nav className="grid gap-2">
-              {links.map((link) => {
+              {links.map((link: any) => {
                 const Icon = link.icon;
 
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="group flex items-center gap-3 rounded-2xl border border-transparent bg-white/30 px-4 py-3 shadow-sm backdrop-blur transition hover:border-[#B19A55]/30 hover:bg-white/80 hover:shadow-xl"
+                    className="group flex items-center justify-between rounded-2xl border border-transparent bg-white/30 px-4 py-3 shadow-sm backdrop-blur transition hover:border-[#B19A55]/30 hover:bg-white/80 hover:shadow-xl"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#B19A55]/10 text-[#B19A55] transition group-hover:bg-[#B19A55] group-hover:text-white">
-                      <Icon size={17} />
-                    </div>
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#B19A55]/10 text-[#B19A55] transition group-hover:bg-[#B19A55] group-hover:text-white">
+                        <Icon size={17} />
+                      </div>
 
-                    <div>
                       <p className="font-serif text-base font-semibold text-[#1A1A1A]">
                         {link.label}
                       </p>
                     </div>
+
+                    {link.badge > 0 && (
+                      <div className="flex h-7 min-w-[28px] items-center justify-center rounded-full bg-[#B19A55] px-2 text-xs font-bold text-white">
+                        {link.badge}
+                      </div>
+                    )}
                   </Link>
                 );
               })}
