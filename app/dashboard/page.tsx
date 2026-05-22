@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { PropertyCard } from "@/components/PropertyCard";
 import { ClientMessages } from "@/components/ClientMessages";
@@ -24,10 +27,125 @@ function money(value: number | null) {
   });
 }
 
-export default async function DashboardPage() {
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+export default function DashboardPage() {
+  const [user, setUser] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+
+  const [budgets, setBudgets] = useState<any[]>([]);
+  const [favorites, setFavorites] = useState<any[]>([]);
+  const [recentlyViewed, setRecentlyViewed] = useState<any[]>([]);
+  const [propertyNotes, setPropertyNotes] = useState<any[]>([]);
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  async function loadDashboard() {
+    setLoading(true);
+
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      setUser(null);
+      setLoading(false);
+      return;
+    }
+
+    setUser(user);
+
+    const { data: budgetsData } = await supabase
+      .from("buyer_budgets")
+      .select("*")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(3);
+
+    const { data: favoritesData } = await supabase
+      .from("favorites")
+      .select(
+        `
+        id,
+        property_id,
+        properties (
+          id,
+          title,
+          city,
+          price,
+          beds,
+          baths,
+          image,
+          status
+        )
+      `
+      )
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(3);
+
+    const { data: viewedData } = await supabase
+      .from("property_views")
+      .select(
+        `
+        id,
+        property_id,
+        properties (
+          id,
+          title,
+          city,
+          price,
+          beds,
+          baths,
+          image,
+          status
+        )
+      `
+      )
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(3);
+
+    const { data: notesData } = await supabase
+      .from("property_notes")
+      .select(
+        `
+        id,
+        rating,
+        note,
+        created_at,
+        properties (
+          id,
+          title,
+          city,
+          price,
+          beds,
+          baths,
+          image,
+          status
+        )
+      `
+      )
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .limit(5);
+
+    setBudgets(budgetsData || []);
+    setFavorites(favoritesData || []);
+    setRecentlyViewed(viewedData || []);
+    setPropertyNotes(notesData || []);
+    setLoading(false);
+  }
+
+  const latestBudget = budgets?.[0];
+
+  if (loading) {
+    return (
+      <main className="flex min-h-screen items-center justify-center bg-[#F8F5EF] px-6 text-[#1A1A1A]">
+        <p className="font-serif text-2xl font-bold">Loading dashboard...</p>
+      </main>
+    );
+  }
 
   if (!user) {
     return (
@@ -56,83 +174,6 @@ export default async function DashboardPage() {
       </main>
     );
   }
-
-  const { data: budgets } = await supabase
-    .from("buyer_budgets")
-    .select("*")
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(3);
-
-  const { data: favorites } = await supabase
-    .from("favorites")
-    .select(
-      `
-      id,
-      property_id,
-      properties (
-        id,
-        title,
-        city,
-        price,
-        beds,
-        baths,
-        image,
-        status
-      )
-    `
-    )
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(3);
-
-  const { data: recentlyViewed } = await supabase
-    .from("property_views")
-    .select(
-      `
-      id,
-      property_id,
-      properties (
-        id,
-        title,
-        city,
-        price,
-        beds,
-        baths,
-        image,
-        status
-      )
-    `
-    )
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(3);
-
-  const { data: propertyNotes } = await supabase
-    .from("property_notes")
-    .select(
-      `
-      id,
-      rating,
-      note,
-      created_at,
-      properties (
-        id,
-        title,
-        city,
-        price,
-        beds,
-        baths,
-        image,
-        status
-      )
-    `
-    )
-    .eq("user_id", user.id)
-    .order("created_at", { ascending: false })
-    .limit(5);
-
-  const latestBudget = budgets?.[0];
 
   return (
     <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
@@ -165,25 +206,25 @@ export default async function DashboardPage() {
           <DashboardStat
             icon={<Calculator size={18} />}
             label="Saved Budgets"
-            value={budgets?.length || 0}
+            value={budgets.length}
           />
 
           <DashboardStat
             icon={<Heart size={18} />}
             label="Saved Homes"
-            value={favorites?.length || 0}
+            value={favorites.length}
           />
 
           <DashboardStat
             icon={<Search size={18} />}
             label="Viewed Homes"
-            value={recentlyViewed?.length || 0}
+            value={recentlyViewed.length}
           />
 
           <DashboardStat
             icon={<MessageSquareText size={18} />}
             label="Property Notes"
-            value={propertyNotes?.length || 0}
+            value={propertyNotes.length}
           />
 
           <DashboardStat
@@ -224,10 +265,7 @@ export default async function DashboardPage() {
                   value={money(latestBudget.annual_income)}
                 />
 
-                <InfoCard
-                  label="Savings"
-                  value={money(latestBudget.savings)}
-                />
+                <InfoCard label="Savings" value={money(latestBudget.savings)} />
               </div>
             ) : (
               <EmptyBox
@@ -289,7 +327,7 @@ export default async function DashboardPage() {
             </h2>
           </div>
 
-          {propertyNotes && propertyNotes.length > 0 ? (
+          {propertyNotes.length > 0 ? (
             <div className="mt-8 grid gap-6">
               {propertyNotes.map((entry: any) => {
                 const property = entry.properties;
@@ -365,7 +403,7 @@ export default async function DashboardPage() {
             <h2 className="font-serif text-2xl font-bold">Saved Homes</h2>
           </div>
 
-          {favorites && favorites.length > 0 ? (
+          {favorites.length > 0 ? (
             <div className="mt-8 grid gap-6 sm:grid-cols-2 xl:grid-cols-3">
               {favorites.map((favorite: any) => {
                 const property = favorite.properties;
@@ -405,7 +443,7 @@ export default async function DashboardPage() {
           </div>
 
           <div className="mt-6 grid gap-4">
-            {budgets && budgets.length > 0 ? (
+            {budgets.length > 0 ? (
               budgets.map((budget) => (
                 <div
                   key={budget.id}
