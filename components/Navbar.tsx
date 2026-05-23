@@ -67,7 +67,7 @@ const adminLinks = [
   },
 ];
 
-export default function Navbar() {
+export function Navbar() {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const [loggedIn, setLoggedIn] = useState(false);
