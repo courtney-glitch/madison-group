@@ -2,8 +2,15 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { Home, MessageCircle, Send } from "lucide-react";
+import {
+  Home,
+  MessageCircle,
+  Paperclip,
+  Send,
+} from "lucide-react";
+
 import { supabase } from "@/lib/supabase";
+import { ChatAttachmentUpload } from "@/components/ChatAttachmentUpload";
 
 type MessageItem = {
   id: string;
@@ -16,6 +23,7 @@ type MessageProperty = {
   id: string;
   message_id: string;
   property_id: string;
+
   properties: {
     id: string;
     title: string;
@@ -26,14 +34,31 @@ type MessageProperty = {
   } | null;
 };
 
+type MessageAttachment = {
+  id: string;
+  message_id: string;
+  file_url: string;
+  file_name: string;
+  file_type: string;
+};
+
 export function ClientMessages() {
   const [conversationId, setConversationId] = useState("");
+
   const [messages, setMessages] = useState<MessageItem[]>([]);
-  const [messageProperties, setMessageProperties] = useState<MessageProperty[]>(
-    []
-  );
+
+  const [messageProperties, setMessageProperties] = useState<
+    MessageProperty[]
+  >([]);
+
+  const [messageAttachments, setMessageAttachments] = useState<
+    MessageAttachment[]
+  >([]);
+
   const [newMessage, setNewMessage] = useState("");
+
   const [status, setStatus] = useState("");
+
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -63,6 +88,17 @@ export function ClientMessages() {
           event: "*",
           schema: "public",
           table: "message_properties",
+        },
+        async () => {
+          await refreshMessages(conversationId);
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "message_attachments",
         },
         async () => {
           await refreshMessages(conversationId);
@@ -130,7 +166,8 @@ export function ClientMessages() {
       .eq("conversation_id", id)
       .order("created_at", { ascending: true });
 
-    const { data: propertyData } = await supabase.from("message_properties")
+    const { data: propertyData } = await supabase
+      .from("message_properties")
       .select(`
         id,
         message_id,
@@ -145,14 +182,31 @@ export function ClientMessages() {
         )
       `);
 
+    const { data: attachmentData } = await supabase
+      .from("message_attachments")
+      .select("*");
+
     setMessages(loadedMessages || []);
+
     setMessageProperties(
-      ((propertyData || []) as unknown as MessageProperty[]) || []
+      (propertyData || []) as unknown as MessageProperty[]
+    );
+
+    setMessageAttachments(
+      (attachmentData || []) as MessageAttachment[]
     );
   }
 
   function getMessageProperty(messageId: string) {
-    return messageProperties.find((item) => item.message_id === messageId);
+    return messageProperties.find(
+      (item) => item.message_id === messageId
+    );
+  }
+
+  function getMessageAttachment(messageId: string) {
+    return messageAttachments.find(
+      (item) => item.message_id === messageId
+    );
   }
 
   async function sendMessage() {
@@ -160,13 +214,15 @@ export function ClientMessages() {
 
     setStatus("");
 
-    const { error } = await supabase.from("messages").insert({
-      conversation_id: conversationId,
-      sender_type: "client",
-      message: newMessage.trim(),
-      read_by_admin: false,
-      read_by_client: true,
-    });
+    const { error } = await supabase
+      .from("messages")
+      .insert({
+        conversation_id: conversationId,
+        sender_type: "client",
+        message: newMessage.trim(),
+        read_by_admin: false,
+        read_by_client: true,
+      });
 
     if (error) {
       setStatus(error.message);
@@ -200,8 +256,14 @@ export function ClientMessages() {
         ) : messages.length > 0 ? (
           <div className="grid gap-4">
             {messages.map((item) => {
-              const attachedProperty = getMessageProperty(item.id);
-              const property = attachedProperty?.properties;
+              const attachedProperty =
+                getMessageProperty(item.id);
+
+              const property =
+                attachedProperty?.properties;
+
+              const attachment =
+                getMessageAttachment(item.id);
 
               return (
                 <div
@@ -269,6 +331,30 @@ export function ClientMessages() {
                     </Link>
                   )}
 
+                  {attachment && (
+                    <div className="mt-4 overflow-hidden rounded-2xl border border-[#1A1A1A]/10 bg-white">
+                      {attachment.file_type.startsWith(
+                        "image"
+                      ) ? (
+                        <img
+                          src={attachment.file_url}
+                          alt={attachment.file_name}
+                          className="max-h-[420px] w-full object-cover"
+                        />
+                      ) : (
+                        <a
+                          href={attachment.file_url}
+                          target="_blank"
+                          className="flex items-center gap-2 p-4 text-sm font-medium text-[#B19A55]"
+                        >
+                          <Paperclip size={15} />
+
+                          {attachment.file_name}
+                        </a>
+                      )}
+                    </div>
+                  )}
+
                   <p
                     className={`mt-2 text-[10px] uppercase tracking-[0.18em] ${
                       item.sender_type === "client"
@@ -284,9 +370,21 @@ export function ClientMessages() {
           </div>
         ) : (
           <p className="text-sm leading-7 text-[#1A1A1A]/60">
-            No messages yet. Start a conversation with your Madison Group
-            advisor.
+            No messages yet. Start a conversation with your
+            Madison Group advisor.
           </p>
+        )}
+      </div>
+
+      <div className="mt-5">
+        {conversationId && (
+          <ChatAttachmentUpload
+            conversationId={conversationId}
+            senderType="client"
+            onSent={() =>
+              refreshMessages(conversationId)
+            }
+          />
         )}
       </div>
 
@@ -294,7 +392,9 @@ export function ClientMessages() {
         <textarea
           rows={4}
           value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
+          onChange={(e) =>
+            setNewMessage(e.target.value)
+          }
           placeholder="Write your message..."
           className="rounded-2xl border border-[#1A1A1A]/10 bg-[#F8F5EF] px-4 py-4 text-sm outline-none transition focus:border-[#B19A55]"
         />
