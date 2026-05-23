@@ -8,7 +8,9 @@ import { AdminMessagesCenter } from "@/components/AdminMessagesCenter";
 
 export default function MessagesPage() {
   const [loading, setLoading] = useState(true);
+
   const [loggedIn, setLoggedIn] = useState(false);
+
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
@@ -36,16 +38,18 @@ export default function MessagesPage() {
       .eq("id", user.id)
       .maybeSingle();
 
-    setIsAdmin(profile?.role === "admin" || user.email === "ronaviljoyc@gmail.com");
+    setIsAdmin(profile?.role === "admin");
 
     setLoading(false);
   }
 
   if (loading) {
     return (
-      <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
+      <main className="min-h-screen bg-[#F8F5EF] px-6 py-12">
         <section className="mx-auto max-w-5xl rounded-[1.5rem] bg-white p-8 shadow-xl">
-          <p className="font-serif text-2xl font-bold">Loading messages...</p>
+          <p className="font-serif text-2xl font-bold">
+            Loading messages...
+          </p>
         </section>
       </main>
     );
@@ -53,13 +57,9 @@ export default function MessagesPage() {
 
   if (!loggedIn) {
     return (
-      <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
+      <main className="min-h-screen bg-[#F8F5EF] px-6 py-12">
         <section className="mx-auto max-w-5xl rounded-[1.5rem] bg-white p-8 shadow-xl">
-          <p className="font-serif text-[11px] uppercase tracking-[0.32em] text-[#B19A55]">
-            Messages
-          </p>
-
-          <h1 className="mt-3 font-serif text-4xl font-bold">
+          <h1 className="font-serif text-4xl font-bold">
             Please login first.
           </h1>
         </section>
@@ -70,7 +70,11 @@ export default function MessagesPage() {
   return (
     <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
       <section className="mx-auto max-w-7xl">
-        {isAdmin ? <AdminMessagesCenter /> : <ClientMessages />}
+        {isAdmin ? (
+          <AdminMessagesCenter />
+        ) : (
+          <ClientMessages />
+        )}
       </section>
     </main>
   );
