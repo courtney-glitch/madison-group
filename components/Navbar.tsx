@@ -128,7 +128,7 @@ export function Navbar() {
       icon: LayoutDashboard,
     },
     {
-      href: "/messages",
+      href: isAdmin ? "/admin/messages" : "/messages",
       label: "Messages",
       icon: MessageCircle,
       badge: unreadCount,
