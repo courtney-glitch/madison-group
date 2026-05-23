@@ -2,51 +2,85 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabase";
-
 import {
-  LayoutDashboard,
-  Search,
-  Map,
-  Heart,
-  Bookmark,
-  Building2,
-  Phone,
-  User,
-  LogOut,
-  Calculator,
-  Scale,
   Activity,
+  Building2,
+  Heart,
+  Home,
+  Menu,
   MessageCircle,
-  ListChecks,
+  User,
+  X,
 } from "lucide-react";
 
-export function Navbar() {
-  const router = useRouter();
+import { supabase } from "@/lib/supabase";
+
+const navigationLinks = [
+  {
+    href: "/",
+    label: "Home",
+    icon: Home,
+  },
+
+  {
+    href: "/properties",
+    label: "Properties",
+    icon: Building2,
+  },
+
+  {
+    href: "/favorites",
+    label: "Favorites",
+    icon: Heart,
+  },
+
+  {
+    href: "/messages",
+    label: "Messages",
+    icon: MessageCircle,
+  },
+
+  {
+    href: "/dashboard",
+    label: "Dashboard",
+    icon: User,
+  },
+];
+
+const adminLinks = [
+  {
+    href: "/admin/client-activity",
+    label: "Client Activity",
+    icon: Activity,
+  },
+
+  {
+    href: "/admin/messages",
+    label: "Admin Messages",
+    icon: MessageCircle,
+  },
+
+  {
+    href: "/admin/properties",
+    label: "Manage Properties",
+    icon: Building2,
+  },
+];
+
+export default function Navbar() {
+  const [menuOpen, setMenuOpen] = useState(false);
 
   const [loggedIn, setLoggedIn] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
+
   const [isAdmin, setIsAdmin] = useState(false);
+
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
     checkUser();
 
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange(() => {
-      checkUser();
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
-  useEffect(() => {
-    if (!loggedIn) return;
-
     const channel = supabase
-      .channel("navbar-messages")
+      .channel("navbar-message-count")
       .on(
         "postgres_changes",
         {
@@ -55,7 +89,7 @@ export function Navbar() {
           table: "messages",
         },
         async () => {
-          await loadUnreadCount();
+          await checkUser();
         }
       )
       .subscribe();
@@ -63,19 +97,21 @@ export function Navbar() {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [loggedIn, isAdmin]);
+  }, []);
 
   async function checkUser() {
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    setLoggedIn(!!user);
-
     if (!user) {
+      setLoggedIn(false);
       setIsAdmin(false);
+      setUnreadCount(0);
       return;
     }
+
+    setLoggedIn(true);
 
     const { data: profile } = await supabase
       .from("profiles")
@@ -87,234 +123,161 @@ export function Navbar() {
 
     setIsAdmin(admin);
 
-    await loadUnreadCount(admin);
-  }
-
-  async function loadUnreadCount(adminOverride?: boolean) {
-    const admin =
-      typeof adminOverride === "boolean"
-        ? adminOverride
-        : isAdmin;
-
-    let query = supabase.from("messages").select("*", {
-      count: "exact",
-      head: true,
-    });
-
     if (admin) {
-      query = query.eq("read_by_admin", false);
+      const { data: unreadMessages } = await supabase
+        .from("messages")
+        .select("id")
+        .eq("sender_type", "client")
+        .eq("read_by_admin", false);
+
+      setUnreadCount(unreadMessages?.length || 0);
     } else {
-      query = query.eq("read_by_client", false);
+      const { data: conversation } = await supabase
+        .from("conversations")
+        .select("id")
+        .eq("user_id", user.id)
+        .limit(1)
+        .maybeSingle();
+
+      if (!conversation) {
+        setUnreadCount(0);
+        return;
+      }
+
+      const { data: unreadMessages } = await supabase
+        .from("messages")
+        .select("id")
+        .eq("conversation_id", conversation.id)
+        .eq("sender_type", "advisor")
+        .eq("read_by_client", false);
+
+      setUnreadCount(unreadMessages?.length || 0);
     }
-
-    const { count } = await query;
-
-    setUnreadCount(count || 0);
   }
-
-  async function handleLogout() {
-    await supabase.auth.signOut();
-
-    setMenuOpen(false);
-
-    router.push("/login");
-    router.refresh();
-  }
-
-  const links = [
-    {
-      href: "/dashboard",
-      label: "Dashboard",
-      icon: LayoutDashboard,
-    },
-    {
-      href: isAdmin ? "/admin/messages" : "/messages",
-      label: "Messages",
-      icon: MessageCircle,
-      badge: unreadCount,
-    },
-    {
-      href: "/timeline",
-      label: "Timeline",
-      icon: ListChecks,
-    },
-    {
-      href: "/properties",
-      label: "Home Search",
-      icon: Search,
-    },
-    {
-      href: "/map-search",
-      label: "Map Search",
-      icon: Map,
-    },
-    {
-      href: "/budget-calculator",
-      label: "Budget",
-      icon: Calculator,
-    },
-    {
-      href: "/compare",
-      label: "Compare",
-      icon: Scale,
-    },
-    {
-      href: "/saved-searches",
-      label: "Saved",
-      icon: Bookmark,
-    },
-    {
-      href: "/favorites",
-      label: "Favorites",
-      icon: Heart,
-    },
-    {
-      href: "/communities/wyckoff",
-      label: "Communities",
-      icon: Building2,
-    },
-    {
-      href: "/contact",
-      label: "Contact",
-      icon: Phone,
-    },
-  ];
-
-  const adminLinks = [
-    {
-      href: "/admin/client-activity",
-      label: "Client Activity",
-      icon: Activity,
-    },
-  ];
 
   return (
-    <>
-      <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/30 bg-white/70 backdrop-blur-2xl md:left-72">
-        <div className="relative flex h-20 items-center justify-center px-6">
-          <button
-            type="button"
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="absolute left-4 rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[10px] uppercase tracking-[0.25em] shadow-sm backdrop-blur md:hidden"
-          >
-            Menu
-          </button>
+    <header className="sticky top-0 z-50 border-b border-[#1A1A1A]/10 bg-white/95 backdrop-blur">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+        <Link href="/" className="font-serif text-2xl font-bold">
+          Madison Group
+        </Link>
 
-          <Link href="/" className="flex items-center justify-center">
-            <img
-              src="/madison-logo.jpg"
-              alt="Madison Group"
-              className="h-12 w-auto object-contain"
-            />
-          </Link>
+        <nav className="hidden items-center gap-3 lg:flex">
+          {navigationLinks.map((link) => {
+            const Icon = link.icon;
 
-          <div className="absolute right-6 hidden items-center gap-3 md:flex">
-            {loggedIn ? (
-              <>
-                <Link
-                  href="/account"
-                  className="flex items-center gap-2 rounded-full border border-[#1A1A1A]/10 bg-white/60 px-4 py-2 text-[10px] uppercase tracking-[0.2em] shadow-sm backdrop-blur transition hover:border-[#B19A55]/40 hover:text-[#B19A55]"
-                >
-                  <User size={13} />
-                  Account
-                </Link>
-
-                <button
-                  type="button"
-                  onClick={handleLogout}
-                  className="flex items-center gap-2 rounded-full border border-[#B19A55]/20 bg-[#B19A55]/10 px-4 py-2 text-[10px] uppercase tracking-[0.2em] text-[#B19A55] transition hover:bg-[#B19A55] hover:text-white"
-                >
-                  <LogOut size={13} />
-                  Logout
-                </button>
-              </>
-            ) : (
+            return (
               <Link
-                href="/login"
-                className="rounded-full border border-[#B19A55]/30 bg-[#B19A55]/10 px-5 py-2 text-[10px] uppercase tracking-[0.25em] text-[#B19A55] transition hover:bg-[#B19A55] hover:text-white"
+                key={link.href}
+                href={link.href}
+                className="relative flex items-center gap-2 rounded-full px-5 py-3 text-sm font-medium text-[#1A1A1A]/75 transition hover:bg-[#F8F5EF] hover:text-[#B19A55]"
               >
-                Login
+                <Icon size={16} />
+
+                {link.label}
+
+                {link.label === "Messages" &&
+                  unreadCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-bold text-white">
+                      {unreadCount}
+                    </span>
+                  )}
               </Link>
-            )}
-          </div>
-        </div>
-      </header>
+            );
+          })}
 
-      <aside className="fixed left-0 top-0 z-50 hidden h-screen w-72 overflow-y-auto border-r border-white/20 bg-white/65 backdrop-blur-3xl md:block">
-        <div className="flex min-h-full flex-col justify-between px-5 py-6">
-          <div>
-            <div className="mb-10">
-              <p className="font-serif text-xs tracking-[0.4em] text-[#B19A55]">
-                MADISON GROUP
+          {loggedIn &&
+            isAdmin &&
+            adminLinks.map((link) => {
+              const Icon = link.icon;
+
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  className="flex items-center gap-2 rounded-full bg-[#1A1A1A] px-5 py-3 text-sm font-medium text-white transition hover:bg-[#B19A55]"
+                >
+                  <Icon size={16} />
+
+                  {link.label}
+                </Link>
+              );
+            })}
+        </nav>
+
+        <button
+          type="button"
+          onClick={() => setMenuOpen(true)}
+          className="rounded-full border border-[#1A1A1A]/10 p-3 lg:hidden"
+        >
+          <Menu size={20} />
+        </button>
+      </div>
+
+      {menuOpen && (
+        <div className="fixed inset-0 z-[100] bg-black/50 lg:hidden">
+          <div className="absolute right-0 top-0 flex h-full w-[85%] max-w-sm flex-col bg-white p-6 shadow-2xl">
+            <div className="flex items-center justify-between">
+              <p className="font-serif text-2xl font-bold">
+                Menu
               </p>
 
-              <p className="mt-2 text-[10px] uppercase tracking-[0.25em] text-[#1A1A1A]/40">
-                Luxury Real Estate
-              </p>
+              <button
+                type="button"
+                onClick={() => setMenuOpen(false)}
+                className="rounded-full border border-[#1A1A1A]/10 p-3"
+              >
+                <X size={20} />
+              </button>
             </div>
 
-            <nav className="grid gap-2">
-              {links.map((link: any) => {
+            <div className="mt-8 grid gap-3">
+              {navigationLinks.map((link) => {
                 const Icon = link.icon;
 
                 return (
                   <Link
                     key={link.href}
                     href={link.href}
-                    className="group flex items-center justify-between rounded-2xl border border-transparent bg-white/30 px-4 py-3 shadow-sm backdrop-blur transition hover:border-[#B19A55]/30 hover:bg-white/80 hover:shadow-xl"
+                    onClick={() => setMenuOpen(false)}
+                    className="relative flex items-center gap-3 rounded-2xl bg-[#F8F5EF] px-5 py-4 font-medium text-[#1A1A1A]"
                   >
-                    <div className="flex items-center gap-3">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#B19A55]/10 text-[#B19A55] transition group-hover:bg-[#B19A55] group-hover:text-white">
-                        <Icon size={17} />
-                      </div>
+                    <Icon size={18} />
 
-                      <p className="font-serif text-base font-semibold text-[#1A1A1A]">
-                        {link.label}
-                      </p>
-                    </div>
+                    {link.label}
 
-                    {link.badge > 0 && (
-                      <div className="flex h-7 min-w-[28px] items-center justify-center rounded-full bg-[#B19A55] px-2 text-xs font-bold text-white">
-                        {link.badge}
-                      </div>
-                    )}
+                    {link.label === "Messages" &&
+                      unreadCount > 0 && (
+                        <span className="absolute right-4 top-1/2 flex h-6 min-w-[24px] -translate-y-1/2 items-center justify-center rounded-full bg-red-500 px-2 text-[10px] font-bold text-white">
+                          {unreadCount}
+                        </span>
+                      )}
                   </Link>
                 );
               })}
 
-              {isAdmin && (
-                <>
-                  <div className="my-4 border-t border-[#1A1A1A]/10" />
+              {loggedIn &&
+                isAdmin &&
+                adminLinks.map((link) => {
+                  const Icon = link.icon;
 
-                  <p className="px-2 text-[10px] uppercase tracking-[0.3em] text-[#B19A55]">
-                    Admin
-                  </p>
+                  return (
+                    <Link
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-3 rounded-2xl bg-[#1A1A1A] px-5 py-4 font-medium text-white"
+                    >
+                      <Icon size={18} />
 
-                  {adminLinks.map((link) => {
-                    const Icon = link.icon;
-
-                    return (
-                      <Link
-                        key={link.href}
-                        href={link.href}
-                        className="group flex items-center gap-3 rounded-2xl border border-[#B19A55]/10 bg-[#B19A55]/5 px-4 py-3 shadow-sm backdrop-blur transition hover:bg-[#B19A55] hover:text-white"
-                      >
-                        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#B19A55] text-white">
-                          <Icon size={17} />
-                        </div>
-
-                        <p className="font-serif text-base font-semibold">
-                          {link.label}
-                        </p>
-                      </Link>
-                    );
-                  })}
-                </>
-              )}
-            </nav>
+                      {link.label}
+                    </Link>
+                  );
+                })}
+            </div>
           </div>
         </div>
-      </aside>
-    </>
+      )}
+    </header>
   );
 }
