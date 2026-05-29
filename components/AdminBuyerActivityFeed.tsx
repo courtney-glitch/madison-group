@@ -93,7 +93,7 @@ export function AdminBuyerActivityFeed() {
       .order("created_at", { ascending: false })
       .limit(30);
 
-    setActivities((data || []) as BuyerActivity[]);
+    setActivities((data || []) as unknown as BuyerActivity[]);
     setLoading(false);
   }
 
