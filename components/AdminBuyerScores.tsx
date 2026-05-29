@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Flame, Thermometer, Snowflake, UserRound } from "lucide-react";
+import { Flame, Thermometer, Snowflake } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { calculateBuyerScore } from "@/lib/buyerScore";
 
@@ -14,6 +14,7 @@ type BuyerActivity = {
 function scoreIcon(label: "Cold" | "Warm" | "Hot") {
   if (label === "Hot") return <Flame size={18} />;
   if (label === "Warm") return <Thermometer size={18} />;
+
   return <Snowflake size={18} />;
 }
 
@@ -52,7 +53,8 @@ export function AdminBuyerScores() {
       .select("id, user_id, activity_type")
       .order("created_at", { ascending: false });
 
-    setActivities((data || []) as BuyerActivity[]);
+    setActivities((data || []) as unknown as BuyerActivity[]);
+
     setLoading(false);
   }
 
@@ -172,8 +174,14 @@ export function AdminBuyerScores() {
                     <div className="mt-4 flex flex-wrap gap-2">
                       <MiniStat label="Views" value={buyer.propertyViews} />
                       <MiniStat label="Favorites" value={buyer.favorites} />
-                      <MiniStat label="Searches" value={buyer.savedSearches} />
-                      <MiniStat label="Showings" value={buyer.showingRequests} />
+                      <MiniStat
+                        label="Searches"
+                        value={buyer.savedSearches}
+                      />
+                      <MiniStat
+                        label="Showings"
+                        value={buyer.showingRequests}
+                      />
                       <MiniStat label="Messages" value={buyer.messages} />
                     </div>
                   </div>
@@ -213,7 +221,13 @@ export function AdminBuyerScores() {
   );
 }
 
-function MiniStat({ label, value }: { label: string; value: number }) {
+function MiniStat({
+  label,
+  value,
+}: {
+  label: string;
+  value: number;
+}) {
   return (
     <div className="rounded-full bg-white px-4 py-2 text-xs text-[#1A1A1A]/60">
       {label}: <span className="font-bold text-[#1A1A1A]">{value}</span>
