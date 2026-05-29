@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { AdminMessageReply } from "@/components/AdminMessageReply";
+import { AdminBuyerActivityFeed } from "@/components/AdminBuyerActivityFeed";
 
 import {
   Calculator,
@@ -8,6 +9,7 @@ import {
   MessageCircle,
   MessageSquareText,
   Star,
+  Activity,
 } from "lucide-react";
 
 function money(value: number | null) {
@@ -101,8 +103,8 @@ export default async function ClientActivityPage() {
             </h1>
 
             <p className="mt-5 max-w-3xl text-base leading-8 text-[#1A1A1A]/65">
-              Monitor buyer activity, saved budgets, showing requests, notes,
-              ratings, and client messages.
+              Monitor buyer behavior, saved budgets, showing requests, notes,
+              ratings, messages, and live engagement signals.
             </p>
           </div>
 
@@ -114,7 +116,7 @@ export default async function ClientActivityPage() {
           </Link>
         </div>
 
-        <div className="mt-10 grid gap-5 md:grid-cols-4">
+        <div className="mt-10 grid gap-5 md:grid-cols-5">
           <AdminStat
             icon={<Calculator size={18} />}
             label="Buyer Budgets"
@@ -138,6 +140,16 @@ export default async function ClientActivityPage() {
             label="Messages"
             value={messages?.length || 0}
           />
+
+          <AdminStat
+            icon={<Activity size={18} />}
+            label="Live Activity"
+            value={1}
+          />
+        </div>
+
+        <div className="mt-10">
+          <AdminBuyerActivityFeed />
         </div>
 
         <section className="mt-10 rounded-[1.5rem] bg-white p-6 shadow-xl">
@@ -168,10 +180,7 @@ export default async function ClientActivityPage() {
                     value={money(budget.estimated_monthly_payment)}
                   />
 
-                  <InfoSmall
-                    label="Savings"
-                    value={money(budget.savings)}
-                  />
+                  <InfoSmall label="Savings" value={money(budget.savings)} />
                 </div>
               ))
             ) : (
@@ -204,10 +213,7 @@ export default async function ClientActivityPage() {
                       value={request.properties?.title || "Property"}
                     />
 
-                    <InfoSmall
-                      label="Email"
-                      value={request.email || "—"}
-                    />
+                    <InfoSmall label="Email" value={request.email || "—"} />
                   </div>
 
                   {request.message && (
@@ -224,18 +230,12 @@ export default async function ClientActivityPage() {
         </section>
 
         <section className="mt-10 rounded-[1.5rem] bg-white p-6 shadow-xl">
-          <SectionTitle
-            icon={<Star size={20} />}
-            title="Buyer Notes & Ratings"
-          />
+          <SectionTitle icon={<Star size={20} />} title="Buyer Notes & Ratings" />
 
           <div className="mt-6 grid gap-4">
             {notes && notes.length > 0 ? (
               notes.map((note: any) => (
-                <div
-                  key={note.id}
-                  className="rounded-3xl bg-[#F8F5EF] p-5"
-                >
+                <div key={note.id} className="rounded-3xl bg-[#F8F5EF] p-5">
                   <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
                     <div>
                       <p className="text-[10px] uppercase tracking-[0.2em] text-[#B19A55]">
@@ -259,11 +259,7 @@ export default async function ClientActivityPage() {
                         >
                           <Star
                             size={15}
-                            fill={
-                              star <= note.rating
-                                ? "currentColor"
-                                : "none"
-                            }
+                            fill={star <= note.rating ? "currentColor" : "none"}
                           />
                         </div>
                       ))}
@@ -284,18 +280,12 @@ export default async function ClientActivityPage() {
         </section>
 
         <section className="mt-10 rounded-[1.5rem] bg-white p-6 shadow-xl">
-          <SectionTitle
-            icon={<MessageCircle size={20} />}
-            title="Recent Messages"
-          />
+          <SectionTitle icon={<MessageCircle size={20} />} title="Recent Messages" />
 
           <div className="mt-6 grid gap-4">
             {messages && messages.length > 0 ? (
               messages.map((message: any) => (
-                <div
-                  key={message.id}
-                  className="rounded-3xl bg-[#F8F5EF] p-5"
-                >
+                <div key={message.id} className="rounded-3xl bg-[#F8F5EF] p-5">
                   <p className="text-[10px] uppercase tracking-[0.2em] text-[#B19A55]">
                     {message.sender_type}
                   </p>
@@ -306,16 +296,13 @@ export default async function ClientActivityPage() {
 
                   <p className="mt-3 text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/35">
                     User:{" "}
-                    {message.conversations &&
-                    Array.isArray(message.conversations)
+                    {message.conversations && Array.isArray(message.conversations)
                       ? message.conversations[0]?.user_id?.slice(0, 8)
                       : "Unknown"}
                   </p>
 
                   {message.conversation_id && (
-                    <AdminMessageReply
-                      conversationId={message.conversation_id}
-                    />
+                    <AdminMessageReply conversationId={message.conversation_id} />
                   )}
                 </div>
               ))
@@ -367,13 +354,7 @@ function SectionTitle({
   );
 }
 
-function InfoSmall({
-  label,
-  value,
-}: {
-  label: string;
-  value: string;
-}) {
+function InfoSmall({ label, value }: { label: string; value: string }) {
   return (
     <div>
       <p className="text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/45">
