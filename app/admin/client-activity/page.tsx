@@ -3,6 +3,7 @@ import { supabase } from "@/lib/supabase";
 import { AdminMessageReply } from "@/components/AdminMessageReply";
 import { AdminBuyerActivityFeed } from "@/components/AdminBuyerActivityFeed";
 import { AdminBuyerScores } from "@/components/AdminBuyerScores";
+import { AdminAIRecommendations } from "@/components/AdminAIRecommendations";
 
 import {
   Calculator,
@@ -12,6 +13,7 @@ import {
   Star,
   Activity,
 } from "lucide-react";
+import { AdminAIRecommendations } from "@/components/AdminAIRecommendations";
 
 function money(value: number | null) {
   if (!value) return "$0";
