@@ -150,6 +150,8 @@ export default async function ClientActivityPage() {
         </div>
 
         <div className="mt-10 grid gap-10">
+         <AdminAIRecommendations />
+         
           <AdminBuyerScores />
         
         <AdminBuyerActivityFeed />
