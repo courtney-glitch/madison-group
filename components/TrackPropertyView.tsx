@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { supabase } from "@/lib/supabase";
+import { trackBuyerActivity } from "@/lib/activityTracker";
 
 type TrackPropertyViewProps = {
   propertyId: string;
@@ -19,6 +20,13 @@ export function TrackPropertyView({ propertyId }: TrackPropertyViewProps) {
       await supabase.from("property_views").insert({
         user_id: user.id,
         property_id: propertyId,
+      });
+
+      await trackBuyerActivity({
+        userId: user.id,
+        propertyId,
+        activityType: "property_view",
+        activityLabel: "Viewed property details",
       });
     }
 
