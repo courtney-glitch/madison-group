@@ -2,6 +2,7 @@ import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { AdminMessageReply } from "@/components/AdminMessageReply";
 import { AdminBuyerActivityFeed } from "@/components/AdminBuyerActivityFeed";
+import { AdminBuyerScores } from "@/components/AdminBuyerScores";
 
 import {
   Calculator,
@@ -148,8 +149,10 @@ export default async function ClientActivityPage() {
           />
         </div>
 
-        <div className="mt-10">
-          <AdminBuyerActivityFeed />
+        <div className="mt-10 grid gap-10">
+          <AdminBuyerScores />
+        
+        <AdminBuyerActivityFeed />
         </div>
 
         <section className="mt-10 rounded-[1.5rem] bg-white p-6 shadow-xl">
