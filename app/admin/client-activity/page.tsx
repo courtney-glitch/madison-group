@@ -6,14 +6,13 @@ import { AdminBuyerScores } from "@/components/AdminBuyerScores";
 import { AdminAIRecommendations } from "@/components/AdminAIRecommendations";
 
 import {
+  Activity,
   Calculator,
   CalendarDays,
   MessageCircle,
   MessageSquareText,
   Star,
-  Activity,
 } from "lucide-react";
-import { AdminAIRecommendations } from "@/components/AdminAIRecommendations";
 
 function money(value: number | null) {
   if (!value) return "$0";
@@ -120,73 +119,29 @@ export default async function ClientActivityPage() {
         </div>
 
         <div className="mt-10 grid gap-5 md:grid-cols-5">
-          <AdminStat
-            icon={<Calculator size={18} />}
-            label="Buyer Budgets"
-            value={budgets?.length || 0}
-          />
-
-          <AdminStat
-            icon={<CalendarDays size={18} />}
-            label="Showings"
-            value={showingRequests?.length || 0}
-          />
-
-          <AdminStat
-            icon={<MessageSquareText size={18} />}
-            label="Notes"
-            value={notes?.length || 0}
-          />
-
-          <AdminStat
-            icon={<MessageCircle size={18} />}
-            label="Messages"
-            value={messages?.length || 0}
-          />
-
-          <AdminStat
-            icon={<Activity size={18} />}
-            label="Live Activity"
-            value={1}
-          />
+          <AdminStat icon={<Calculator size={18} />} label="Buyer Budgets" value={budgets?.length || 0} />
+          <AdminStat icon={<CalendarDays size={18} />} label="Showings" value={showingRequests?.length || 0} />
+          <AdminStat icon={<MessageSquareText size={18} />} label="Notes" value={notes?.length || 0} />
+          <AdminStat icon={<MessageCircle size={18} />} label="Messages" value={messages?.length || 0} />
+          <AdminStat icon={<Activity size={18} />} label="Live Activity" value={1} />
         </div>
 
         <div className="mt-10 grid gap-10">
-         <AdminAIRecommendations />
-         
+          <AdminAIRecommendations />
           <AdminBuyerScores />
-        
-        <AdminBuyerActivityFeed />
+          <AdminBuyerActivityFeed />
         </div>
 
         <section className="mt-10 rounded-[1.5rem] bg-white p-6 shadow-xl">
-          <SectionTitle
-            icon={<Calculator size={20} />}
-            title="Recent Buyer Budgets"
-          />
+          <SectionTitle icon={<Calculator size={20} />} title="Recent Buyer Budgets" />
 
           <div className="mt-6 grid gap-4">
             {budgets && budgets.length > 0 ? (
               budgets.map((budget: any) => (
-                <div
-                  key={budget.id}
-                  className="grid gap-4 rounded-3xl bg-[#F8F5EF] p-5 md:grid-cols-4"
-                >
-                  <InfoSmall
-                    label="User"
-                    value={budget.user_id?.slice(0, 8) || "Unknown"}
-                  />
-
-                  <InfoSmall
-                    label="Home Budget"
-                    value={money(budget.estimated_home_price)}
-                  />
-
-                  <InfoSmall
-                    label="Monthly Payment"
-                    value={money(budget.estimated_monthly_payment)}
-                  />
-
+                <div key={budget.id} className="grid gap-4 rounded-3xl bg-[#F8F5EF] p-5 md:grid-cols-4">
+                  <InfoSmall label="User" value={budget.user_id?.slice(0, 8) || "Unknown"} />
+                  <InfoSmall label="Home Budget" value={money(budget.estimated_home_price)} />
+                  <InfoSmall label="Monthly Payment" value={money(budget.estimated_monthly_payment)} />
                   <InfoSmall label="Savings" value={money(budget.savings)} />
                 </div>
               ))
@@ -197,29 +152,15 @@ export default async function ClientActivityPage() {
         </section>
 
         <section className="mt-10 rounded-[1.5rem] bg-white p-6 shadow-xl">
-          <SectionTitle
-            icon={<CalendarDays size={20} />}
-            title="Showing Requests"
-          />
+          <SectionTitle icon={<CalendarDays size={20} />} title="Showing Requests" />
 
           <div className="mt-6 grid gap-4">
             {showingRequests && showingRequests.length > 0 ? (
               showingRequests.map((request: any) => (
-                <div
-                  key={request.id}
-                  className="rounded-3xl bg-[#F8F5EF] p-5"
-                >
+                <div key={request.id} className="rounded-3xl bg-[#F8F5EF] p-5">
                   <div className="grid gap-4 md:grid-cols-3">
-                    <InfoSmall
-                      label="Client"
-                      value={request.full_name || "Unknown"}
-                    />
-
-                    <InfoSmall
-                      label="Property"
-                      value={request.properties?.title || "Property"}
-                    />
-
+                    <InfoSmall label="Client" value={request.full_name || "Unknown"} />
+                    <InfoSmall label="Property" value={request.properties?.title || "Property"} />
                     <InfoSmall label="Email" value={request.email || "—"} />
                   </div>
 
@@ -264,10 +205,7 @@ export default async function ClientActivityPage() {
                               : "bg-white text-[#1A1A1A]/20"
                           }`}
                         >
-                          <Star
-                            size={15}
-                            fill={star <= note.rating ? "currentColor" : "none"}
-                          />
+                          <Star size={15} fill={star <= note.rating ? "currentColor" : "none"} />
                         </div>
                       ))}
                     </div>
@@ -335,9 +273,7 @@ function AdminStat({
   return (
     <div className="rounded-[1.5rem] bg-white p-5 shadow-sm">
       <div className="text-[#B19A55]">{icon}</div>
-
       <p className="mt-4 font-serif text-3xl font-bold">{value}</p>
-
       <p className="mt-2 text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/45">
         {label}
       </p>
@@ -345,17 +281,10 @@ function AdminStat({
   );
 }
 
-function SectionTitle({
-  icon,
-  title,
-}: {
-  icon: React.ReactNode;
-  title: string;
-}) {
+function SectionTitle({ icon, title }: { icon: React.ReactNode; title: string }) {
   return (
     <div className="flex items-center gap-3">
       <div className="text-[#B19A55]">{icon}</div>
-
       <h2 className="font-serif text-2xl font-bold">{title}</h2>
     </div>
   );
@@ -367,7 +296,6 @@ function InfoSmall({ label, value }: { label: string; value: string }) {
       <p className="text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/45">
         {label}
       </p>
-
       <p className="mt-2 font-serif text-lg font-bold">{value}</p>
     </div>
   );
