@@ -6,6 +6,7 @@ import { supabase } from "@/lib/supabase";
 import { PropertyCard } from "@/components/PropertyCard";
 import { ClientMessages } from "@/components/ClientMessages";
 import { TransactionTimeline } from "@/components/TransactionTimeline";
+import { PropertyMatchSuggestions } from "@/components/PropertyMatchSuggestions";
 
 import {
   LayoutDashboard,
@@ -241,6 +242,10 @@ export default function DashboardPage() {
             value={1}
           />
         </div>
+
+        <section className="mt-10">
+          <PropertyMatchSuggestions />
+        </section>
 
         <section className="mt-10">
           <TransactionTimeline />
