@@ -120,7 +120,7 @@ export function PropertyMatchSuggestions() {
               id={property.id}
               title={property.title}
               city={property.city || ""}
-              price={property.price || 0}
+              price={String(property.price || 0)}
               beds={property.beds || 0}
               baths={property.baths || 0}
               image={property.image || ""}
