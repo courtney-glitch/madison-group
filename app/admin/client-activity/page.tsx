@@ -13,6 +13,7 @@ import {
   MessageSquareText,
   Star,
 } from "lucide-react";
+import { AdminLiveNotifications } from "@/components/AdminLiveNotifications";
 
 function money(value: number | null) {
   if (!value) return "$0";
