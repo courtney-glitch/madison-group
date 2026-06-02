@@ -7,6 +7,7 @@ import { PropertyCard } from "@/components/PropertyCard";
 import { ClientMessages } from "@/components/ClientMessages";
 import { TransactionTimeline } from "@/components/TransactionTimeline";
 import { PropertyMatchSuggestions } from "@/components/PropertyMatchSuggestions";
+import { SavedSearchAlerts } from "@/components/SavedSearchAlerts";
 
 import {
   LayoutDashboard,
@@ -245,6 +246,10 @@ export default function DashboardPage() {
 
         <section className="mt-10">
           <PropertyMatchSuggestions />
+        </section>
+
+        <section className="mt-10">
+          <SavedSearchAlerts />
         </section>
 
         <section className="mt-10">
