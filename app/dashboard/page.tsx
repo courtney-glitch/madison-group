@@ -22,6 +22,7 @@ import {
   MessageCircle,
   ListChecks,
 } from "lucide-react";
+import { BuyerReadinessMeter } from "@/components/BuyerReadinessMeter";
 
 function money(value: number | null) {
   if (!value) return "$0";
@@ -245,6 +246,10 @@ export default function DashboardPage() {
             value={1}
           />
         </div>
+
+        <section className="mt-10">
+          <BuyerReadinessMeter />
+        </section>
 
         <section className="mt-10">
           <PropertyMatchSuggestions />
