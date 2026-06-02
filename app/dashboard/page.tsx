@@ -9,6 +9,7 @@ import { TransactionTimeline } from "@/components/TransactionTimeline";
 import { PropertyMatchSuggestions } from "@/components/PropertyMatchSuggestions";
 import { SavedSearchAlerts } from "@/components/SavedSearchAlerts";
 import { BuyerNotifications } from "@/components/BuyerNotifications";
+import { BuyerJourneyTimeline } from "@/components/BuyerJourneyTimeline";
 
 import {
   LayoutDashboard,
@@ -255,6 +256,10 @@ export default function DashboardPage() {
 
         <section className="mt-10">
           <SavedSearchAlerts />
+        </section>
+
+        <section className="mt-10">
+          <BuyerJourneyTimeline />
         </section>
 
         <section className="mt-10">
