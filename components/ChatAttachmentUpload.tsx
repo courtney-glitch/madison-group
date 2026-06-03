@@ -3,6 +3,8 @@
 import { useState } from "react";
 import { ImageUp, Send } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { createNotificationEvent } from "@/lib/createNotificationEvent";
+import { getPushNotificationTemplate } from "@/lib/pushNotificationTemplates";
 
 type ChatAttachmentUploadProps = {
   conversationId: string;
@@ -75,6 +77,29 @@ export function ChatAttachmentUpload({
       return;
     }
 
+    const { data: conversation } = await supabase
+      .from("conversations")
+      .select("user_id")
+      .eq("id", conversationId)
+      .maybeSingle();
+
+    if (conversation?.user_id) {
+      const template = getPushNotificationTemplate({
+        type: "new_message",
+      });
+
+      await createNotificationEvent({
+        userId: conversation.user_id,
+        notificationType: "new_message",
+        title: template.title,
+        body:
+          senderType === "advisor"
+            ? "Your advisor sent you a new attachment."
+            : "A client sent a new attachment.",
+        relatedConversationId: conversationId,
+      });
+    }
+
     setFile(null);
     setNote("");
     setStatus("Attachment sent.");
@@ -88,7 +113,9 @@ export function ChatAttachmentUpload({
       <div className="flex items-center gap-2">
         <ImageUp size={16} className="text-[#B19A55]" />
 
-        <p className="font-serif text-sm font-bold">Attach Photo or File</p>
+        <p className="font-serif text-sm font-bold">
+          Attach Photo or File
+        </p>
       </div>
 
       <div className="mt-4 grid gap-3">
