@@ -2,12 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
-import {
-  Home,
-  MessageCircle,
-  Paperclip,
-  Send,
-} from "lucide-react";
+import { Home, MessageCircle, Paperclip, Send } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
 import { ChatAttachmentUpload } from "@/components/ChatAttachmentUpload";
@@ -23,7 +18,6 @@ type MessageProperty = {
   id: string;
   message_id: string;
   property_id: string;
-
   properties: {
     id: string;
     title: string;
@@ -44,21 +38,11 @@ type MessageAttachment = {
 
 export function ClientMessages() {
   const [conversationId, setConversationId] = useState("");
-
   const [messages, setMessages] = useState<MessageItem[]>([]);
-
-  const [messageProperties, setMessageProperties] = useState<
-    MessageProperty[]
-  >([]);
-
-  const [messageAttachments, setMessageAttachments] = useState<
-    MessageAttachment[]
-  >([]);
-
+  const [messageProperties, setMessageProperties] = useState<MessageProperty[]>([]);
+  const [messageAttachments, setMessageAttachments] = useState<MessageAttachment[]>([]);
   const [newMessage, setNewMessage] = useState("");
-
   const [status, setStatus] = useState("");
-
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -72,37 +56,18 @@ export function ClientMessages() {
       .channel(`messages-${conversationId}`)
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "messages",
-          filter: `conversation_id=eq.${conversationId}`,
-        },
-        async () => {
-          await refreshMessages(conversationId);
-        }
+        { event: "*", schema: "public", table: "messages", filter: `conversation_id=eq.${conversationId}` },
+        async () => refreshMessages(conversationId)
       )
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "message_properties",
-        },
-        async () => {
-          await refreshMessages(conversationId);
-        }
+        { event: "*", schema: "public", table: "message_properties" },
+        async () => refreshMessages(conversationId)
       )
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "message_attachments",
-        },
-        async () => {
-          await refreshMessages(conversationId);
-        }
+        { event: "*", schema: "public", table: "message_attachments" },
+        async () => refreshMessages(conversationId)
       )
       .subscribe();
 
@@ -137,9 +102,7 @@ export function ClientMessages() {
     if (!activeConversationId) {
       const { data: newConversation, error } = await supabase
         .from("conversations")
-        .insert({
-          user_id: user.id,
-        })
+        .insert({ user_id: user.id })
         .select()
         .single();
 
@@ -153,9 +116,7 @@ export function ClientMessages() {
     }
 
     setConversationId(activeConversationId);
-
     await refreshMessages(activeConversationId);
-
     setLoading(false);
   }
 
@@ -166,8 +127,7 @@ export function ClientMessages() {
       .eq("conversation_id", id)
       .order("created_at", { ascending: true });
 
-    const { data: propertyData } = await supabase
-      .from("message_properties")
+    const { data: propertyData } = await supabase.from("message_properties")
       .select(`
         id,
         message_id,
@@ -187,26 +147,16 @@ export function ClientMessages() {
       .select("*");
 
     setMessages(loadedMessages || []);
-
-    setMessageProperties(
-      (propertyData || []) as unknown as MessageProperty[]
-    );
-
-    setMessageAttachments(
-      (attachmentData || []) as MessageAttachment[]
-    );
+    setMessageProperties((propertyData || []) as unknown as MessageProperty[]);
+    setMessageAttachments((attachmentData || []) as MessageAttachment[]);
   }
 
   function getMessageProperty(messageId: string) {
-    return messageProperties.find(
-      (item) => item.message_id === messageId
-    );
+    return messageProperties.find((item) => item.message_id === messageId);
   }
 
   function getMessageAttachment(messageId: string) {
-    return messageAttachments.find(
-      (item) => item.message_id === messageId
-    );
+    return messageAttachments.find((item) => item.message_id === messageId);
   }
 
   async function sendMessage() {
@@ -214,15 +164,13 @@ export function ClientMessages() {
 
     setStatus("");
 
-    const { error } = await supabase
-      .from("messages")
-      .insert({
-        conversation_id: conversationId,
-        sender_type: "client",
-        message: newMessage.trim(),
-        read_by_admin: false,
-        read_by_client: true,
-      });
+    const { error } = await supabase.from("messages").insert({
+      conversation_id: conversationId,
+      sender_type: "client",
+      message: newMessage.trim(),
+      read_by_admin: false,
+      read_by_client: true,
+    });
 
     if (error) {
       setStatus(error.message);
@@ -233,7 +181,7 @@ export function ClientMessages() {
   }
 
   return (
-    <section className="rounded-[1.5rem] bg-white p-6 shadow-xl">
+    <section className="rounded-[1.5rem] bg-white p-4 shadow-xl md:p-6">
       <div className="flex items-center gap-3">
         <MessageCircle className="text-[#B19A55]" />
 
@@ -248,130 +196,118 @@ export function ClientMessages() {
         </div>
       </div>
 
-      <div className="mt-6 rounded-3xl bg-[#F8F5EF] p-5">
+      <div className="mt-6 max-h-[560px] overflow-y-auto rounded-3xl bg-[#F8F5EF] p-4 md:p-5">
         {loading ? (
-          <p className="text-sm text-[#1A1A1A]/60">
-            Loading messages...
-          </p>
+          <p className="text-sm text-[#1A1A1A]/60">Loading messages...</p>
         ) : messages.length > 0 ? (
           <div className="grid gap-4">
             {messages.map((item) => {
-              const attachedProperty =
-                getMessageProperty(item.id);
-
-              const property =
-                attachedProperty?.properties;
-
-              const attachment =
-                getMessageAttachment(item.id);
+              const attachedProperty = getMessageProperty(item.id);
+              const property = attachedProperty?.properties;
+              const attachment = getMessageAttachment(item.id);
+              const isClient = item.sender_type === "client";
 
               return (
                 <div
                   key={item.id}
-                  className={`max-w-[88%] rounded-3xl px-5 py-4 ${
-                    item.sender_type === "client"
-                      ? "ml-auto bg-[#B19A55] text-white"
-                      : "bg-white text-[#1A1A1A]"
-                  }`}
+                  className={`flex ${isClient ? "justify-end" : "justify-start"}`}
                 >
-                  <p className="text-sm leading-6">
-                    {item.message}
-                  </p>
-
-                  {property && (
-                    <Link
-                      href={`/properties/${property.id}`}
-                      className={`mt-4 block overflow-hidden rounded-2xl border ${
-                        item.sender_type === "client"
-                          ? "border-white/20 bg-white text-[#1A1A1A]"
-                          : "border-[#1A1A1A]/10 bg-[#F8F5EF]"
-                      }`}
-                    >
-                      {property.image ? (
-                        <img
-                          src={property.image}
-                          alt={property.title}
-                          className="h-40 w-full object-cover"
-                        />
-                      ) : (
-                        <div className="flex h-40 items-center justify-center bg-[#1A1A1A] text-sm text-white">
-                          Image Coming Soon
-                        </div>
-                      )}
-
-                      <div className="p-4">
-                        <div className="flex items-center gap-2 text-[#B19A55]">
-                          <Home size={15} />
-
-                          <p className="text-[10px] uppercase tracking-[0.2em]">
-                            Shared Property
-                          </p>
-                        </div>
-
-                        <h3 className="mt-2 font-serif text-lg font-bold">
-                          {property.title}
-                        </h3>
-
-                        <p className="mt-1 text-sm text-[#1A1A1A]/60">
-                          {property.city}
-                        </p>
-
-                        <div className="mt-3 flex items-center justify-between gap-3">
-                          <p className="font-serif text-lg font-bold text-[#B19A55]">
-                            {property.price}
-                          </p>
-
-                          {property.status && (
-                            <span className="rounded-full bg-[#1A1A1A] px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-white">
-                              {property.status}
-                            </span>
-                          )}
-                        </div>
-                      </div>
-                    </Link>
-                  )}
-
-                  {attachment && (
-                    <div className="mt-4 overflow-hidden rounded-2xl border border-[#1A1A1A]/10 bg-white">
-                      {attachment.file_type.startsWith(
-                        "image"
-                      ) ? (
-                        <img
-                          src={attachment.file_url}
-                          alt={attachment.file_name}
-                          className="max-h-[420px] w-full object-cover"
-                        />
-                      ) : (
-                        <a
-                          href={attachment.file_url}
-                          target="_blank"
-                          className="flex items-center gap-2 p-4 text-sm font-medium text-[#B19A55]"
-                        >
-                          <Paperclip size={15} />
-
-                          {attachment.file_name}
-                        </a>
-                      )}
-                    </div>
-                  )}
-
-                  <p
-                    className={`mt-2 text-[10px] uppercase tracking-[0.18em] ${
-                      item.sender_type === "client"
-                        ? "text-white/60"
-                        : "text-[#1A1A1A]/40"
+                  <div
+                    className={`max-w-[88%] rounded-3xl px-5 py-4 ${
+                      isClient ? "bg-[#B19A55] text-white" : "bg-white text-[#1A1A1A]"
                     }`}
                   >
-                    {item.sender_type}
-                  </p>
+                    <p className="text-sm leading-6">{item.message}</p>
+
+                    {property && (
+                      <Link
+                        href={`/properties/${property.id}`}
+                        className={`mt-4 block overflow-hidden rounded-2xl border ${
+                          isClient
+                            ? "border-white/20 bg-white text-[#1A1A1A]"
+                            : "border-[#1A1A1A]/10 bg-[#F8F5EF]"
+                        }`}
+                      >
+                        {property.image ? (
+                          <img
+                            src={property.image}
+                            alt={property.title}
+                            className="h-40 w-full object-cover"
+                          />
+                        ) : (
+                          <div className="flex h-40 items-center justify-center bg-[#1A1A1A] text-sm text-white">
+                            Image Coming Soon
+                          </div>
+                        )}
+
+                        <div className="p-4">
+                          <div className="flex items-center gap-2 text-[#B19A55]">
+                            <Home size={15} />
+
+                            <p className="text-[10px] uppercase tracking-[0.2em]">
+                              Shared Property
+                            </p>
+                          </div>
+
+                          <h3 className="mt-2 font-serif text-lg font-bold">
+                            {property.title}
+                          </h3>
+
+                          <p className="mt-1 text-sm text-[#1A1A1A]/60">
+                            {property.city}
+                          </p>
+
+                          <div className="mt-3 flex items-center justify-between gap-3">
+                            <p className="font-serif text-lg font-bold text-[#B19A55]">
+                              {property.price}
+                            </p>
+
+                            {property.status && (
+                              <span className="rounded-full bg-[#1A1A1A] px-3 py-1 text-[10px] uppercase tracking-[0.15em] text-white">
+                                {property.status}
+                              </span>
+                            )}
+                          </div>
+                        </div>
+                      </Link>
+                    )}
+
+                    {attachment && (
+                      <div className="mt-4 overflow-hidden rounded-2xl border border-[#1A1A1A]/10 bg-white">
+                        {attachment.file_type.startsWith("image") ? (
+                          <img
+                            src={attachment.file_url}
+                            alt={attachment.file_name}
+                            className="max-h-[420px] w-full object-cover"
+                          />
+                        ) : (
+                          <a
+                            href={attachment.file_url}
+                            target="_blank"
+                            className="flex items-center gap-2 p-4 text-sm font-medium text-[#B19A55]"
+                          >
+                            <Paperclip size={15} />
+                            {attachment.file_name}
+                          </a>
+                        )}
+                      </div>
+                    )}
+
+                    <p
+                      className={`mt-2 text-[10px] uppercase tracking-[0.18em] ${
+                        isClient ? "text-white/60" : "text-[#1A1A1A]/40"
+                      }`}
+                    >
+                      {new Date(item.created_at).toLocaleString()}
+                    </p>
+                  </div>
                 </div>
               );
             })}
           </div>
         ) : (
           <p className="text-sm leading-7 text-[#1A1A1A]/60">
-            No messages yet. Start a conversation with your
-            Madison Group advisor.
+            No messages yet. Start a conversation with your Madison Group advisor.
           </p>
         )}
       </div>
@@ -381,9 +317,7 @@ export function ClientMessages() {
           <ChatAttachmentUpload
             conversationId={conversationId}
             senderType="client"
-            onSent={() =>
-              refreshMessages(conversationId)
-            }
+            onSent={() => refreshMessages(conversationId)}
           />
         )}
       </div>
@@ -392,9 +326,7 @@ export function ClientMessages() {
         <textarea
           rows={4}
           value={newMessage}
-          onChange={(e) =>
-            setNewMessage(e.target.value)
-          }
+          onChange={(e) => setNewMessage(e.target.value)}
           placeholder="Write your message..."
           className="rounded-2xl border border-[#1A1A1A]/10 bg-[#F8F5EF] px-4 py-4 text-sm outline-none transition focus:border-[#B19A55]"
         />
