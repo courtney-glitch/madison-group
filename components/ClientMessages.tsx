@@ -6,6 +6,7 @@ import { Home, MessageCircle, Paperclip, Send } from "lucide-react";
 
 import { supabase } from "@/lib/supabase";
 import { ChatAttachmentUpload } from "@/components/ChatAttachmentUpload";
+import { TypingIndicator } from "@/components/TypingIndicator";
 
 type MessageItem = {
   id: string;
@@ -320,6 +321,10 @@ export function ClientMessages() {
             onSent={() => refreshMessages(conversationId)}
           />
         )}
+      </div>
+      
+      <div className="mt-4">
+        <TypingIndicator />
       </div>
 
       <div className="mt-5 grid gap-3">
