@@ -10,6 +10,7 @@ import { PropertyMatchSuggestions } from "@/components/PropertyMatchSuggestions"
 import { SavedSearchAlerts } from "@/components/SavedSearchAlerts";
 import { BuyerNotifications } from "@/components/BuyerNotifications";
 import { BuyerJourneyTimeline } from "@/components/BuyerJourneyTimeline";
+import { MobileQuickActions } from "@/components/MobileQuickActions";
 
 import {
   LayoutDashboard,
@@ -246,6 +247,10 @@ export default function DashboardPage() {
             value={1}
           />
         </div>
+
+        <section className="mt-10">
+          <MobileQuickActions />
+        </section>
 
         <section className="mt-10">
           <BuyerReadinessMeter />

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Flame, Thermometer, Snowflake } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { calculateBuyerScore } from "@/lib/buyerScore";
+import { AIFollowUpSuggestion } from "@/components/AIFollowUpSuggestion";
 
 type BuyerActivity = {
   id: string;
@@ -184,6 +185,15 @@ export function AdminBuyerScores() {
                       />
                       <MiniStat label="Messages" value={buyer.messages} />
                     </div>
+                    <AIFollowUpSuggestion
+                    buyerLabel={buyer.label}
+                    buyerScore={buyer.score}
+                    propertyViews={buyer.propertyViews}
+                    favorites={buyer.favorites}
+                    savedSearches={buyer.savedSearches}
+                    showingRequests={buyer.showingRequests}
+                    messages={buyer.messages}
+                    />
                   </div>
                 </div>
 

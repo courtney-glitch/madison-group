@@ -94,6 +94,8 @@ export default async function ClientActivityPage() {
 
   return (
     <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
+     <AdminLiveNotifications />
+      
       <section className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
