@@ -11,6 +11,7 @@ import { SavedSearchAlerts } from "@/components/SavedSearchAlerts";
 import { BuyerNotifications } from "@/components/BuyerNotifications";
 import { BuyerJourneyTimeline } from "@/components/BuyerJourneyTimeline";
 import { MobileQuickActions } from "@/components/MobileQuickActions";
+import { NotificationCenter } from "@/components/NotificationCenter";
 
 import {
   LayoutDashboard,
@@ -262,6 +263,10 @@ export default function DashboardPage() {
 
       <section className="mt-10">
         <BuyerNotifications />
+      </section>
+
+      <section className="mt-10">
+        <NotificationCenter />
       </section>
 
         <section className="mt-10">
