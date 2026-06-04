@@ -18,13 +18,13 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className="bg-[#F8F5EF] text-[#1A1A1A]">
+      <body className="overflow-x-hidden bg-[#F8F5EF] text-[#1A1A1A]">
         <Navbar />
 
         <RealtimeNotifications />
 
-        <div className="md:ml-72">
-          <main className="min-h-screen pb-28 md:pb-0">
+        <div className="w-full overflow-x-hidden md:ml-72 md:w-[calc(100%-18rem)]">
+          <main className="min-h-screen overflow-x-hidden pb-28 md:pb-0">
             {children}
           </main>
 
