@@ -185,7 +185,7 @@ export default function DashboardPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
+    <main className="min-h-screen overflow-x-hidden bg-[#F8F5EF] px-4 py-8 text-[#1A1A1A] md:px-6 md:py-12">
       <section className="mx-auto max-w-7xl">
         <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
           <div>
@@ -193,7 +193,7 @@ export default function DashboardPage() {
               Madison Group Client Portal
             </p>
 
-            <h1 className="mt-3 font-serif text-[clamp(2.5rem,5vw,4.5rem)] font-bold leading-tight">
+            <h1 className="mt-3 font-serif text-[2.4rem] font-bold leading-tight md:text-[clamp(2.5rem,5vw,4.5rem)]">
               Welcome back.
             </h1>
 
