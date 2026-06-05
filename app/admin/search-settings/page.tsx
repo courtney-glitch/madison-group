@@ -1,13 +1,85 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { Search, SlidersHorizontal } from "lucide-react";
-import { useState } from "react";
+import { supabase } from "@/lib/supabase";
+
+type SearchSetting = {
+  id: string;
+  default_city: string | null;
+  min_price: string | null;
+  max_price: string | null;
+  property_type: string | null;
+};
 
 export default function SearchSettingsPage() {
+  const [settingId, setSettingId] = useState("");
   const [defaultCity, setDefaultCity] = useState("Bergen County");
   const [minPrice, setMinPrice] = useState("500000");
   const [maxPrice, setMaxPrice] = useState("2000000");
   const [propertyType, setPropertyType] = useState("Single Family");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
+
+  async function loadSettings() {
+    setLoading(true);
+
+    const { data } = await supabase
+      .from("search_settings")
+      .select("*")
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    if (data) {
+      const setting = data as SearchSetting;
+
+      setSettingId(setting.id);
+      setDefaultCity(setting.default_city || "Bergen County");
+      setMinPrice(setting.min_price || "500000");
+      setMaxPrice(setting.max_price || "2000000");
+      setPropertyType(setting.property_type || "Single Family");
+    }
+
+    setLoading(false);
+  }
+
+  async function saveSettings() {
+    setSaving(true);
+
+    if (settingId) {
+      await supabase
+        .from("search_settings")
+        .update({
+          default_city: defaultCity,
+          min_price: minPrice,
+          max_price: maxPrice,
+          property_type: propertyType,
+        })
+        .eq("id", settingId);
+    } else {
+      const { data } = await supabase
+        .from("search_settings")
+        .insert({
+          default_city: defaultCity,
+          min_price: minPrice,
+          max_price: maxPrice,
+          property_type: propertyType,
+        })
+        .select()
+        .single();
+
+      if (data) {
+        setSettingId(data.id);
+      }
+    }
+
+    setSaving(false);
+  }
 
   return (
     <main className="min-h-screen bg-[#F8F5EF] px-4 py-8 text-[#1A1A1A] md:px-6 md:py-12">
@@ -28,28 +100,63 @@ export default function SearchSettingsPage() {
           </div>
         </div>
 
-        <div className="mt-8 grid gap-4 md:grid-cols-2">
-          <Input label="Default Market" value={defaultCity} onChange={setDefaultCity} />
-          <Input label="Minimum Price" value={minPrice} onChange={setMinPrice} />
-          <Input label="Maximum Price" value={maxPrice} onChange={setMaxPrice} />
-          <Input label="Property Type" value={propertyType} onChange={setPropertyType} />
-        </div>
-
-        <div className="mt-8 rounded-3xl bg-[#F8F5EF] p-5">
-          <div className="flex items-center gap-2 text-[#B19A55]">
-            <Search size={16} />
-            <p className="font-serif text-sm font-bold">Current Default Search</p>
-          </div>
-
-          <p className="mt-4 text-sm leading-7 text-[#1A1A1A]/65">
-            {defaultCity} homes from ${Number(minPrice).toLocaleString()} to $
-            {Number(maxPrice).toLocaleString()} · {propertyType}
+        {loading ? (
+          <p className="mt-8 rounded-3xl bg-[#F8F5EF] p-5 text-sm text-[#1A1A1A]/60">
+            Loading search settings...
           </p>
-        </div>
+        ) : (
+          <>
+            <div className="mt-8 grid gap-4 md:grid-cols-2">
+              <Input
+                label="Default Market"
+                value={defaultCity}
+                onChange={setDefaultCity}
+              />
 
-        <button className="mt-8 rounded-full bg-[#B19A55] px-6 py-4 font-serif text-[11px] font-bold uppercase tracking-[0.2em] text-white">
-          Save Search Settings
-        </button>
+              <Input
+                label="Minimum Price"
+                value={minPrice}
+                onChange={setMinPrice}
+              />
+
+              <Input
+                label="Maximum Price"
+                value={maxPrice}
+                onChange={setMaxPrice}
+              />
+
+              <Input
+                label="Property Type"
+                value={propertyType}
+                onChange={setPropertyType}
+              />
+            </div>
+
+            <div className="mt-8 rounded-3xl bg-[#F8F5EF] p-5">
+              <div className="flex items-center gap-2 text-[#B19A55]">
+                <Search size={16} />
+
+                <p className="font-serif text-sm font-bold">
+                  Current Default Search
+                </p>
+              </div>
+
+              <p className="mt-4 text-sm leading-7 text-[#1A1A1A]/65">
+                {defaultCity} homes from ${Number(minPrice || 0).toLocaleString()} to $
+                {Number(maxPrice || 0).toLocaleString()} · {propertyType}
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={saveSettings}
+              disabled={saving}
+              className="mt-8 rounded-full bg-[#B19A55] px-6 py-4 font-serif text-[11px] font-bold uppercase tracking-[0.2em] text-white disabled:opacity-50"
+            >
+              {saving ? "Saving..." : "Save Search Settings"}
+            </button>
+          </>
+        )}
       </section>
     </main>
   );
