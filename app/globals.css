@@ -43,6 +43,7 @@ video {
 }
 
 @media (max-width: 768px) {
+  
   main {
   padding-top: 7.5rem !important;
 }
