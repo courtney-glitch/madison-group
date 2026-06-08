@@ -11,6 +11,7 @@ type SearchSetting = {
   max_price: string | null;
   property_type: string | null;
 };
+import { AdminPageShell } from "@/components/AdminPageShell";
 
 export default function SearchSettingsPage() {
   const [settingId, setSettingId] = useState("");
@@ -82,12 +83,13 @@ export default function SearchSettingsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F8F5EF] px-4 py-8 text-[#1A1A1A] md:px-6 md:py-12">
-      <section className="mx-auto max-w-5xl rounded-[1.5rem] bg-white p-6 shadow-xl md:p-8">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#B19A55]/10 text-[#B19A55]">
-            <SlidersHorizontal size={20} />
-          </div>
+    <AdminPageShell>
+      <main className="min-h-screen bg-[#F8F5EF] px-4 py-8 text-[#1A1A1A] md:px-6 md:py-12">
+        <section className="mx-auto max-w-5xl rounded-[1.5rem] bg-white p-6 shadow-xl md:p-8">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#B19A55]/10 text-[#B19A55]">
+              <SlidersHorizontal size={20} />
+            </div>
 
           <div>
             <p className="font-serif text-[11px] uppercase tracking-[0.32em] text-[#B19A55]">
@@ -159,6 +161,7 @@ export default function SearchSettingsPage() {
         )}
       </section>
     </main>
+    </AdminPageShell>
   );
 }
 

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Mail, Trash2, UserPlus } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { AdminPageShell } from "@/components/AdminPageShell";
 
 type ClientInvite = {
   id: string;
@@ -85,11 +86,12 @@ Madison Group Properties`
   const mailtoLink = `mailto:${clientEmail}?subject=${emailSubject}&body=${emailBody}`;
 
   return (
-    <main className="min-h-screen bg-[#F8F5EF] px-4 py-8 text-[#1A1A1A] md:px-6 md:py-12">
-      <section className="mx-auto max-w-6xl">
-        <section className="rounded-[1.5rem] bg-white p-6 shadow-xl md:p-8">
-          <div className="flex items-center gap-3">
-            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#B19A55]/10 text-[#B19A55]">
+    <AdminPageShell>
+      <main className="min-h-screen bg-[#F8F5EF] px-4 py-8 text-[#1A1A1A] md:px-6 md:py-12">
+        <section className="mx-auto max-w-6xl">
+          <section className="rounded-[1.5rem] bg-white p-6 shadow-xl md:p-8">
+            <div className="flex items-center gap-3">
+              <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#B19A55]/10 text-[#B19A55]">
               <UserPlus size={20} />
             </div>
 
@@ -202,5 +204,6 @@ Madison Group Properties`
         </section>
       </section>
     </main>
-  );
+  </AdminPageShell>
+);
 }

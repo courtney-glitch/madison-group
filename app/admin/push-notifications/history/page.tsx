@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { BellRing, CheckCircle2 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { AdminPageShell } from "@/components/AdminPageShell";
 
 type NotificationEvent = {
   id: string;
@@ -35,6 +36,7 @@ export default function NotificationHistoryPage() {
   }
 
   return (
+   <AdminPageShell>
     <main className="min-h-screen bg-[#F8F5EF] px-4 py-8 text-[#1A1A1A] md:px-6 md:py-12">
       <section className="mx-auto max-w-5xl">
         <div className="flex items-center gap-3">
@@ -99,5 +101,6 @@ export default function NotificationHistoryPage() {
         </div>
       </section>
     </main>
+    </AdminPageShell>
   );
 }

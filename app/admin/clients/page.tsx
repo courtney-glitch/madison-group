@@ -22,6 +22,7 @@ type CRMClient = {
   unread_count: number | null;
   created_at: string;
 };
+import { AdminPageShell } from "@/components/AdminPageShell";
 
 export default function ClientsPage() {
   const [clients, setClients] = useState<CRMClient[]>([]);
@@ -86,12 +87,13 @@ export default function ClientsPage() {
   }
 
   return (
-    <main className="min-h-screen bg-[#F8F5EF] px-4 py-8 text-[#1A1A1A] md:px-6 md:py-12">
-      <section className="mx-auto max-w-7xl">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#B19A55]/10 text-[#B19A55]">
-            <Users size={20} />
-          </div>
+    <AdminPageShell>
+      <main className="min-h-screen bg-[#F8F5EF] px-4 py-8 text-[#1A1A1A] md:px-6 md:py-12">
+        <section className="mx-auto max-w-7xl">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#B19A55]/10 text-[#B19A55]">
+              <Users size={20} />
+            </div>
 
           <div>
             <p className="font-serif text-[11px] uppercase tracking-[0.32em] text-[#B19A55]">
@@ -256,5 +258,6 @@ export default function ClientsPage() {
         </div>
       </section>
     </main>
+    </AdminPageShell>
   );
 }

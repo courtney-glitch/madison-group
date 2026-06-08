@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { Plus, Trash2, Users } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { AdminPageShell } from "@/components/AdminPageShell";
 
 type TeamMember = {
   id: string;
@@ -70,6 +71,7 @@ export default function TeamPage() {
   }
 
   return (
+  <AdminPageShell>
     <main className="min-h-screen bg-[#F8F5EF] px-4 py-8 text-[#1A1A1A] md:px-6 md:py-12">
       <section className="mx-auto max-w-6xl">
         <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -197,5 +199,6 @@ export default function TeamPage() {
         </div>
       </section>
     </main>
+  </AdminPageShell>
   );
 }

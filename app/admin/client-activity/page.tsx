@@ -4,6 +4,7 @@ import { AdminMessageReply } from "@/components/AdminMessageReply";
 import { AdminBuyerActivityFeed } from "@/components/AdminBuyerActivityFeed";
 import { AdminBuyerScores } from "@/components/AdminBuyerScores";
 import { AdminAIRecommendations } from "@/components/AdminAIRecommendations";
+import { AdminPageShell } from "@/components/AdminPageShell";
 
 import {
   Activity,
@@ -93,6 +94,7 @@ export default async function ClientActivityPage() {
     .limit(10);
 
   return (
+    <AdminPageShell>
     <main className="min-h-screen bg-[#F8F5EF] px-6 py-12 text-[#1A1A1A]">
      <AdminLiveNotifications />
       
@@ -261,6 +263,7 @@ export default async function ClientActivityPage() {
         </section>
       </section>
     </main>
+    </AdminPageShell>
   );
 }
 

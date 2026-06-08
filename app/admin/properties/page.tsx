@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { AdminPageShell } from "@/components/AdminPageShell";
 
 export default function AdminPropertiesPage() {
   const [properties, setProperties] = useState<any[]>([]);
@@ -33,6 +34,7 @@ export default function AdminPropertiesPage() {
   }
 
   return (
+   <AdminPageShell>
     <main className="min-h-screen bg-white px-6 py-12 text-[#1A1A1A]">
       <section className="mx-auto max-w-6xl">
         <div className="flex items-center justify-between gap-6">
@@ -91,5 +93,6 @@ export default function AdminPropertiesPage() {
         </div>
       </section>
     </main>
+    </AdminPageShell>
   );
 }

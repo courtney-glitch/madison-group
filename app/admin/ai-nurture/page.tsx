@@ -7,6 +7,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { AdminPageShell } from "@/components/AdminPageShell";
 
 export default async function AINurturePage() {
   const { data: activities } = await supabase
@@ -23,11 +24,12 @@ export default async function AINurturePage() {
     ) || [];
 
   return (
-    <main className="min-h-screen bg-[#F8F5EF] px-4 py-8 text-[#1A1A1A] md:px-6 md:py-12">
-      <section className="mx-auto max-w-7xl">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#B19A55]/10 text-[#B19A55]">
-            <Sparkles size={20} />
+    <AdminPageShell>
+      <main className="min-h-screen bg-[#F8F5EF] px-4 py-8 text-[#1A1A1A] md:px-6 md:py-12">
+        <section className="mx-auto max-w-7xl">
+          <div className="flex items-center gap-3">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#B19A55]/10 text-[#B19A55]">
+              <Sparkles size={20} />
           </div>
 
           <div>
@@ -103,6 +105,7 @@ export default async function AINurturePage() {
         </section>
       </section>
     </main>
+  </AdminPageShell>
   );
 }
 

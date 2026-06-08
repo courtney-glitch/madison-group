@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { BellRing, Send } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { AdminPageShell } from "@/components/AdminPageShell";
 
 export default function CreatePushNotificationPage() {
   const [title, setTitle] = useState("");
@@ -44,6 +45,7 @@ export default function CreatePushNotificationPage() {
   }
 
   return (
+   <AdminPageShell>
     <main className="min-h-screen bg-[#F8F5EF] px-4 py-8 text-[#1A1A1A] md:px-6 md:py-12">
       <section className="mx-auto max-w-5xl rounded-[1.5rem] bg-white p-6 shadow-xl md:p-8">
         <div className="flex items-center gap-3">
@@ -136,5 +138,6 @@ export default function CreatePushNotificationPage() {
         </div>
       </section>
     </main>
+    </AdminPageShell>
   );
 }
