@@ -5,7 +5,7 @@ import { MessageCircle, Users } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { RealtimeChatBox } from "@/components/RealtimeChatBox";
 import { AdminPageShell } from "@/components/AdminPageShell";
-import { getLastMessagePreview } from "@/lib/chatHelpers";
+import { getLastMessagePreview, getProfileName } from "@/lib/chatHelpers";
 
 type Conversation = {
   id: string;
@@ -14,6 +14,7 @@ type Conversation = {
   created_at: string;
   preview?: string;
   preview_created_at?: string | null;
+  client_name?: string | null;
 };
 
 export default function AdminLiveChatPage() {
@@ -57,11 +58,13 @@ export default function AdminLiveChatPage() {
     const conversationsWithPreview = await Promise.all(
       loadedConversations.map(async (conversation) => {
         const preview = await getLastMessagePreview(conversation.id);
+        const client_name = await getProfileName(conversation.client_id);
 
         return {
           ...conversation,
           preview: preview.preview,
           preview_created_at: preview.createdAt,
+          client_name,
         };
       })
     );
@@ -126,8 +129,7 @@ export default function AdminLiveChatPage() {
                         }`}
                       >
                         <p className="font-serif text-sm font-bold">
-                          Client{" "}
-                          {conversation.client_id?.slice(0, 8) || "Unknown"}
+                          {conversation.client_name || "Unknown Client"}
                         </p>
 
                         <p
