@@ -8,6 +8,7 @@ import {
   Users,
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { AdminPageShell } from "@/components/AdminPageShell";
 
 export default async function AdminDashboardPage() {
   const { count: clientCount } = await supabase
@@ -54,6 +55,7 @@ export default async function AdminDashboardPage() {
   ];
 
   return (
+  <AdminPageShell> 
     <main className="min-h-screen bg-[#F8F5EF] px-4 py-8 text-[#1A1A1A] md:px-6 md:py-12">
       <section className="mx-auto max-w-7xl">
         <div>
@@ -121,6 +123,7 @@ export default async function AdminDashboardPage() {
         </div>
       </section>
     </main>
+    </AdminPageShell>
   );
 }
 
