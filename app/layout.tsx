@@ -5,6 +5,7 @@ import { Navbar } from "@/components/Navbar";
 import { Footer } from "@/components/Footer";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 import { RealtimeNotifications } from "@/components/RealtimeNotifications";
+import { UserPresenceTracker } from "@/components/UserPresenceTracker";
 
 export const metadata: Metadata = {
   title: "Madison Group Properties",
@@ -22,7 +23,7 @@ export default function RootLayout({
         <Navbar />
 
         <RealtimeNotifications />
-
+        <UserPresenceTracker />
         <div className="w-full overflow-x-hidden md:ml-72 md:w-[calc(100%-18rem)]">
           <main className="min-h-screen overflow-x-hidden pb-28 md:pb-0">
             {children}
