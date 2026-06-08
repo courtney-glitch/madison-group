@@ -6,16 +6,19 @@ import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 import {
-  Activity,
   Bell,
   Bookmark,
   BriefcaseBusiness,
   Building2,
   Calculator,
   ChevronDown,
+  Compass,
+  Crown,
   ExternalLink,
   GraduationCap,
-  Heart,
+  HeartHandshake,
+  Home,
+  Layers3,
   LayoutDashboard,
   Link2,
   LogOut,
@@ -24,10 +27,13 @@ import {
   Plus,
   Search,
   Settings,
+  ShieldCheck,
   SlidersHorizontal,
   Sparkles,
+  Star,
   Users,
   User,
+  WandSparkles,
   Wrench,
 } from "lucide-react";
 
@@ -41,11 +47,13 @@ type NavItem = {
 
 function SidebarGroup({
   title,
+  subtitle,
   items,
   defaultOpen = true,
   onClick,
 }: {
   title: string;
+  subtitle?: string;
   items: NavItem[];
   defaultOpen?: boolean;
   onClick?: () => void;
@@ -53,36 +61,43 @@ function SidebarGroup({
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className="border-b border-[#1A1A1A]/8 pb-3">
+    <div className="rounded-[1.25rem] border border-[#1A1A1A]/5 bg-white/45 p-2 shadow-sm">
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex w-full items-center justify-between px-1 py-3 text-left"
+        className="flex w-full items-center justify-between rounded-2xl px-3 py-3 text-left transition hover:bg-white/70"
       >
-        <span className="font-serif text-[11px] text-[#1A1A1A]/55">
-          {title}
-        </span>
+        <div>
+          <p className="font-serif text-[12px] font-bold text-[#1A1A1A]">
+            {title}
+          </p>
+
+          {subtitle && (
+            <p className="mt-1 text-[9px] uppercase tracking-[0.18em] text-[#1A1A1A]/35">
+              {subtitle}
+            </p>
+          )}
+        </div>
 
         <ChevronDown
-          size={14}
-          className={`text-[#1A1A1A]/35 transition ${open ? "rotate-180" : ""}`}
+          size={15}
+          className={`text-[#B19A55] transition ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && (
-        <div className="grid gap-1">
+        <div className="mt-1 grid gap-1">
           {items.map((item) => (
             <div key={item.href}>
               <Link
                 href={item.href}
                 onClick={onClick}
-                className="group flex items-center justify-between rounded-xl px-2 py-2.5 text-[#1A1A1A] transition hover:bg-[#B19A55]/10"
+                className="group flex items-center justify-between rounded-2xl px-3 py-2.5 text-[#1A1A1A] transition hover:bg-[#1A1A1A] hover:text-white"
               >
                 <div className="flex min-w-0 items-center gap-3">
-                  <item.icon
-                    size={17}
-                    className="shrink-0 text-[#1A1A1A]/45 group-hover:text-[#B19A55]"
-                  />
+                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl bg-[#B19A55]/10 text-[#B19A55] transition group-hover:bg-white/10 group-hover:text-[#D4B06A]">
+                    <item.icon size={15} />
+                  </div>
 
                   <span className="truncate font-serif text-[13px] font-semibold">
                     {item.label}
@@ -97,15 +112,15 @@ function SidebarGroup({
               </Link>
 
               {item.children && item.children.length > 0 && (
-                <div className="ml-8 grid gap-1 pb-1">
+                <div className="ml-11 mt-1 grid gap-1 pb-1">
                   {item.children.map((child) => (
                     <Link
                       key={child.href}
                       href={child.href}
                       onClick={onClick}
-                      className="flex items-center gap-2 rounded-lg px-2 py-2 text-[#1A1A1A]/70 transition hover:bg-[#B19A55]/10 hover:text-[#B19A55]"
+                      className="flex items-center gap-2 rounded-xl px-3 py-2 text-[#1A1A1A]/65 transition hover:bg-[#B19A55]/10 hover:text-[#B19A55]"
                     >
-                      <child.icon size={14} />
+                      <child.icon size={13} />
 
                       <span className="font-serif text-[12px]">
                         {child.label}
@@ -168,66 +183,84 @@ export function Navbar() {
     router.refresh();
   }
 
-  const agentLinks: NavItem[] = [
-    { href: "/admin/invite-client", label: "Invite a New Client", icon: Plus },
-    { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/admin/messages", label: "Chat", icon: MessageCircle, badge: unreadCount },
-    { href: "/admin/client-activity", label: "Client Activity", icon: Users, badge: unreadCount > 0 ? unreadCount : undefined },
-    { href: "/properties", label: "Home Search", icon: Search },
-    { href: "/saved-searches", label: "Saved Searches", icon: Bookmark },
-    { href: "/admin/ai-nurture", label: "AI Nurture", icon: Sparkles },
-    { href: "/favorites", label: "Favorites", icon: Heart },
-    { href: "/trusted-vendors", label: "Trusted Vendors", icon: BriefcaseBusiness },
-    { href: "/admin/search-settings", label: "Search Settings", icon: Settings },
-    { href: "/admin/external-links", label: "External Links", icon: ExternalLink },
+  const clientCareLinks: NavItem[] = [
+    { href: "/admin/invite-client", label: "Start Client Journey", icon: Plus },
+    { href: "/admin/clients", label: "Client Book", icon: Users },
+    {
+      href: "/admin/client-activity",
+      label: "Buyer Signals",
+      icon: WandSparkles,
+      badge: unreadCount > 0 ? unreadCount : undefined,
+    },
+    {
+      href: "/admin/messages",
+      label: "Advisor Inbox",
+      icon: MessageCircle,
+      badge: unreadCount,
+    },
+    { href: "/admin/ai-nurture", label: "Advisor AI", icon: Sparkles },
+  ];
+
+  const propertySuiteLinks: NavItem[] = [
+    { href: "/properties", label: "Property Collection", icon: Compass },
+    { href: "/admin/properties", label: "Listing Studio", icon: Building2 },
+    { href: "/saved-searches", label: "Search Vault", icon: Bookmark },
+    { href: "/favorites", label: "Curated Homes", icon: Star },
+    { href: "/admin/search-settings", label: "Search Rules", icon: SlidersHorizontal },
+  ];
+
+  const growthLinks: NavItem[] = [
+    { href: "/trusted-vendors", label: "Partner Network", icon: HeartHandshake },
+    { href: "/admin/external-links", label: "Resource Library", icon: ExternalLink },
     {
       href: "/admin/push-notifications",
-      label: "Push Notifications",
+      label: "Engagement Studio",
       icon: Bell,
       children: [
-        { href: "/admin/push-notifications/create", label: "Create New", icon: Plus },
-        { href: "/admin/push-notifications/history", label: "History", icon: ListIcon },
+        { href: "/admin/push-notifications/create", label: "New Broadcast", icon: Plus },
+        { href: "/admin/push-notifications/history", label: "Broadcast Log", icon: ListIcon },
       ],
     },
   ];
 
-  const adminLinks: NavItem[] = [
-    { href: "/admin/team", label: "Team", icon: Users },
-    { href: "/admin/clients", label: "All Clients", icon: Users },
+  const operationsLinks: NavItem[] = [
+    { href: "/admin/dashboard", label: "Command Dashboard", icon: LayoutDashboard },
+    { href: "/admin/team", label: "Team Suite", icon: ShieldCheck },
+    { href: "/admin/user-roles", label: "Access Control", icon: Crown },
     {
       href: "/admin/global-settings",
-      label: "Global Settings",
+      label: "Brand Control",
       icon: Settings,
       children: [
-        { href: "/admin/global-settings/branding", label: "Branding", icon: Palette },
-        { href: "/admin/global-settings/onboarding", label: "Onboarding", icon: Sparkles },
-        { href: "/admin/global-settings/trusted-vendors", label: "Trusted Vendors", icon: BriefcaseBusiness },
-        { href: "/admin/global-settings/customize-learn", label: "Customize Learn", icon: GraduationCap },
-        { href: "/admin/global-settings/search-settings", label: "Search Settings", icon: Search },
-        { href: "/admin/global-settings/external-links", label: "External Links", icon: Link2 },
-        { href: "/admin/global-settings/default-filters", label: "Default Filters", icon: SlidersHorizontal },
-        { href: "/admin/global-settings/ui-customization", label: "UI Customization", icon: Wrench },
+        { href: "/admin/global-settings/branding", label: "Identity System", icon: Palette },
+        { href: "/admin/global-settings/onboarding", label: "Welcome Flow", icon: Layers3 },
+        { href: "/admin/global-settings/trusted-vendors", label: "Vendor Network", icon: BriefcaseBusiness },
+        { href: "/admin/global-settings/customize-learn", label: "Learning Studio", icon: GraduationCap },
+        { href: "/admin/global-settings/search-settings", label: "Search Logic", icon: Search },
+        { href: "/admin/global-settings/external-links", label: "Link Library", icon: Link2 },
+        { href: "/admin/global-settings/default-filters", label: "Filter Presets", icon: SlidersHorizontal },
+        { href: "/admin/global-settings/ui-customization", label: "Experience Design", icon: Wrench },
       ],
     },
   ];
 
-  const clientLinks: NavItem[] = [
-    { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { href: "/properties", label: "Home Search", icon: Search },
-    { href: "/favorites", label: "Favorites", icon: Heart },
-    { href: "/budget-calculator", label: "Budget", icon: Calculator },
-    { href: "/education", label: "Education", icon: GraduationCap },
-    { href: "/hire-professionals", label: "Hire Professionals", icon: BriefcaseBusiness },
+  const portalLinks: NavItem[] = [
+    { href: "/dashboard", label: "My Homebase", icon: Home },
+    { href: "/properties", label: "Explore Homes", icon: Search },
+    { href: "/favorites", label: "My Shortlist", icon: Star },
+    { href: "/budget-calculator", label: "Buying Power", icon: Calculator },
+    { href: "/education", label: "Learn Center", icon: GraduationCap },
+    { href: "/hire-professionals", label: "Hire Experts", icon: BriefcaseBusiness },
   ];
 
   return (
     <>
-      <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/30 bg-white/75 backdrop-blur-2xl md:left-72">
+      <header className="fixed left-0 right-0 top-0 z-50 border-b border-white/30 bg-[#F8F5EF]/85 backdrop-blur-2xl md:left-72">
         <div className="relative flex h-20 items-center justify-center px-6">
           <button
             type="button"
             onClick={() => setMenuOpen(!menuOpen)}
-            className="absolute left-4 rounded-full border border-[#1A1A1A]/10 bg-white/80 px-5 py-2.5 font-serif text-[11px] uppercase tracking-[0.25em] shadow-sm md:hidden"
+            className="absolute left-4 rounded-full border border-[#B19A55]/20 bg-white/80 px-5 py-2.5 font-serif text-[11px] uppercase tracking-[0.25em] text-[#1A1A1A] shadow-sm md:hidden"
           >
             Menu
           </button>
@@ -272,34 +305,73 @@ export function Navbar() {
         </div>
       </header>
 
-      <aside className="fixed left-0 top-0 z-50 hidden h-screen w-72 overflow-y-auto border-r border-white/20 bg-white/80 backdrop-blur-3xl md:block">
-        <div className="flex min-h-full flex-col px-5 py-6">
-          <div className="mb-7">
-            <p className="font-serif text-xs tracking-[0.4em] text-[#B19A55]">
-              MADISON GROUP
+      <aside className="fixed left-0 top-0 z-50 hidden h-screen w-72 overflow-y-auto border-r border-white/30 bg-[#F8F5EF]/90 backdrop-blur-3xl md:block">
+        <div className="flex min-h-full flex-col px-4 py-6">
+          <div className="mb-6 rounded-[1.5rem] bg-[#1A1A1A] p-5 text-white shadow-xl">
+            <p className="font-serif text-[11px] uppercase tracking-[0.35em] text-[#D4B06A]">
+              Madison
             </p>
 
-            <p className="mt-2 text-[10px] uppercase tracking-[0.25em] text-[#1A1A1A]/40">
-              Luxury Real Estate
+            <h2 className="mt-2 font-serif text-2xl font-bold">
+              Command Center
+            </h2>
+
+            <p className="mt-3 text-xs leading-6 text-white/55">
+              Building Beautiful Lives through guided real estate intelligence.
             </p>
           </div>
 
           <nav className="grid gap-3">
-            <SidebarGroup title="Agent view" items={agentLinks} defaultOpen />
-            <SidebarGroup title="Admin view" items={adminLinks} defaultOpen={false} />
-            <SidebarGroup title="Client view" items={clientLinks} defaultOpen={false} />
+            <SidebarGroup
+              title="Client Care"
+              subtitle="relationships"
+              items={clientCareLinks}
+              defaultOpen
+            />
+
+            <SidebarGroup
+              title="Property Suite"
+              subtitle="search + listings"
+              items={propertySuiteLinks}
+              defaultOpen={false}
+            />
+
+            <SidebarGroup
+              title="Growth Tools"
+              subtitle="engagement"
+              items={growthLinks}
+              defaultOpen={false}
+            />
+
+            <SidebarGroup
+              title="Operations"
+              subtitle="admin control"
+              items={operationsLinks}
+              defaultOpen={false}
+            />
+
+            <SidebarGroup
+              title="My Portal"
+              subtitle="client experience"
+              items={portalLinks}
+              defaultOpen={false}
+            />
           </nav>
         </div>
       </aside>
 
       {menuOpen && (
-        <div className="fixed inset-0 z-[70] overflow-y-auto bg-[#F8F5EF]/95 px-5 py-6 backdrop-blur-3xl md:hidden">
+        <div className="fixed inset-0 z-[70] overflow-y-auto bg-[#F8F5EF]/98 px-5 py-6 backdrop-blur-3xl md:hidden">
           <div className="mb-6 flex items-center justify-between">
-            <img
-              src="/madison-logo.jpg"
-              alt="Madison Group"
-              className="h-14 w-auto object-contain"
-            />
+            <div>
+              <p className="font-serif text-[10px] uppercase tracking-[0.35em] text-[#B19A55]">
+                Madison
+              </p>
+
+              <h2 className="mt-1 font-serif text-2xl font-bold">
+                Command Center
+              </h2>
+            </div>
 
             <button
               type="button"
@@ -312,22 +384,41 @@ export function Navbar() {
 
           <nav className="grid gap-3">
             <SidebarGroup
-              title="Agent view"
-              items={agentLinks}
+              title="Client Care"
+              subtitle="relationships"
+              items={clientCareLinks}
               defaultOpen
               onClick={() => setMenuOpen(false)}
             />
 
             <SidebarGroup
-              title="Admin view"
-              items={adminLinks}
+              title="Property Suite"
+              subtitle="search + listings"
+              items={propertySuiteLinks}
               defaultOpen={false}
               onClick={() => setMenuOpen(false)}
             />
 
             <SidebarGroup
-              title="Client view"
-              items={clientLinks}
+              title="Growth Tools"
+              subtitle="engagement"
+              items={growthLinks}
+              defaultOpen={false}
+              onClick={() => setMenuOpen(false)}
+            />
+
+            <SidebarGroup
+              title="Operations"
+              subtitle="admin control"
+              items={operationsLinks}
+              defaultOpen={false}
+              onClick={() => setMenuOpen(false)}
+            />
+
+            <SidebarGroup
+              title="My Portal"
+              subtitle="client experience"
+              items={portalLinks}
               defaultOpen={false}
               onClick={() => setMenuOpen(false)}
             />
@@ -336,7 +427,7 @@ export function Navbar() {
               <button
                 type="button"
                 onClick={handleLogout}
-                className="mt-3 rounded-2xl bg-[#B19A55] px-5 py-4 font-serif text-base text-white"
+                className="mt-3 rounded-2xl bg-[#1A1A1A] px-5 py-4 font-serif text-base text-white"
               >
                 Logout
               </button>
@@ -344,7 +435,7 @@ export function Navbar() {
               <Link
                 href="/login"
                 onClick={() => setMenuOpen(false)}
-                className="mt-3 rounded-2xl bg-[#B19A55] px-5 py-4 text-center font-serif text-base text-white"
+                className="mt-3 rounded-2xl bg-[#1A1A1A] px-5 py-4 text-center font-serif text-base text-white"
               >
                 Login
               </Link>
@@ -356,7 +447,13 @@ export function Navbar() {
   );
 }
 
-function ListIcon({ size = 14, className = "" }: { size?: number; className?: string }) {
+function ListIcon({
+  size = 14,
+  className = "",
+}: {
+  size?: number;
+  className?: string;
+}) {
   return (
     <svg
       width={size}
