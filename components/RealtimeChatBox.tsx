@@ -10,6 +10,7 @@ type ChatMessage = {
   sender_id: string;
   message: string;
   read_by_client: boolean | null;
+  read_by_agent: boolean | null;
   created_at: string;
 };
 
@@ -29,15 +30,16 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [typingUsers, setTypingUsers] = useState<TypingStatus[]>([]);
   const [currentUserId, setCurrentUserId] = useState("");
+  const [role, setRole] = useState("client");
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
 
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   useEffect(() => {
+    loadCurrentUser();
     loadMessages();
     loadTypingUsers();
-    loadCurrentUser();
 
     const channel = supabase
       .channel(`realtime-chat-${conversationId}`)
@@ -82,7 +84,17 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
       data: { user },
     } = await supabase.auth.getUser();
 
-    setCurrentUserId(user?.id || "");
+    if (!user) return;
+
+    setCurrentUserId(user.id);
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    setRole(profile?.role || "client");
   }
 
   async function loadMessages() {
@@ -93,6 +105,38 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
       .order("created_at", { ascending: true });
 
     setMessages((data || []) as ChatMessage[]);
+
+    await markMessagesAsRead();
+  }
+
+  async function markMessagesAsRead() {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) return;
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    const userRole = profile?.role || "client";
+
+    if (userRole === "admin" || userRole === "agent") {
+      await supabase
+        .from("messages")
+        .update({ read_by_agent: true })
+        .eq("conversation_id", conversationId)
+        .neq("sender_id", user.id);
+    } else {
+      await supabase
+        .from("messages")
+        .update({ read_by_client: true })
+        .eq("conversation_id", conversationId)
+        .neq("sender_id", user.id);
+    }
   }
 
   async function loadTypingUsers() {
@@ -142,17 +186,34 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
 
     setSending(true);
 
+    const isAgent = role === "admin" || role === "agent";
+
     await supabase.from("messages").insert({
       conversation_id: conversationId,
       sender_id: currentUserId,
       message: newMessage.trim(),
-      read_by_client: false,
+      read_by_client: !isAgent,
+      read_by_agent: isAgent,
     });
 
     await stopTyping();
 
     setNewMessage("");
     setSending(false);
+  }
+
+  function getReceipt(message: ChatMessage) {
+    const isMine = message.sender_id === currentUserId;
+
+    if (!isMine) return "";
+
+    const isAgent = role === "admin" || role === "agent";
+
+    if (isAgent) {
+      return message.read_by_client ? "Read" : "Sent";
+    }
+
+    return message.read_by_agent ? "Read" : "Sent";
   }
 
   const otherTypingUsers = typingUsers.filter(
@@ -166,6 +227,7 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
           <div className="grid gap-3">
             {messages.map((message) => {
               const isMine = message.sender_id === currentUserId;
+              const receipt = getReceipt(message);
 
               return (
                 <div
@@ -187,6 +249,7 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
                       }`}
                     >
                       {new Date(message.created_at).toLocaleString()}
+                      {receipt && ` · ${receipt}`}
                     </p>
                   </div>
                 </div>
@@ -194,19 +257,7 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
             })}
 
             {otherTypingUsers.length > 0 && (
-              <div className="flex justify-start">
-                <div className="rounded-3xl bg-white px-4 py-3 text-[#1A1A1A] shadow-sm">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/40">
-                    Typing
-                  </p>
-
-                  <div className="mt-2 flex gap-1">
-                    <span className="h-2 w-2 rounded-full bg-[#B19A55]" />
-                    <span className="h-2 w-2 rounded-full bg-[#B19A55]/70" />
-                    <span className="h-2 w-2 rounded-full bg-[#B19A55]/40" />
-                  </div>
-                </div>
-              </div>
+              <TypingBubble />
             )}
           </div>
         ) : (
@@ -216,19 +267,7 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
             </p>
 
             {otherTypingUsers.length > 0 && (
-              <div className="flex justify-start">
-                <div className="rounded-3xl bg-white px-4 py-3 text-[#1A1A1A] shadow-sm">
-                  <p className="text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/40">
-                    Typing
-                  </p>
-
-                  <div className="mt-2 flex gap-1">
-                    <span className="h-2 w-2 rounded-full bg-[#B19A55]" />
-                    <span className="h-2 w-2 rounded-full bg-[#B19A55]/70" />
-                    <span className="h-2 w-2 rounded-full bg-[#B19A55]/40" />
-                  </div>
-                </div>
-              </div>
+              <TypingBubble />
             )}
           </div>
         )}
@@ -258,5 +297,23 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
         </button>
       </div>
     </section>
+  );
+}
+
+function TypingBubble() {
+  return (
+    <div className="flex justify-start">
+      <div className="rounded-3xl bg-white px-4 py-3 text-[#1A1A1A] shadow-sm">
+        <p className="text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/40">
+          Typing
+        </p>
+
+        <div className="mt-2 flex gap-1">
+          <span className="h-2 w-2 rounded-full bg-[#B19A55]" />
+          <span className="h-2 w-2 rounded-full bg-[#B19A55]/70" />
+          <span className="h-2 w-2 rounded-full bg-[#B19A55]/40" />
+        </div>
+      </div>
+    </div>
   );
 }
