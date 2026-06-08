@@ -204,7 +204,7 @@ export function Navbar() {
     },
     {
       href: "/admin/messages",
-      label: "Advisor Inbox",
+      label: "Client Requests",
       icon: MessageCircle,
       badge: unreadCount,
     },
