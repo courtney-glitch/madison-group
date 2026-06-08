@@ -209,6 +209,11 @@ export function Navbar() {
       badge: unreadCount,
     },
     { href: "/admin/ai-nurture", label: "Advisor AI", icon: Sparkles },
+    {
+      href: "/admin/live-chat",
+      label: "Live Chat Desk",
+      icon: MessageCircle,
+    },
   ];
 
   const propertySuiteLinks: NavItem[] = [
