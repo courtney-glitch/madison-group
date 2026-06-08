@@ -307,20 +307,15 @@ export function Navbar() {
 
       <aside className="fixed left-0 top-0 z-50 hidden h-screen w-72 overflow-y-auto border-r border-white/30 bg-[#F8F5EF]/90 backdrop-blur-3xl md:block">
         <div className="flex min-h-full flex-col px-4 py-6">
-          <div className="mb-6 rounded-[1.5rem] bg-[#1A1A1A] p-5 text-white shadow-xl">
-            <p className="font-serif text-[11px] uppercase tracking-[0.35em] text-[#D4B06A]">
-              Madison
-            </p>
+          <div className="mb-6 px-2">
+            <p className="font-serif text-[10px] uppercase tracking-[0.35em] text-[#B19A55]">
+              Madison Group
+           </p>
 
-            <h2 className="mt-2 font-serif text-2xl font-bold">
-              Command Center
-            </h2>
-
-            <p className="mt-3 text-xs leading-6 text-white/55">
-              Building Beautiful Lives through guided real estate intelligence.
-            </p>
-          </div>
-
+           <h2 className="mt-2 font-serif text-3xl font-bold leading-tight text-[#1A1A1A]">
+             Command Center
+           </h2>
+         </div>
           <nav className="grid gap-3">
             <SidebarGroup
               title="Client Care"
