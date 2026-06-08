@@ -7,10 +7,12 @@ import { supabase } from "@/lib/supabase";
 type ChatMessage = {
   id: string;
   conversation_id: string;
-  sender_id: string;
+  sender_id: string | null;
+  sender_type?: string | null;
   message: string;
   read_by_client: boolean | null;
   read_by_agent: boolean | null;
+  read_by_admin?: boolean | null;
   created_at: string;
 };
 
@@ -33,8 +35,9 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
   const [role, setRole] = useState("client");
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
+  const [status, setStatus] = useState("");
 
-  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     loadCurrentUser();
@@ -82,9 +85,18 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
   async function loadCurrentUser() {
     const {
       data: { user },
+      error,
     } = await supabase.auth.getUser();
 
-    if (!user) return;
+    if (error) {
+      setStatus(error.message);
+      return;
+    }
+
+    if (!user) {
+      setStatus("Please login first.");
+      return;
+    }
 
     setCurrentUserId(user.id);
 
@@ -98,11 +110,18 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
   }
 
   async function loadMessages() {
-    const { data } = await supabase
+    if (!conversationId) return;
+
+    const { data, error } = await supabase
       .from("messages")
       .select("*")
       .eq("conversation_id", conversationId)
       .order("created_at", { ascending: true });
+
+    if (error) {
+      setStatus(error.message);
+      return;
+    }
 
     setMessages((data || []) as ChatMessage[]);
 
@@ -110,6 +129,8 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
   }
 
   async function markMessagesAsRead() {
+    if (!conversationId) return;
+
     const {
       data: { user },
     } = await supabase.auth.getUser();
@@ -127,7 +148,10 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
     if (userRole === "admin" || userRole === "agent") {
       await supabase
         .from("messages")
-        .update({ read_by_agent: true })
+        .update({
+          read_by_agent: true,
+          read_by_admin: true,
+        })
         .eq("conversation_id", conversationId)
         .neq("sender_id", user.id);
     } else {
@@ -140,6 +164,8 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
   }
 
   async function loadTypingUsers() {
+    if (!conversationId) return;
+
     const { data } = await supabase
       .from("typing_status")
       .select("*")
@@ -182,21 +208,42 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
   }
 
   async function sendMessage() {
-    if (!newMessage.trim() || !conversationId || !currentUserId) return;
+    if (!newMessage.trim()) return;
+
+    setStatus("");
+
+    if (!conversationId) {
+      setStatus("Missing conversation ID.");
+      return;
+    }
+
+    if (!currentUserId) {
+      setStatus("Missing current user ID. Please refresh and login again.");
+      return;
+    }
 
     setSending(true);
 
     const isAgent = role === "admin" || role === "agent";
 
-    await supabase.from("messages").insert({
+    const { error } = await supabase.from("messages").insert({
       conversation_id: conversationId,
       sender_id: currentUserId,
+      sender_type: isAgent ? "advisor" : "client",
       message: newMessage.trim(),
       read_by_client: !isAgent,
       read_by_agent: isAgent,
+      read_by_admin: isAgent,
     });
 
+    if (error) {
+      setStatus(error.message);
+      setSending(false);
+      return;
+    }
+
     await stopTyping();
+    await loadMessages();
 
     setNewMessage("");
     setSending(false);
@@ -213,7 +260,7 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
       return message.read_by_client ? "Read" : "Sent";
     }
 
-    return message.read_by_agent ? "Read" : "Sent";
+    return message.read_by_agent || message.read_by_admin ? "Read" : "Sent";
   }
 
   const otherTypingUsers = typingUsers.filter(
@@ -256,9 +303,7 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
               );
             })}
 
-            {otherTypingUsers.length > 0 && (
-              <TypingBubble />
-            )}
+            {otherTypingUsers.length > 0 && <TypingBubble />}
           </div>
         ) : (
           <div className="grid gap-3">
@@ -266,9 +311,7 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
               No messages yet. Start the conversation.
             </p>
 
-            {otherTypingUsers.length > 0 && (
-              <TypingBubble />
-            )}
+            {otherTypingUsers.length > 0 && <TypingBubble />}
           </div>
         )}
       </div>
@@ -296,6 +339,12 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
           {sending ? "Sending..." : "Send Message"}
         </button>
       </div>
+
+      {status && (
+        <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
+          {status}
+        </p>
+      )}
     </section>
   );
 }
