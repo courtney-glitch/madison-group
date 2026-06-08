@@ -312,6 +312,7 @@ export function Navbar() {
 
   const portalLinks: NavItem[] = [
     { href: "/dashboard", label: "My Homebase", icon: Home },
+    { href: "/live-chat", label: "Live Chat", icon: MessageCircle },
     { href: "/properties", label: "Explore Homes", icon: Search },
     { href: "/favorites", label: "My Shortlist", icon: Star },
     { href: "/budget-calculator", label: "Buying Power", icon: Calculator },
