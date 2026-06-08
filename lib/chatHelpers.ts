@@ -14,3 +14,15 @@ export async function getLastMessagePreview(conversationId: string) {
     createdAt: data?.created_at || null,
   };
 }
+
+export async function getProfileName(userId: string | null) {
+  if (!userId) return "Unknown Client";
+
+  const { data } = await supabase
+    .from("profiles")
+    .select("full_name")
+    .eq("id", userId)
+    .maybeSingle();
+
+  return data?.full_name || "Unnamed Client";
+}
