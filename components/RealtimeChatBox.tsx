@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
@@ -13,18 +13,30 @@ type ChatMessage = {
   created_at: string;
 };
 
+type TypingStatus = {
+  id: string;
+  conversation_id: string;
+  user_id: string;
+  is_typing: boolean;
+  updated_at: string;
+};
+
 type RealtimeChatBoxProps = {
   conversationId: string;
 };
 
 export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
+  const [typingUsers, setTypingUsers] = useState<TypingStatus[]>([]);
   const [currentUserId, setCurrentUserId] = useState("");
   const [newMessage, setNewMessage] = useState("");
   const [sending, setSending] = useState(false);
 
+  const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   useEffect(() => {
     loadMessages();
+    loadTypingUsers();
     loadCurrentUser();
 
     const channel = supabase
@@ -41,10 +53,27 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
           await loadMessages();
         }
       )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "typing_status",
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        async () => {
+          await loadTypingUsers();
+        }
+      )
       .subscribe();
 
     return () => {
       supabase.removeChannel(channel);
+      stopTyping();
+
+      if (typingTimeoutRef.current) {
+        clearTimeout(typingTimeoutRef.current);
+      }
     };
   }, [conversationId]);
 
@@ -66,6 +95,48 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
     setMessages((data || []) as ChatMessage[]);
   }
 
+  async function loadTypingUsers() {
+    const { data } = await supabase
+      .from("typing_status")
+      .select("*")
+      .eq("conversation_id", conversationId)
+      .eq("is_typing", true);
+
+    setTypingUsers((data || []) as TypingStatus[]);
+  }
+
+  async function startTyping() {
+    if (!conversationId || !currentUserId) return;
+
+    await supabase.from("typing_status").upsert({
+      conversation_id: conversationId,
+      user_id: currentUserId,
+      is_typing: true,
+      updated_at: new Date().toISOString(),
+    });
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+    }
+
+    typingTimeoutRef.current = setTimeout(() => {
+      stopTyping();
+    }, 1500);
+  }
+
+  async function stopTyping() {
+    if (!conversationId || !currentUserId) return;
+
+    await supabase
+      .from("typing_status")
+      .update({
+        is_typing: false,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("conversation_id", conversationId)
+      .eq("user_id", currentUserId);
+  }
+
   async function sendMessage() {
     if (!newMessage.trim() || !conversationId || !currentUserId) return;
 
@@ -78,9 +149,15 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
       read_by_client: false,
     });
 
+    await stopTyping();
+
     setNewMessage("");
     setSending(false);
   }
+
+  const otherTypingUsers = typingUsers.filter(
+    (user) => user.user_id !== currentUserId
+  );
 
   return (
     <section className="rounded-[1.5rem] bg-white p-4 shadow-xl md:p-6">
@@ -115,11 +192,45 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
                 </div>
               );
             })}
+
+            {otherTypingUsers.length > 0 && (
+              <div className="flex justify-start">
+                <div className="rounded-3xl bg-white px-4 py-3 text-[#1A1A1A] shadow-sm">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/40">
+                    Typing
+                  </p>
+
+                  <div className="mt-2 flex gap-1">
+                    <span className="h-2 w-2 rounded-full bg-[#B19A55]" />
+                    <span className="h-2 w-2 rounded-full bg-[#B19A55]/70" />
+                    <span className="h-2 w-2 rounded-full bg-[#B19A55]/40" />
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         ) : (
-          <p className="rounded-3xl bg-white p-5 text-sm text-[#1A1A1A]/60">
-            No messages yet. Start the conversation.
-          </p>
+          <div className="grid gap-3">
+            <p className="rounded-3xl bg-white p-5 text-sm text-[#1A1A1A]/60">
+              No messages yet. Start the conversation.
+            </p>
+
+            {otherTypingUsers.length > 0 && (
+              <div className="flex justify-start">
+                <div className="rounded-3xl bg-white px-4 py-3 text-[#1A1A1A] shadow-sm">
+                  <p className="text-[10px] uppercase tracking-[0.2em] text-[#1A1A1A]/40">
+                    Typing
+                  </p>
+
+                  <div className="mt-2 flex gap-1">
+                    <span className="h-2 w-2 rounded-full bg-[#B19A55]" />
+                    <span className="h-2 w-2 rounded-full bg-[#B19A55]/70" />
+                    <span className="h-2 w-2 rounded-full bg-[#B19A55]/40" />
+                  </div>
+                </div>
+              </div>
+            )}
+          </div>
         )}
       </div>
 
@@ -127,7 +238,11 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
         <textarea
           rows={3}
           value={newMessage}
-          onChange={(e) => setNewMessage(e.target.value)}
+          onChange={(e) => {
+            setNewMessage(e.target.value);
+            startTyping();
+          }}
+          onBlur={stopTyping}
           placeholder="Write a message..."
           className="rounded-2xl border border-[#1A1A1A]/10 bg-[#F8F5EF] px-4 py-3 text-sm outline-none focus:border-[#B19A55]"
         />
