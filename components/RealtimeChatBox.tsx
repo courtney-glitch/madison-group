@@ -333,8 +333,14 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
         startTyping();
       }}
       onBlur={stopTyping}
-      placeholder="Write a message..."
-      className="w-full rounded-3xl border border-[#1A1A1A]/10 bg-[#F8F5EF] px-5 py-4 text-sm outline-none focus:border-[#B19A55]"
+      onKeyDown={(e) => {
+        if (e.key === "Enter" && !e.shiftKey) {
+          e.preventDefault();
+         sendMessage();
+     }
+   }}
+   placeholder="Write a message..."
+     className="w-full rounded-3xl border border-[#1A1A1A]/10 bg-[#F8F5EF] px-5 py-4 text-sm outline-none focus:border-[#B19A55]"
     />
   </div>
 
