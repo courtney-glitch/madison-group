@@ -15,6 +15,7 @@ type Conversation = {
   preview?: string;
   preview_created_at?: string | null;
   client_name?: string | null;
+  unread_count?: number;
 };
 
 export default function AdminLiveChatPage() {
@@ -45,29 +46,46 @@ export default function AdminLiveChatPage() {
     };
   }, []);
 
+  async function getUnreadCount(conversationId: string) {
+    const { count } = await supabase
+      .from("messages")
+      .select("*", { count: "exact", head: true })
+      .eq("conversation_id", conversationId)
+      .eq("read_by_agent", false)
+      .eq("sender_type", "client");
+
+    return count || 0;
+  }
+
   async function loadConversations(showLoading = true) {
     if (showLoading) setLoading(true);
 
-    const { data } = await supabase
-      .from("conversations")
-      .select("*")
-      .order("created_at", { ascending: false });
+    const { data } = await supabase.from("conversations").select("*");
 
     const loadedConversations = (data || []) as Conversation[];
 
     const conversationsWithPreview = await Promise.all(
       loadedConversations.map(async (conversation) => {
         const preview = await getLastMessagePreview(conversation.id);
-        const client_name = await getProfileName(conversation.client_id);
+        const clientName = await getProfileName(conversation.client_id);
+        const unreadCount = await getUnreadCount(conversation.id);
 
         return {
           ...conversation,
           preview: preview.preview,
           preview_created_at: preview.createdAt,
-          client_name,
+          client_name: clientName,
+          unread_count: unreadCount,
         };
       })
     );
+
+    conversationsWithPreview.sort((a, b) => {
+      const aTime = a.preview_created_at || a.created_at;
+      const bTime = b.preview_created_at || b.created_at;
+
+      return new Date(bTime).getTime() - new Date(aTime).getTime();
+    });
 
     setConversations(conversationsWithPreview);
 
@@ -76,6 +94,21 @@ export default function AdminLiveChatPage() {
     }
 
     setLoading(false);
+  }
+
+  async function openConversation(conversationId: string) {
+    setActiveConversationId(conversationId);
+
+    await supabase
+      .from("messages")
+      .update({
+        read_by_agent: true,
+        read_by_admin: true,
+      })
+      .eq("conversation_id", conversationId)
+      .eq("sender_type", "client");
+
+    await loadConversations(false);
   }
 
   return (
@@ -100,12 +133,18 @@ export default function AdminLiveChatPage() {
 
           <div className="grid gap-5 lg:grid-cols-[0.35fr_0.65fr]">
             <section className="rounded-[1.5rem] bg-white p-5 shadow-xl">
-              <div className="flex items-center gap-2 text-[#B19A55]">
-                <Users size={17} />
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex items-center gap-2 text-[#B19A55]">
+                  <Users size={17} />
 
-                <h2 className="font-serif text-lg font-bold">
-                  Conversations
-                </h2>
+                  <h2 className="font-serif text-lg font-bold">
+                    Conversations
+                  </h2>
+                </div>
+
+                <p className="rounded-full bg-[#F8F5EF] px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-[#1A1A1A]/45">
+                  {conversations.length}
+                </p>
               </div>
 
               <div className="mt-5 grid gap-3">
@@ -116,33 +155,50 @@ export default function AdminLiveChatPage() {
                 ) : conversations.length > 0 ? (
                   conversations.map((conversation) => {
                     const isActive = activeConversationId === conversation.id;
+                    const unread = conversation.unread_count || 0;
 
                     return (
                       <button
                         key={conversation.id}
                         type="button"
-                        onClick={() => setActiveConversationId(conversation.id)}
+                        onClick={() => openConversation(conversation.id)}
                         className={`rounded-2xl p-4 text-left transition ${
                           isActive
-                            ? "bg-[#B19A55] text-white"
+                            ? "bg-[#B19A55] text-white shadow-lg"
+                            : unread > 0
+                            ? "bg-[#1A1A1A] text-white"
                             : "bg-[#F8F5EF] text-[#1A1A1A]"
                         }`}
                       >
-                        <p className="font-serif text-sm font-bold">
-                          {conversation.client_name || "Unknown Client"}
-                        </p>
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0">
+                            <p className="truncate font-serif text-sm font-bold">
+                              {conversation.client_name || "Unknown Client"}
+                            </p>
 
-                        <p
-                          className={`mt-2 line-clamp-2 text-sm leading-6 ${
-                            isActive ? "text-white/80" : "text-[#1A1A1A]/60"
-                          }`}
-                        >
-                          {conversation.preview || "No messages yet."}
-                        </p>
+                            <p
+                              className={`mt-2 line-clamp-2 text-sm leading-6 ${
+                                isActive || unread > 0
+                                  ? "text-white/80"
+                                  : "text-[#1A1A1A]/60"
+                              }`}
+                            >
+                              {conversation.preview || "No messages yet."}
+                            </p>
+                          </div>
+
+                          {unread > 0 && (
+                            <span className="flex h-6 min-w-6 shrink-0 items-center justify-center rounded-full bg-red-500 px-2 text-[10px] font-bold text-white">
+                              {unread > 99 ? "99+" : unread}
+                            </span>
+                          )}
+                        </div>
 
                         <p
                           className={`mt-3 text-[10px] uppercase tracking-[0.18em] ${
-                            isActive ? "text-white/65" : "text-[#1A1A1A]/40"
+                            isActive || unread > 0
+                              ? "text-white/65"
+                              : "text-[#1A1A1A]/40"
                           }`}
                         >
                           {conversation.preview_created_at
