@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { ChatAttachmentUpload } from "@/components/ChatAttachmentUpload";
 
 type ChatMessage = {
   id: string;
@@ -316,29 +317,36 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
         )}
       </div>
 
-      <div className="mt-4 grid gap-3">
-        <textarea
-          rows={3}
-          value={newMessage}
-          onChange={(e) => {
-            setNewMessage(e.target.value);
-            startTyping();
-          }}
-          onBlur={stopTyping}
-          placeholder="Write a message..."
-          className="rounded-2xl border border-[#1A1A1A]/10 bg-[#F8F5EF] px-4 py-3 text-sm outline-none focus:border-[#B19A55]"
-        />
+       <div className="mt-4 flex items-end gap-3">
+         <ChatAttachmentUpload
+           conversationId={conversationId}
+           senderType={role === "admin" || role === "agent" ? "advisor" : "client"}
+           onSent={loadMessages}
+         />
 
-        <button
-          type="button"
-          onClick={sendMessage}
-          disabled={sending || !newMessage.trim()}
-          className="flex items-center justify-center gap-2 rounded-full bg-[#B19A55] px-6 py-4 font-serif text-[11px] font-bold uppercase tracking-[0.2em] text-white disabled:opacity-50"
-        >
-          <Send size={15} />
-          {sending ? "Sending..." : "Send Message"}
-        </button>
-      </div>
+  <div className="flex-1">
+    <textarea
+      rows={3}
+      value={newMessage}
+      onChange={(e) => {
+        setNewMessage(e.target.value);
+        startTyping();
+      }}
+      onBlur={stopTyping}
+      placeholder="Write a message..."
+      className="w-full rounded-3xl border border-[#1A1A1A]/10 bg-[#F8F5EF] px-5 py-4 text-sm outline-none focus:border-[#B19A55]"
+    />
+  </div>
+
+  <button
+    type="button"
+    onClick={sendMessage}
+    disabled={sending || !newMessage.trim()}
+    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#B19A55] text-white transition hover:bg-[#9C8749] disabled:opacity-50"
+  >
+    <Send size={18} />
+  </button>
+</div>
 
       {status && (
         <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
