@@ -143,6 +143,7 @@ export function Navbar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [role, setRole] = useState("client");
 
   useEffect(() => {
     checkUser();
@@ -164,9 +165,18 @@ export function Navbar() {
     setLoggedIn(!!user);
 
     if (!user) {
+      setRole("client");
       setUnreadCount(0);
       return;
     }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    setRole(profile?.role || "client");
 
     const { count } = await supabase
       .from("messages")
@@ -206,25 +216,49 @@ export function Navbar() {
     { href: "/admin/properties", label: "Listing Studio", icon: Building2 },
     { href: "/saved-searches", label: "Search Vault", icon: Bookmark },
     { href: "/favorites", label: "Curated Homes", icon: Star },
-    { href: "/admin/search-settings", label: "Search Rules", icon: SlidersHorizontal },
+    {
+      href: "/admin/search-settings",
+      label: "Search Rules",
+      icon: SlidersHorizontal,
+    },
   ];
 
   const growthLinks: NavItem[] = [
-    { href: "/trusted-vendors", label: "Partner Network", icon: HeartHandshake },
-    { href: "/admin/external-links", label: "Resource Library", icon: ExternalLink },
+    {
+      href: "/trusted-vendors",
+      label: "Partner Network",
+      icon: HeartHandshake,
+    },
+    {
+      href: "/admin/external-links",
+      label: "Resource Library",
+      icon: ExternalLink,
+    },
     {
       href: "/admin/push-notifications",
       label: "Engagement Studio",
       icon: Bell,
       children: [
-        { href: "/admin/push-notifications/create", label: "New Broadcast", icon: Plus },
-        { href: "/admin/push-notifications/history", label: "Broadcast Log", icon: ListIcon },
+        {
+          href: "/admin/push-notifications/create",
+          label: "New Broadcast",
+          icon: Plus,
+        },
+        {
+          href: "/admin/push-notifications/history",
+          label: "Broadcast Log",
+          icon: ListIcon,
+        },
       ],
     },
   ];
 
   const operationsLinks: NavItem[] = [
-    { href: "/admin/dashboard", label: "Command Dashboard", icon: LayoutDashboard },
+    {
+      href: "/admin/dashboard",
+      label: "Command Dashboard",
+      icon: LayoutDashboard,
+    },
     { href: "/admin/team", label: "Team Suite", icon: ShieldCheck },
     { href: "/admin/user-roles", label: "Access Control", icon: Crown },
     {
@@ -232,14 +266,46 @@ export function Navbar() {
       label: "Brand Control",
       icon: Settings,
       children: [
-        { href: "/admin/global-settings/branding", label: "Identity System", icon: Palette },
-        { href: "/admin/global-settings/onboarding", label: "Welcome Flow", icon: Layers3 },
-        { href: "/admin/global-settings/trusted-vendors", label: "Vendor Network", icon: BriefcaseBusiness },
-        { href: "/admin/global-settings/customize-learn", label: "Learning Studio", icon: GraduationCap },
-        { href: "/admin/global-settings/search-settings", label: "Search Logic", icon: Search },
-        { href: "/admin/global-settings/external-links", label: "Link Library", icon: Link2 },
-        { href: "/admin/global-settings/default-filters", label: "Filter Presets", icon: SlidersHorizontal },
-        { href: "/admin/global-settings/ui-customization", label: "Experience Design", icon: Wrench },
+        {
+          href: "/admin/global-settings/branding",
+          label: "Identity System",
+          icon: Palette,
+        },
+        {
+          href: "/admin/global-settings/onboarding",
+          label: "Welcome Flow",
+          icon: Layers3,
+        },
+        {
+          href: "/admin/global-settings/trusted-vendors",
+          label: "Vendor Network",
+          icon: BriefcaseBusiness,
+        },
+        {
+          href: "/admin/global-settings/customize-learn",
+          label: "Learning Studio",
+          icon: GraduationCap,
+        },
+        {
+          href: "/admin/global-settings/search-settings",
+          label: "Search Logic",
+          icon: Search,
+        },
+        {
+          href: "/admin/global-settings/external-links",
+          label: "Link Library",
+          icon: Link2,
+        },
+        {
+          href: "/admin/global-settings/default-filters",
+          label: "Filter Presets",
+          icon: SlidersHorizontal,
+        },
+        {
+          href: "/admin/global-settings/ui-customization",
+          label: "Experience Design",
+          icon: Wrench,
+        },
       ],
     },
   ];
@@ -250,7 +316,11 @@ export function Navbar() {
     { href: "/favorites", label: "My Shortlist", icon: Star },
     { href: "/budget-calculator", label: "Buying Power", icon: Calculator },
     { href: "/education", label: "Learn Center", icon: GraduationCap },
-    { href: "/hire-professionals", label: "Hire Experts", icon: BriefcaseBusiness },
+    {
+      href: "/hire-professionals",
+      label: "Hire Experts",
+      icon: BriefcaseBusiness,
+    },
   ];
 
   return (
@@ -310,40 +380,47 @@ export function Navbar() {
           <div className="mb-6 px-2">
             <p className="font-serif text-[10px] uppercase tracking-[0.35em] text-[#B19A55]">
               Madison Group
-           </p>
+            </p>
 
-           <h2 className="mt-2 font-serif text-3xl font-bold leading-tight text-[#1A1A1A]">
-             Command Center
-           </h2>
-         </div>
+            <h2 className="mt-2 font-serif text-3xl font-bold leading-tight text-[#1A1A1A]">
+              Command Center
+            </h2>
+          </div>
+
           <nav className="grid gap-3">
-            <SidebarGroup
-              title="Client Care"
-              subtitle="relationships"
-              items={clientCareLinks}
-              defaultOpen
-            />
+            {(role === "admin" || role === "agent") && (
+              <>
+                <SidebarGroup
+                  title="Client Care"
+                  subtitle="relationships"
+                  items={clientCareLinks}
+                  defaultOpen
+                />
 
-            <SidebarGroup
-              title="Property Suite"
-              subtitle="search + listings"
-              items={propertySuiteLinks}
-              defaultOpen={false}
-            />
+                <SidebarGroup
+                  title="Property Suite"
+                  subtitle="search + listings"
+                  items={propertySuiteLinks}
+                  defaultOpen={false}
+                />
 
-            <SidebarGroup
-              title="Growth Tools"
-              subtitle="engagement"
-              items={growthLinks}
-              defaultOpen={false}
-            />
+                <SidebarGroup
+                  title="Growth Tools"
+                  subtitle="engagement"
+                  items={growthLinks}
+                  defaultOpen={false}
+                />
+              </>
+            )}
 
-            <SidebarGroup
-              title="Operations"
-              subtitle="admin control"
-              items={operationsLinks}
-              defaultOpen={false}
-            />
+            {role === "admin" && (
+              <SidebarGroup
+                title="Operations"
+                subtitle="admin control"
+                items={operationsLinks}
+                defaultOpen={false}
+              />
+            )}
 
             <SidebarGroup
               title="My Portal"
@@ -378,37 +455,43 @@ export function Navbar() {
           </div>
 
           <nav className="grid gap-3">
-            <SidebarGroup
-              title="Client Care"
-              subtitle="relationships"
-              items={clientCareLinks}
-              defaultOpen
-              onClick={() => setMenuOpen(false)}
-            />
+            {(role === "admin" || role === "agent") && (
+              <>
+                <SidebarGroup
+                  title="Client Care"
+                  subtitle="relationships"
+                  items={clientCareLinks}
+                  defaultOpen
+                  onClick={() => setMenuOpen(false)}
+                />
 
-            <SidebarGroup
-              title="Property Suite"
-              subtitle="search + listings"
-              items={propertySuiteLinks}
-              defaultOpen={false}
-              onClick={() => setMenuOpen(false)}
-            />
+                <SidebarGroup
+                  title="Property Suite"
+                  subtitle="search + listings"
+                  items={propertySuiteLinks}
+                  defaultOpen={false}
+                  onClick={() => setMenuOpen(false)}
+                />
 
-            <SidebarGroup
-              title="Growth Tools"
-              subtitle="engagement"
-              items={growthLinks}
-              defaultOpen={false}
-              onClick={() => setMenuOpen(false)}
-            />
+                <SidebarGroup
+                  title="Growth Tools"
+                  subtitle="engagement"
+                  items={growthLinks}
+                  defaultOpen={false}
+                  onClick={() => setMenuOpen(false)}
+                />
+              </>
+            )}
 
-            <SidebarGroup
-              title="Operations"
-              subtitle="admin control"
-              items={operationsLinks}
-              defaultOpen={false}
-              onClick={() => setMenuOpen(false)}
-            />
+            {role === "admin" && (
+              <SidebarGroup
+                title="Operations"
+                subtitle="admin control"
+                items={operationsLinks}
+                defaultOpen={false}
+                onClick={() => setMenuOpen(false)}
+              />
+            )}
 
             <SidebarGroup
               title="My Portal"
