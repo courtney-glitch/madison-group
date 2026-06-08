@@ -5,12 +5,15 @@ import { MessageCircle, Users } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { RealtimeChatBox } from "@/components/RealtimeChatBox";
 import { AdminPageShell } from "@/components/AdminPageShell";
+import { getLastMessagePreview } from "@/lib/chatHelpers";
 
 type Conversation = {
   id: string;
   client_id: string | null;
   agent_id: string | null;
   created_at: string;
+  preview?: string;
+  preview_created_at?: string | null;
 };
 
 export default function AdminLiveChatPage() {
@@ -20,20 +23,53 @@ export default function AdminLiveChatPage() {
 
   useEffect(() => {
     loadConversations();
+
+    const channel = supabase
+      .channel("admin-live-chat-inbox")
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "messages",
+        },
+        async () => {
+          await loadConversations(false);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
-  async function loadConversations() {
-    setLoading(true);
+  async function loadConversations(showLoading = true) {
+    if (showLoading) setLoading(true);
 
     const { data } = await supabase
       .from("conversations")
       .select("*")
       .order("created_at", { ascending: false });
 
-    setConversations((data || []) as Conversation[]);
+    const loadedConversations = (data || []) as Conversation[];
 
-    if (data && data.length > 0) {
-      setActiveConversationId(data[0].id);
+    const conversationsWithPreview = await Promise.all(
+      loadedConversations.map(async (conversation) => {
+        const preview = await getLastMessagePreview(conversation.id);
+
+        return {
+          ...conversation,
+          preview: preview.preview,
+          preview_created_at: preview.createdAt,
+        };
+      })
+    );
+
+    setConversations(conversationsWithPreview);
+
+    if (!activeConversationId && conversationsWithPreview.length > 0) {
+      setActiveConversationId(conversationsWithPreview[0].id);
     }
 
     setLoading(false);
@@ -63,6 +99,7 @@ export default function AdminLiveChatPage() {
             <section className="rounded-[1.5rem] bg-white p-5 shadow-xl">
               <div className="flex items-center gap-2 text-[#B19A55]">
                 <Users size={17} />
+
                 <h2 className="font-serif text-lg font-bold">
                   Conversations
                 </h2>
@@ -74,32 +111,49 @@ export default function AdminLiveChatPage() {
                     Loading conversations...
                   </p>
                 ) : conversations.length > 0 ? (
-                  conversations.map((conversation) => (
-                    <button
-                      key={conversation.id}
-                      type="button"
-                      onClick={() => setActiveConversationId(conversation.id)}
-                      className={`rounded-2xl p-4 text-left transition ${
-                        activeConversationId === conversation.id
-                          ? "bg-[#B19A55] text-white"
-                          : "bg-[#F8F5EF] text-[#1A1A1A]"
-                      }`}
-                    >
-                      <p className="font-serif text-sm font-bold">
-                        Client {conversation.client_id?.slice(0, 8) || "Unknown"}
-                      </p>
+                  conversations.map((conversation) => {
+                    const isActive = activeConversationId === conversation.id;
 
-                      <p
-                        className={`mt-2 text-[10px] uppercase tracking-[0.18em] ${
-                          activeConversationId === conversation.id
-                            ? "text-white/65"
-                            : "text-[#1A1A1A]/40"
+                    return (
+                      <button
+                        key={conversation.id}
+                        type="button"
+                        onClick={() => setActiveConversationId(conversation.id)}
+                        className={`rounded-2xl p-4 text-left transition ${
+                          isActive
+                            ? "bg-[#B19A55] text-white"
+                            : "bg-[#F8F5EF] text-[#1A1A1A]"
                         }`}
                       >
-                        {new Date(conversation.created_at).toLocaleString()}
-                      </p>
-                    </button>
-                  ))
+                        <p className="font-serif text-sm font-bold">
+                          Client{" "}
+                          {conversation.client_id?.slice(0, 8) || "Unknown"}
+                        </p>
+
+                        <p
+                          className={`mt-2 line-clamp-2 text-sm leading-6 ${
+                            isActive ? "text-white/80" : "text-[#1A1A1A]/60"
+                          }`}
+                        >
+                          {conversation.preview || "No messages yet."}
+                        </p>
+
+                        <p
+                          className={`mt-3 text-[10px] uppercase tracking-[0.18em] ${
+                            isActive ? "text-white/65" : "text-[#1A1A1A]/40"
+                          }`}
+                        >
+                          {conversation.preview_created_at
+                            ? new Date(
+                                conversation.preview_created_at
+                              ).toLocaleString()
+                            : new Date(
+                                conversation.created_at
+                              ).toLocaleString()}
+                        </p>
+                      </button>
+                    );
+                  })
                 ) : (
                   <p className="rounded-2xl bg-[#F8F5EF] p-4 text-sm text-[#1A1A1A]/60">
                     No live chat conversations yet.
