@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 
 import {
   Bell,
+  BellRing,
   Bookmark,
   BriefcaseBusiness,
   Building2,
@@ -143,6 +144,7 @@ export function Navbar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [notificationCount, setNotificationCount] = useState(0);
   const [role, setRole] = useState("client");
 
   useEffect(() => {
@@ -167,6 +169,7 @@ export function Navbar() {
     if (!user) {
       setRole("client");
       setUnreadCount(0);
+      setNotificationCount(0);
       return;
     }
 
@@ -178,12 +181,20 @@ export function Navbar() {
 
     setRole(profile?.role || "client");
 
-    const { count } = await supabase
+    const { count: unreadMessages } = await supabase
       .from("messages")
       .select("*", { count: "exact", head: true })
       .eq("read_by_client", false);
 
-    setUnreadCount(count || 0);
+    setUnreadCount(unreadMessages || 0);
+
+    const { count: notificationUnread } = await supabase
+      .from("notification_events")
+      .select("*", { count: "exact", head: true })
+      .eq("user_id", user.id)
+      .eq("is_read", false);
+
+    setNotificationCount(notificationUnread || 0);
   }
 
   async function handleLogout() {
@@ -203,17 +214,17 @@ export function Navbar() {
       badge: unreadCount > 0 ? unreadCount : undefined,
     },
     {
-      href: "/admin/messages",
-      label: "Client Requests",
-      icon: MessageCircle,
-      badge: unreadCount,
-    },
-    { href: "/admin/ai-nurture", label: "Advisor AI", icon: Sparkles },
-    {
       href: "/admin/live-chat",
       label: "Live Chat Desk",
       icon: MessageCircle,
+      badge: unreadCount > 0 ? unreadCount : undefined,
     },
+    {
+      href: "/admin/client-requests",
+      label: "Client Requests",
+      icon: Users,
+    },
+    { href: "/admin/ai-nurture", label: "Advisor AI", icon: Sparkles },
   ];
 
   const propertySuiteLinks: NavItem[] = [
@@ -318,6 +329,7 @@ export function Navbar() {
   const portalLinks: NavItem[] = [
     { href: "/dashboard", label: "My Homebase", icon: Home },
     { href: "/live-chat", label: "Live Chat", icon: MessageCircle },
+    { href: "/notifications", label: "Notifications", icon: BellRing, badge: notificationCount },
     { href: "/properties", label: "Explore Homes", icon: Search },
     { href: "/favorites", label: "My Shortlist", icon: Star },
     { href: "/budget-calculator", label: "Buying Power", icon: Calculator },
@@ -352,6 +364,19 @@ export function Navbar() {
           <div className="absolute right-6 hidden items-center gap-3 md:flex">
             {loggedIn ? (
               <>
+                <Link
+                  href="/notifications"
+                  className="relative flex h-11 w-11 items-center justify-center rounded-full border border-[#1A1A1A]/10 bg-white/70 text-[#1A1A1A]"
+                >
+                  <BellRing size={17} />
+
+                  {notificationCount > 0 && (
+                    <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[9px] font-bold text-white">
+                      {notificationCount > 99 ? "99+" : notificationCount}
+                    </span>
+                  )}
+                </Link>
+
                 <Link
                   href="/account"
                   className="flex items-center gap-2 rounded-full border border-[#1A1A1A]/10 bg-white/70 px-4 py-2 text-[10px] uppercase tracking-[0.2em]"
