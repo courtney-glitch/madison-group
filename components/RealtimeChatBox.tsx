@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import { Send } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ChatAttachmentUpload } from "@/components/ChatAttachmentUpload";
+import { createNotificationEvent } from "@/lib/createNotificationEvent";
+import { getPushNotificationTemplate } from "@/lib/pushNotificationTemplates";
 
 type ChatMessage = {
   id: string;
@@ -125,7 +127,6 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
     }
 
     setMessages((data || []) as ChatMessage[]);
-
     await markMessagesAsRead();
   }
 
@@ -208,6 +209,54 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
       .eq("user_id", currentUserId);
   }
 
+  async function createChatNotification(isAgent: boolean, messageText: string) {
+    const { data: conversation } = await supabase
+      .from("conversations")
+      .select("client_id, user_id")
+      .eq("id", conversationId)
+      .maybeSingle();
+
+    const template = getPushNotificationTemplate({
+      type: "new_message",
+    });
+
+    if (isAgent) {
+      const clientId = conversation?.client_id || conversation?.user_id;
+
+      if (!clientId) return;
+
+      await createNotificationEvent({
+        userId: clientId,
+        notificationType: "new_message",
+        title: template.title,
+        body: "Your advisor sent you a new message.",
+        relatedConversationId: conversationId,
+      });
+
+      return;
+    }
+
+    const { data: adminProfiles } = await supabase
+      .from("profiles")
+      .select("id")
+      .in("role", ["admin", "agent"]);
+
+    await Promise.all(
+      (adminProfiles || []).map((profile) =>
+        createNotificationEvent({
+          userId: profile.id,
+          notificationType: "new_message",
+          title: "New client message",
+          body:
+            messageText.length > 80
+              ? `${messageText.slice(0, 80)}...`
+              : messageText,
+          relatedConversationId: conversationId,
+        })
+      )
+    );
+  }
+
   async function sendMessage() {
     if (!newMessage.trim()) return;
 
@@ -226,12 +275,13 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
     setSending(true);
 
     const isAgent = role === "admin" || role === "agent";
+    const messageText = newMessage.trim();
 
     const { error } = await supabase.from("messages").insert({
       conversation_id: conversationId,
       sender_id: currentUserId,
       sender_type: isAgent ? "advisor" : "client",
-      message: newMessage.trim(),
+      message: messageText,
       read_by_client: !isAgent,
       read_by_agent: isAgent,
       read_by_admin: isAgent,
@@ -243,6 +293,7 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
       return;
     }
 
+    await createChatNotification(isAgent, messageText);
     await stopTyping();
     await loadMessages();
 
@@ -317,42 +368,42 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
         )}
       </div>
 
-       <div className="mt-4 flex items-end gap-3">
-         <ChatAttachmentUpload
-           conversationId={conversationId}
-           senderType={role === "admin" || role === "agent" ? "advisor" : "client"}
-           onSent={loadMessages}
-         />
+      <div className="mt-4 flex items-end gap-3">
+        <ChatAttachmentUpload
+          conversationId={conversationId}
+          senderType={role === "admin" || role === "agent" ? "advisor" : "client"}
+          onSent={loadMessages}
+        />
 
-  <div className="flex-1">
-    <textarea
-      rows={3}
-      value={newMessage}
-      onChange={(e) => {
-        setNewMessage(e.target.value);
-        startTyping();
-      }}
-      onBlur={stopTyping}
-      onKeyDown={(e) => {
-        if (e.key === "Enter" && !e.shiftKey) {
-          e.preventDefault();
-         sendMessage();
-     }
-   }}
-   placeholder="Write a message..."
-     className="w-full rounded-3xl border border-[#1A1A1A]/10 bg-[#F8F5EF] px-5 py-4 text-sm outline-none focus:border-[#B19A55]"
-    />
-  </div>
+        <div className="flex-1">
+          <textarea
+            rows={3}
+            value={newMessage}
+            onChange={(e) => {
+              setNewMessage(e.target.value);
+              startTyping();
+            }}
+            onBlur={stopTyping}
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+              }
+            }}
+            placeholder="Write a message..."
+            className="w-full rounded-3xl border border-[#1A1A1A]/10 bg-[#F8F5EF] px-5 py-4 text-sm outline-none focus:border-[#B19A55]"
+          />
+        </div>
 
-  <button
-    type="button"
-    onClick={sendMessage}
-    disabled={sending || !newMessage.trim()}
-    className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#B19A55] text-white transition hover:bg-[#9C8749] disabled:opacity-50"
-  >
-    <Send size={18} />
-  </button>
-</div>
+        <button
+          type="button"
+          onClick={sendMessage}
+          disabled={sending || !newMessage.trim()}
+          className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-[#B19A55] text-white transition hover:bg-[#9C8749] disabled:opacity-50"
+        >
+          <Send size={18} />
+        </button>
+      </div>
 
       {status && (
         <p className="mt-4 rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-600">
