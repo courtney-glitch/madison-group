@@ -1,11 +1,20 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Send } from "lucide-react";
+import { ExternalLink, FileText, Send } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { ChatAttachmentUpload } from "@/components/ChatAttachmentUpload";
 import { createNotificationEvent } from "@/lib/createNotificationEvent";
 import { getPushNotificationTemplate } from "@/lib/pushNotificationTemplates";
+
+type MessageAttachment = {
+  id: string;
+  message_id: string;
+  file_url: string;
+  file_name: string;
+  file_type: string | null;
+  created_at?: string;
+};
 
 type ChatMessage = {
   id: string;
@@ -17,6 +26,7 @@ type ChatMessage = {
   read_by_agent: boolean | null;
   read_by_admin?: boolean | null;
   created_at: string;
+  attachments?: MessageAttachment[];
 };
 
 type TypingStatus = {
@@ -56,6 +66,17 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
           schema: "public",
           table: "messages",
           filter: `conversation_id=eq.${conversationId}`,
+        },
+        async () => {
+          await loadMessages();
+        }
+      )
+      .on(
+        "postgres_changes",
+        {
+          event: "*",
+          schema: "public",
+          table: "message_attachments",
         },
         async () => {
           await loadMessages();
@@ -126,7 +147,28 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
       return;
     }
 
-    setMessages((data || []) as ChatMessage[]);
+    const loadedMessages = (data || []) as ChatMessage[];
+    const messageIds = loadedMessages.map((message) => message.id);
+
+    let attachments: MessageAttachment[] = [];
+
+    if (messageIds.length > 0) {
+      const { data: attachmentData } = await supabase
+        .from("message_attachments")
+        .select("*")
+        .in("message_id", messageIds);
+
+      attachments = (attachmentData || []) as MessageAttachment[];
+    }
+
+    const messagesWithAttachments = loadedMessages.map((message) => ({
+      ...message,
+      attachments: attachments.filter(
+        (attachment) => attachment.message_id === message.id
+      ),
+    }));
+
+    setMessages(messagesWithAttachments);
     await markMessagesAsRead();
   }
 
@@ -340,6 +382,18 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
                         : "bg-white text-[#1A1A1A]"
                     }`}
                   >
+                    {message.attachments && message.attachments.length > 0 && (
+                      <div className="mb-3 grid gap-3">
+                        {message.attachments.map((attachment) => (
+                          <AttachmentPreview
+                            key={attachment.id}
+                            attachment={attachment}
+                            isMine={isMine}
+                          />
+                        ))}
+                      </div>
+                    )}
+
                     <p className="text-sm leading-6">{message.message}</p>
 
                     <p
@@ -411,6 +465,66 @@ export function RealtimeChatBox({ conversationId }: RealtimeChatBoxProps) {
         </p>
       )}
     </section>
+  );
+}
+
+function AttachmentPreview({
+  attachment,
+  isMine,
+}: {
+  attachment: MessageAttachment;
+  isMine: boolean;
+}) {
+  const isImage = attachment.file_type?.startsWith("image/");
+
+  if (isImage) {
+    return (
+      <a
+        href={attachment.file_url}
+        target="_blank"
+        className="block overflow-hidden rounded-2xl bg-white/15"
+      >
+        <img
+          src={attachment.file_url}
+          alt={attachment.file_name}
+          className="max-h-64 w-full object-cover"
+        />
+      </a>
+    );
+  }
+
+  return (
+    <a
+      href={attachment.file_url}
+      target="_blank"
+      className={`flex items-center gap-3 rounded-2xl p-3 ${
+        isMine ? "bg-white/15 text-white" : "bg-[#F8F5EF] text-[#1A1A1A]"
+      }`}
+    >
+      <div
+        className={`flex h-10 w-10 shrink-0 items-center justify-center rounded-xl ${
+          isMine ? "bg-white/15 text-white" : "bg-white text-[#B19A55]"
+        }`}
+      >
+        <FileText size={18} />
+      </div>
+
+      <div className="min-w-0 flex-1">
+        <p className="truncate font-serif text-sm font-bold">
+          {attachment.file_name}
+        </p>
+
+        <p
+          className={`mt-1 text-[9px] uppercase tracking-[0.18em] ${
+            isMine ? "text-white/60" : "text-[#1A1A1A]/40"
+          }`}
+        >
+          Open file
+        </p>
+      </div>
+
+      <ExternalLink size={14} />
+    </a>
   );
 }
 
