@@ -16,6 +16,13 @@ export function UserPresenceTracker() {
 
       userId = user.id;
 
+      await supabase.from("user_presence").upsert({
+        user_id: user.id,
+        is_online: true,
+        last_seen: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+      });
+
       await supabase
         .from("profiles")
         .update({
@@ -27,6 +34,15 @@ export function UserPresenceTracker() {
 
     async function markOffline() {
       if (!userId) return;
+
+      await supabase
+        .from("user_presence")
+        .update({
+          is_online: false,
+          last_seen: new Date().toISOString(),
+          updated_at: new Date().toISOString(),
+        })
+        .eq("user_id", userId);
 
       await supabase
         .from("profiles")
