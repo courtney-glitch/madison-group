@@ -18,6 +18,8 @@ type Conversation = {
   unread_count?: number;
   is_online?: boolean;
   last_seen?: string | null;
+  preview_sender_type?: string | null;
+  preview_receipt?: string;
 };
 
 export default function AdminLiveChatPage() {
@@ -101,6 +103,12 @@ export default function AdminLiveChatPage() {
   async function loadConversations(showLoading = true) {
     if (showLoading) setLoading(true);
 
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    const currentUserId = user?.id || "";
+
     const { data } = await supabase.from("conversations").select("*");
 
     const loadedConversations = (data || []) as Conversation[];
@@ -112,6 +120,21 @@ export default function AdminLiveChatPage() {
         const unreadCount = await getUnreadCount(conversation.id);
         const presence = await getPresence(conversation.client_id);
 
+        const isMine =
+          preview.senderId &&
+          currentUserId &&
+          preview.senderId === currentUserId;
+
+        const receipt =
+          isMine &&
+          (preview.readByClient ||
+            preview.readByAgent ||
+            preview.readByAdmin)
+            ? "Seen"
+            : isMine
+            ? "Delivered"
+            : "";
+
         return {
           ...conversation,
           preview: preview.preview,
@@ -120,6 +143,8 @@ export default function AdminLiveChatPage() {
           unread_count: unreadCount,
           is_online: presence.is_online,
           last_seen: presence.last_seen,
+          preview_sender_type: preview.senderType,
+          preview_receipt: receipt,
         };
       })
     );
@@ -215,7 +240,7 @@ export default function AdminLiveChatPage() {
                         }`}
                       >
                         <div className="flex items-start justify-between gap-3">
-                          <div className="min-w-0">
+                          <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
                               <span
                                 className={`h-2.5 w-2.5 rounded-full ${
@@ -244,15 +269,34 @@ export default function AdminLiveChatPage() {
                                 : formatLastSeen(conversation.last_seen)}
                             </p>
 
-                            <p
-                              className={`mt-2 line-clamp-2 text-sm leading-6 ${
+                            <div
+                              className={`mt-2 flex items-start justify-between gap-3 ${
                                 isActive || unread > 0
                                   ? "text-white/80"
                                   : "text-[#1A1A1A]/60"
                               }`}
                             >
-                              {conversation.preview || "No messages yet."}
-                            </p>
+                              <p className="line-clamp-2 flex-1 text-sm leading-6">
+                                {conversation.preview_sender_type === "advisor"
+                                  ? "You: "
+                                  : ""}
+                                {conversation.preview || "No messages yet."}
+                              </p>
+
+                              {conversation.preview_receipt && (
+                                <span
+                                  className={`shrink-0 text-[9px] uppercase tracking-[0.18em] ${
+                                    conversation.preview_receipt === "Seen"
+                                      ? "text-emerald-300"
+                                      : isActive || unread > 0
+                                      ? "text-white/45"
+                                      : "text-[#1A1A1A]/35"
+                                  }`}
+                                >
+                                  {conversation.preview_receipt}
+                                </span>
+                              )}
+                            </div>
                           </div>
 
                           {unread > 0 && (
