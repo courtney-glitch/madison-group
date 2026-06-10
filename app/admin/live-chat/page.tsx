@@ -16,6 +16,8 @@ type Conversation = {
   preview_created_at?: string | null;
   client_name?: string | null;
   unread_count?: number;
+  is_online?: boolean;
+  last_seen?: string | null;
 };
 
 export default function AdminLiveChatPage() {
@@ -30,11 +32,14 @@ export default function AdminLiveChatPage() {
       .channel("admin-live-chat-inbox")
       .on(
         "postgres_changes",
-        {
-          event: "*",
-          schema: "public",
-          table: "messages",
-        },
+        { event: "*", schema: "public", table: "messages" },
+        async () => {
+          await loadConversations(false);
+        }
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "user_presence" },
         async () => {
           await loadConversations(false);
         }
@@ -57,6 +62,42 @@ export default function AdminLiveChatPage() {
     return count || 0;
   }
 
+  async function getPresence(userId: string | null) {
+    if (!userId) {
+      return {
+        is_online: false,
+        last_seen: null,
+      };
+    }
+
+    const { data } = await supabase
+      .from("user_presence")
+      .select("is_online, last_seen")
+      .eq("user_id", userId)
+      .maybeSingle();
+
+    return {
+      is_online: data?.is_online || false,
+      last_seen: data?.last_seen || null,
+    };
+  }
+
+  function formatLastSeen(lastSeen?: string | null) {
+    if (!lastSeen) return "Offline";
+
+    const minutes = Math.floor(
+      (Date.now() - new Date(lastSeen).getTime()) / 60000
+    );
+
+    if (minutes < 1) return "Active moments ago";
+    if (minutes < 60) return `Last seen ${minutes}m ago`;
+
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `Last seen ${hours}h ago`;
+
+    return `Last seen ${new Date(lastSeen).toLocaleDateString()}`;
+  }
+
   async function loadConversations(showLoading = true) {
     if (showLoading) setLoading(true);
 
@@ -69,6 +110,7 @@ export default function AdminLiveChatPage() {
         const preview = await getLastMessagePreview(conversation.id);
         const clientName = await getProfileName(conversation.client_id);
         const unreadCount = await getUnreadCount(conversation.id);
+        const presence = await getPresence(conversation.client_id);
 
         return {
           ...conversation,
@@ -76,6 +118,8 @@ export default function AdminLiveChatPage() {
           preview_created_at: preview.createdAt,
           client_name: clientName,
           unread_count: unreadCount,
+          is_online: presence.is_online,
+          last_seen: presence.last_seen,
         };
       })
     );
@@ -172,8 +216,32 @@ export default function AdminLiveChatPage() {
                       >
                         <div className="flex items-start justify-between gap-3">
                           <div className="min-w-0">
-                            <p className="truncate font-serif text-sm font-bold">
-                              {conversation.client_name || "Unknown Client"}
+                            <div className="flex items-center gap-2">
+                              <span
+                                className={`h-2.5 w-2.5 rounded-full ${
+                                  conversation.is_online
+                                    ? "bg-emerald-400"
+                                    : isActive || unread > 0
+                                    ? "bg-white/35"
+                                    : "bg-[#1A1A1A]/20"
+                                }`}
+                              />
+
+                              <p className="truncate font-serif text-sm font-bold">
+                                {conversation.client_name || "Unknown Client"}
+                              </p>
+                            </div>
+
+                            <p
+                              className={`mt-1 text-[10px] uppercase tracking-[0.18em] ${
+                                isActive || unread > 0
+                                  ? "text-white/60"
+                                  : "text-[#1A1A1A]/40"
+                              }`}
+                            >
+                              {conversation.is_online
+                                ? "Online now"
+                                : formatLastSeen(conversation.last_seen)}
                             </p>
 
                             <p
