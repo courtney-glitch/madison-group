@@ -37,6 +37,7 @@ import {
   WandSparkles,
   Wrench,
   CalendarDays,
+  BarChart3,
 } from "lucide-react";
 
 type NavItem = {
@@ -342,6 +343,7 @@ export function Navbar() {
     },
     { href: "/seller-dashboard", label: "Seller Dashboard", icon: Home },
     { href: "/seller-timeline", label: "Seller Timeline", icon: CalendarDays },
+    { href: "/seller-analytics", label: "Seller Analytics", icon: BarChart3 },
   ];
 
   return (
