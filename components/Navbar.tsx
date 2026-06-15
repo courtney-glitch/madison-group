@@ -39,6 +39,7 @@ import {
   CalendarDays,
   BarChart3,
   Handshake,
+  ClipboardList,
 } from "lucide-react";
 
 type NavItem = {
@@ -346,7 +347,8 @@ export function Navbar() {
     { href: "/seller-timeline", label: "Seller Timeline", icon: CalendarDays },
     { href: "/seller-analytics", label: "Seller Analytics", icon: BarChart3 },
     { href: "/admin/referrals", label: "Referral Pipeline", icon: Handshake },
-    { href: "/admin/notifications", label: "Notification Center", icon: Bell }
+    { href: "/admin/notifications", label: "Notification Center", icon: Bell },
+    { href: "/admin/transaction-pipeline", label: "Transaction Pipeline", icon: ClipboardList },
   ];
 
   return (
