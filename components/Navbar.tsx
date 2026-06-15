@@ -38,6 +38,7 @@ import {
   Wrench,
   CalendarDays,
   BarChart3,
+  Handshake,
 } from "lucide-react";
 
 type NavItem = {
@@ -344,6 +345,7 @@ export function Navbar() {
     { href: "/seller-dashboard", label: "Seller Dashboard", icon: Home },
     { href: "/seller-timeline", label: "Seller Timeline", icon: CalendarDays },
     { href: "/seller-analytics", label: "Seller Analytics", icon: BarChart3 },
+    { href: "/admin/referrals", label: "Referral Pipeline", icon: Handshake },
   ];
 
   return (
@@ -360,7 +362,7 @@ export function Navbar() {
 
           <Link href="/" className="flex items-center justify-center">
             <img
-              src="/madison-logo.jpg"
+              src="/madison-logo.png"
               alt="Madison Group"
               className="h-12 w-auto object-contain"
             />
