@@ -346,6 +346,7 @@ export function Navbar() {
     { href: "/seller-timeline", label: "Seller Timeline", icon: CalendarDays },
     { href: "/seller-analytics", label: "Seller Analytics", icon: BarChart3 },
     { href: "/admin/referrals", label: "Referral Pipeline", icon: Handshake },
+    { href: "/admin/notifications", label: "Notification Center", icon: Bell }
   ];
 
   return (
