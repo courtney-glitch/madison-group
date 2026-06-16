@@ -1,13 +1,18 @@
 "use client";
 
-import { AdminGuard } from "@/components/AdminGuard";
+import { ReactNode } from "react";
+import { AdminRouteGuard } from "@/components/AdminRouteGuard";
 
 type AdminPageShellProps = {
-  children: React.ReactNode;
+  children: ReactNode;
 };
 
 export function AdminPageShell({
   children,
 }: AdminPageShellProps) {
-  return <AdminGuard>{children}</AdminGuard>;
+  return (
+    <AdminRouteGuard>
+      {children}
+    </AdminRouteGuard>
+  );
 }
