@@ -1,16 +1,16 @@
 "use client";
 
+import Link from "next/link";
 import {
+  ArrowUpRight,
   BarChart3,
-  TrendingUp,
-  Users,
-  Target,
+  Globe,
   Mail,
   Megaphone,
-  Globe,
-  ArrowUpRight,
+  Target,
+  TrendingUp,
+  Users,
 } from "lucide-react";
-
 import { AdminPageShell } from "@/components/AdminPageShell";
 
 const tools = [
@@ -20,6 +20,7 @@ const tools = [
       "Launch luxury email campaigns and targeted outreach for buyers and sellers.",
     icon: Mail,
     stat: "12 Active",
+    href: "/admin/push-notifications",
   },
   {
     title: "Social Growth",
@@ -27,6 +28,7 @@ const tools = [
       "Track Instagram, Facebook, TikTok, and luxury brand engagement.",
     icon: TrendingUp,
     stat: "+28%",
+    href: "/admin/growth-tools/social-growth",
   },
   {
     title: "Audience Insights",
@@ -34,6 +36,7 @@ const tools = [
       "Analyze visitor behavior, lead activity, and returning clients.",
     icon: Users,
     stat: "4.2k Users",
+    href: "/admin/client-activity",
   },
   {
     title: "Ad Performance",
@@ -41,6 +44,7 @@ const tools = [
       "Monitor ROI, ad clicks, conversions, and campaign performance.",
     icon: Target,
     stat: "87 Leads",
+    href: "/admin/growth-tools/ad-performance",
   },
   {
     title: "Brand Promotion",
@@ -48,6 +52,7 @@ const tools = [
       "Manage promotions, spotlight listings, and featured campaigns.",
     icon: Megaphone,
     stat: "6 Running",
+    href: "/admin/properties",
   },
   {
     title: "Website Analytics",
@@ -55,6 +60,7 @@ const tools = [
       "View property traffic, popular searches, and user activity.",
     icon: Globe,
     stat: "18k Visits",
+    href: "/admin/growth-tools/website-analytics",
   },
 ];
 
@@ -106,8 +112,9 @@ export default function GrowthToolsPage() {
               const Icon = tool.icon;
 
               return (
-                <div
+                <Link
                   key={tool.title}
+                  href={tool.href}
                   className="group rounded-[2rem] bg-white p-6 shadow-xl transition duration-300 hover:-translate-y-1 hover:shadow-2xl"
                 >
                   <div className="flex items-start justify-between gap-4">
@@ -130,14 +137,11 @@ export default function GrowthToolsPage() {
                     </p>
                   </div>
 
-                  <button
-                    type="button"
-                    className="mt-6 flex items-center gap-2 font-serif text-[11px] font-bold uppercase tracking-[0.22em] text-[#B19A55] transition hover:gap-3"
-                  >
+                  <div className="mt-6 flex items-center gap-2 font-serif text-[11px] font-bold uppercase tracking-[0.22em] text-[#B19A55] transition group-hover:gap-3">
                     Open Tool
                     <ArrowUpRight size={15} />
-                  </button>
-                </div>
+                  </div>
+                </Link>
               );
             })}
           </section>
