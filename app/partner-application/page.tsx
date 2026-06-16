@@ -1,16 +1,29 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import { ArrowRight, Handshake } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 
-export default function PartnerApplicationPage() {
+function PartnerApplicationForm() {
+  const searchParams = useSearchParams();
+
   const [name, setName] = useState("");
   const [businessName, setBusinessName] = useState("");
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
   const [partnerType, setPartnerType] = useState("Referral Partner");
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    const typeFromUrl = searchParams.get("type");
+
+    if (typeFromUrl) {
+      setPartnerType(typeFromUrl);
+    }
+  }, [searchParams]);
 
   async function submitApplication() {
     if (!name.trim() || !email.trim()) {
@@ -18,26 +31,32 @@ export default function PartnerApplicationPage() {
       return;
     }
 
+    setSubmitting(true);
+    setStatus("");
+
     const { error } = await supabase.from("partner_applications").insert({
-      name,
-      business_name: businessName,
-      email,
+      name: name.trim(),
+      business_name: businessName.trim(),
+      email: email.trim(),
+      phone: phone.trim(),
       partner_type: partnerType,
-      message,
+      message: message.trim(),
       status: "New",
     });
 
     if (error) {
       setStatus(error.message);
+      setSubmitting(false);
       return;
     }
 
     setName("");
     setBusinessName("");
     setEmail("");
-    setPartnerType("Referral Partner");
+    setPhone("");
     setMessage("");
-    setStatus("Your partnership application has been submitted.");
+    setStatus("Your referral/application has been submitted.");
+    setSubmitting(false);
   }
 
   return (
@@ -54,10 +73,15 @@ export default function PartnerApplicationPage() {
             </p>
 
             <h1 className="mt-2 font-serif text-3xl font-bold md:text-5xl">
-              Partner Application
+              {partnerType}
             </h1>
           </div>
         </div>
+
+        <p className="mt-6 text-sm leading-7 text-[#1A1A1A]/60">
+          Submit a referral or partnership request. Madison will review the
+          information and follow up with the next steps.
+        </p>
 
         <div className="mt-8 grid gap-4">
           <input
@@ -70,15 +94,29 @@ export default function PartnerApplicationPage() {
           <input
             value={businessName}
             onChange={(e) => setBusinessName(e.target.value)}
-            placeholder="Business / Company name"
+            placeholder={
+              partnerType === "Client Referral"
+                ? "Friend / referral name"
+                : partnerType === "Agent Referral"
+                ? "Agent / brokerage name"
+                : "Business / company name"
+            }
             className="rounded-2xl border border-[#1A1A1A]/10 bg-[#F8F5EF] px-4 py-4 text-sm outline-none focus:border-[#B19A55]"
           />
 
           <input
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            placeholder="Email address"
+            placeholder="Your email address"
             type="email"
+            className="rounded-2xl border border-[#1A1A1A]/10 bg-[#F8F5EF] px-4 py-4 text-sm outline-none focus:border-[#B19A55]"
+          />
+
+          <input
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
+            placeholder="Phone number"
+            type="tel"
             className="rounded-2xl border border-[#1A1A1A]/10 bg-[#F8F5EF] px-4 py-4 text-sm outline-none focus:border-[#B19A55]"
           />
 
@@ -88,6 +126,8 @@ export default function PartnerApplicationPage() {
             className="rounded-2xl border border-[#1A1A1A]/10 bg-[#F8F5EF] px-4 py-4 text-sm outline-none focus:border-[#B19A55]"
           >
             <option>Referral Partner</option>
+            <option>Agent Referral</option>
+            <option>Client Referral</option>
             <option>Vendor Collaboration</option>
             <option>Co-Marketing Campaign</option>
             <option>Strategic Partnership</option>
@@ -97,16 +137,17 @@ export default function PartnerApplicationPage() {
             rows={5}
             value={message}
             onChange={(e) => setMessage(e.target.value)}
-            placeholder="Tell us how you'd like to grow with Madison..."
+            placeholder="Tell us about this referral or partnership..."
             className="rounded-2xl border border-[#1A1A1A]/10 bg-[#F8F5EF] px-4 py-4 text-sm outline-none focus:border-[#B19A55]"
           />
 
           <button
             type="button"
             onClick={submitApplication}
-            className="flex items-center justify-center gap-2 rounded-full bg-[#B19A55] px-6 py-4 font-serif text-[11px] font-bold uppercase tracking-[0.2em] text-white"
+            disabled={submitting}
+            className="flex items-center justify-center gap-2 rounded-full bg-[#B19A55] px-6 py-4 font-serif text-[11px] font-bold uppercase tracking-[0.2em] text-white disabled:opacity-50"
           >
-            Submit Application
+            {submitting ? "Submitting..." : "Submit Referral"}
             <ArrowRight size={15} />
           </button>
 
@@ -118,5 +159,19 @@ export default function PartnerApplicationPage() {
         </div>
       </section>
     </main>
+  );
+}
+
+export default function PartnerApplicationPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="min-h-screen bg-[#F8F5EF] px-4 py-12 text-[#1A1A1A]">
+          Loading referral form...
+        </main>
+      }
+    >
+      <PartnerApplicationForm />
+    </Suspense>
   );
 }
