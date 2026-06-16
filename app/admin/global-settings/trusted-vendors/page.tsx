@@ -1,56 +1,94 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   BriefcaseBusiness,
+  Loader2,
   Plus,
   Save,
   Trash2,
 } from "lucide-react";
 import { AdminPageShell } from "@/components/AdminPageShell";
+import { supabase } from "@/lib/supabase";
 
 type Vendor = {
+  id: string;
   name: string;
   category: string;
+  created_at?: string;
 };
 
 export default function TrustedVendorsPage() {
-  const [vendors, setVendors] = useState<Vendor[]>([
-    {
-      name: "ClearSkies Title Agency",
-      category: "Title Company",
-    },
-    {
-      name: "Preferred Mortgage Partner",
-      category: "Lender",
-    },
-  ]);
-
+  const [vendors, setVendors] = useState<Vendor[]>([]);
   const [name, setName] = useState("");
   const [category, setCategory] = useState("");
   const [status, setStatus] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
 
-  function addVendor() {
-    if (!name.trim() || !category.trim()) return;
+  useEffect(() => {
+    loadVendors();
+  }, []);
 
-    setVendors([
-      ...vendors,
-      {
-        name: name.trim(),
-        category: category.trim(),
-      },
-    ]);
+  async function loadVendors() {
+    setLoading(true);
+    setStatus("");
+
+    const { data, error } = await supabase
+      .from("trusted_vendors")
+      .select("*")
+      .order("created_at", { ascending: false });
+
+    if (error) {
+      setStatus(error.message);
+      setLoading(false);
+      return;
+    }
+
+    setVendors((data || []) as Vendor[]);
+    setLoading(false);
+  }
+
+  async function addVendor() {
+    if (!name.trim() || !category.trim()) {
+      setStatus("Please add vendor name and category.");
+      return;
+    }
+
+    setAdding(true);
+    setStatus("");
+
+    const { error } = await supabase.from("trusted_vendors").insert({
+      name: name.trim(),
+      category: category.trim(),
+    });
+
+    if (error) {
+      setStatus(error.message);
+      setAdding(false);
+      return;
+    }
 
     setName("");
     setCategory("");
+    setStatus("Vendor added successfully.");
+    setAdding(false);
+    await loadVendors();
   }
 
-  function removeVendor(index: number) {
-    setVendors(vendors.filter((_, i) => i !== index));
-  }
+  async function removeVendor(id: string) {
+    const { error } = await supabase
+      .from("trusted_vendors")
+      .delete()
+      .eq("id", id);
 
-  function saveVendors() {
-    setStatus("Vendor settings saved locally. Database integration can be connected next.");
+    if (error) {
+      setStatus(error.message);
+      return;
+    }
+
+    setStatus("Vendor removed successfully.");
+    await loadVendors();
   }
 
   return (
@@ -80,30 +118,40 @@ export default function TrustedVendorsPage() {
               </h2>
 
               <div className="mt-6 grid gap-3">
-                {vendors.map((vendor, index) => (
-                  <div
-                    key={`${vendor.name}-${index}`}
-                    className="flex items-center justify-between rounded-3xl bg-[#F8F5EF] p-4"
-                  >
-                    <div>
-                      <p className="font-serif text-lg font-bold">
-                        {vendor.name}
-                      </p>
-
-                      <p className="mt-1 text-[10px] uppercase tracking-[0.18em] text-[#B19A55]">
-                        {vendor.category}
-                      </p>
-                    </div>
-
-                    <button
-                      type="button"
-                      onClick={() => removeVendor(index)}
-                      className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1A1A1A]/50"
+                {loading ? (
+                  <p className="rounded-3xl bg-[#F8F5EF] p-4 text-sm text-[#1A1A1A]/60">
+                    Loading vendors...
+                  </p>
+                ) : vendors.length > 0 ? (
+                  vendors.map((vendor) => (
+                    <div
+                      key={vendor.id}
+                      className="flex items-center justify-between rounded-3xl bg-[#F8F5EF] p-4"
                     >
-                      <Trash2 size={15} />
-                    </button>
-                  </div>
-                ))}
+                      <div>
+                        <p className="font-serif text-lg font-bold">
+                          {vendor.name}
+                        </p>
+
+                        <p className="mt-1 text-[10px] uppercase tracking-[0.18em] text-[#B19A55]">
+                          {vendor.category}
+                        </p>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={() => removeVendor(vendor.id)}
+                        className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#1A1A1A]/50 transition hover:bg-red-50 hover:text-red-500"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="rounded-3xl bg-[#F8F5EF] p-4 text-sm text-[#1A1A1A]/60">
+                    No vendors yet. Add your first trusted vendor.
+                  </p>
+                )}
               </div>
 
               <div className="mt-8 grid gap-4">
@@ -122,19 +170,26 @@ export default function TrustedVendorsPage() {
                 />
 
                 <button
+                  type="button"
                   onClick={addVendor}
-                  className="flex items-center justify-center gap-2 rounded-full bg-[#1A1A1A] px-6 py-4 font-serif text-[11px] font-bold uppercase tracking-[0.2em] text-white"
+                  disabled={adding}
+                  className="flex items-center justify-center gap-2 rounded-full bg-[#1A1A1A] px-6 py-4 font-serif text-[11px] font-bold uppercase tracking-[0.2em] text-white disabled:opacity-50"
                 >
-                  <Plus size={15} />
-                  Add Vendor
+                  {adding ? (
+                    <Loader2 size={15} className="animate-spin" />
+                  ) : (
+                    <Plus size={15} />
+                  )}
+                  {adding ? "Adding..." : "Add Vendor"}
                 </button>
 
                 <button
-                  onClick={saveVendors}
+                  type="button"
+                  onClick={loadVendors}
                   className="flex items-center justify-center gap-2 rounded-full bg-[#B19A55] px-6 py-4 font-serif text-[11px] font-bold uppercase tracking-[0.2em] text-white"
                 >
                   <Save size={15} />
-                  Save Vendors
+                  Refresh Vendors
                 </button>
 
                 {status && (
@@ -155,20 +210,28 @@ export default function TrustedVendorsPage() {
               </h2>
 
               <div className="mt-8 grid gap-3">
-                {vendors.map((vendor, index) => (
-                  <div
-                    key={`preview-${index}`}
-                    className="rounded-3xl bg-white/10 p-4"
-                  >
-                    <p className="text-[10px] uppercase tracking-[0.18em] text-[#D4B06A]">
-                      {vendor.category}
-                    </p>
+                {vendors.length > 0 ? (
+                  vendors.map((vendor) => (
+                    <div
+                      key={`preview-${vendor.id}`}
+                      className="rounded-3xl bg-white/10 p-4"
+                    >
+                      <p className="text-[10px] uppercase tracking-[0.18em] text-[#D4B06A]">
+                        {vendor.category}
+                      </p>
 
-                    <p className="mt-2 font-serif text-lg font-bold">
-                      {vendor.name}
+                      <p className="mt-2 font-serif text-lg font-bold">
+                        {vendor.name}
+                      </p>
+                    </div>
+                  ))
+                ) : (
+                  <div className="rounded-3xl bg-white/10 p-4">
+                    <p className="text-sm text-white/65">
+                      No vendors available yet.
                     </p>
                   </div>
-                ))}
+                )}
               </div>
             </section>
           </div>
