@@ -1,3 +1,4 @@
+import Link from "next/link";
 import {
   ArrowRight,
   BadgeCheck,
@@ -12,26 +13,37 @@ const partnerships = [
   {
     title: "Referral Partners",
     description:
-      "Earn referral opportunities by connecting buyers, sellers, and investors with Madison Group.",
+      "Agents, clients, and business connections can refer buyers, sellers, or agents into Madison.",
     icon: Users,
+    href: "/partner-application?type=Referral Partner",
   },
   {
-    title: "Vendor Collaborations",
+    title: "Refer an Agent",
     description:
-      "Join our trusted network of photographers, lenders, stagers, inspectors, and title professionals.",
+      "Agents can recommend another agent who may want to grow with Madison Group.",
+    icon: Handshake,
+    href: "/partner-application?type=Agent Referral",
+  },
+  {
+    title: "Refer a Friend",
+    description:
+      "Clients can refer friends or family who are looking for a trusted real estate advisor.",
+    icon: BadgeCheck,
+    href: "/partner-application?type=Client Referral",
+  },
+  {
+    title: "Vendor Collaboration",
+    description:
+      "Service providers can apply to collaborate with Madison’s client ecosystem.",
     icon: Building2,
+    href: "/partner-application?type=Vendor Collaboration",
   },
   {
     title: "Co-Marketing Campaigns",
     description:
-      "Launch luxury campaigns and local collaborations with Madison Group Properties.",
+      "Businesses can collaborate with Madison on campaigns, events, and promotions.",
     icon: Megaphone,
-  },
-  {
-    title: "Strategic Partnerships",
-    description:
-      "Build long-term business relationships and expand your brand alongside Madison Group.",
-    icon: Handshake,
+    href: "/partner-application?type=Co-Marketing Campaign",
   },
 ];
 
@@ -61,13 +73,13 @@ export default function TrustedVendorsPage() {
           </h2>
 
           <p className="mt-5 text-sm leading-7 text-[#1A1A1A]/65 md:text-base">
-            Become part of the Madison Group partnership ecosystem through
-            referrals, strategic collaborations, co-marketing campaigns, and
-            trusted service partnerships.
+            A referral and partnership system where agents can refer other
+            agents, clients can refer friends, and businesses can collaborate
+            with Madison Group.
           </p>
         </div>
 
-        <div className="mt-10 grid gap-5 md:grid-cols-2">
+        <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
           {partnerships.map((item) => {
             const Icon = item.icon;
 
@@ -83,7 +95,7 @@ export default function TrustedVendorsPage() {
 
                   <div className="flex items-center gap-2 rounded-full bg-emerald-50 px-3 py-1 text-[10px] uppercase tracking-[0.18em] text-emerald-700">
                     <BadgeCheck size={12} />
-                    Partnership
+                    Referral
                   </div>
                 </div>
 
@@ -95,13 +107,13 @@ export default function TrustedVendorsPage() {
                   {item.description}
                 </p>
 
-                <button
-                  type="button"
+                <Link
+                  href={item.href}
                   className="mt-8 flex items-center gap-2 rounded-full bg-[#B19A55] px-6 py-4 font-serif text-[11px] font-bold uppercase tracking-[0.2em] text-white transition hover:gap-3"
                 >
-                  Apply Partnership
+                  Start Referral
                   <ArrowRight size={15} />
-                </button>
+                </Link>
               </div>
             );
           })}
