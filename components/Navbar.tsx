@@ -40,6 +40,7 @@ import {
   BarChart3,
   Handshake,
   ClipboardList,
+  AlertCircle,
 } from "lucide-react";
 
 type NavItem = {
@@ -349,6 +350,11 @@ export function Navbar() {
     { href: "/admin/referrals", label: "Referral Pipeline", icon: Handshake },
     { href: "/admin/notifications", label: "Notification Center", icon: Bell },
     { href: "/admin/transaction-pipeline", label: "Transaction Pipeline", icon: ClipboardList },
+    {
+  href: "/admin/system-status",
+  label: "Launch Readiness",
+  icon: AlertCircle,
+}
   ];
 
   return (
