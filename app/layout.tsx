@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
 import { Navbar } from "@/components/Navbar";
@@ -10,6 +10,23 @@ import { UserPresenceTracker } from "@/components/UserPresenceTracker";
 export const metadata: Metadata = {
   title: "Madison Group Properties",
   description: "Building Beautiful Lives",
+  manifest: "/manifest.json",
+  icons: {
+    icon: "/icon-192.png",
+    apple: "/icon-192.png",
+  },
+  appleWebApp: {
+    capable: true,
+    title: "Madison Group",
+    statusBarStyle: "default",
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: "#F8F5EF",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
 };
 
 export default function RootLayout({
@@ -24,6 +41,7 @@ export default function RootLayout({
 
         <RealtimeNotifications />
         <UserPresenceTracker />
+
         <div className="w-full overflow-x-hidden md:ml-72 md:w-[calc(100%-18rem)]">
           <main className="min-h-screen overflow-x-hidden pb-28 md:pb-0">
             {children}
