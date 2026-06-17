@@ -18,6 +18,7 @@ type SellerListing = {
   seller_name: string | null;
   property_address: string | null;
   current_stage: string | null;
+  seller_stage: string | null;
   listing_views: number | null;
   showing_requests: number | null;
   buyer_interest: string | null;
@@ -66,6 +67,20 @@ export default function SellerDashboardPage() {
     setLoading(false);
   }
 
+  async function updateSellerStage(
+  id: string,
+  seller_stage: string
+) {
+  const { error } = await supabase
+    .from("seller_listings")
+    .update({ seller_stage })
+    .eq("id", id);
+
+  if (!error) {
+    await loadListings();
+  }
+}
+
   async function addListing() {
     if (!sellerName.trim() || !propertyAddress.trim()) {
       setStatus("Please add seller name and property address.");
@@ -78,7 +93,7 @@ export default function SellerDashboardPage() {
     const { error } = await supabase.from("seller_listings").insert({
       seller_name: sellerName.trim(),
       property_address: propertyAddress.trim(),
-      current_stage: "Active on Market",
+      seller_stage: "Active on Market",
       listing_views: 0,
       showing_requests: 0,
       buyer_interest: "Medium",
@@ -149,7 +164,7 @@ export default function SellerDashboardPage() {
                 </p>
 
                 <h2 className="mt-1 font-serif text-2xl font-bold">
-                  {activeListing?.current_stage || "No Active Listing"}
+                  {activeListing?.seller_stage || "No Active Listing"}
                 </h2>
               </div>
             </div>
@@ -248,9 +263,23 @@ export default function SellerDashboardPage() {
                           {listing.property_address || "No property address"}
                         </p>
 
-                        <p className="mt-3 text-[10px] uppercase tracking-[0.18em] text-[#B19A55]">
-                          {listing.current_stage}
-                        </p>
+                      <select
+                         value={listing.seller_stage || "Active on Market"}
+                         onChange={(e) =>
+                           updateSellerStage(listing.id, e.target.value)
+                         }
+                         className="mt-3 rounded-full border border-[#1A1A1A]/10 bg-white px-4 py-2 text-xs"
+                       >
+                         <option>Listing Preparation</option>
+                         <option>Photography & Marketing</option>
+                         <option>Active on Market</option>
+                         <option>Showing Activity</option>
+                         <option>Offer Review</option>
+                         <option>Under Contract</option>
+                         <option>Inspection & Appraisal</option>
+                         <option>Closing Preparation</option>
+                         <option>Closed</option>
+                       </select>
                       </div>
                     ))
                   ) : (
@@ -284,7 +313,7 @@ export default function SellerDashboardPage() {
 
               <div className="mt-6 grid gap-3 md:grid-cols-2">
                 {timeline.map((step) => {
-                  const isActive = step === activeListing?.current_stage;
+                  const isActive = step === activeListing?.seller_stage;
 
                   return (
                     <div
